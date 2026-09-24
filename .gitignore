@@ -1,0 +1,20 @@
+# ---------- Bí mật: KHÔNG BAO GIỜ commit ----------
+backend/.env
+.env.local
+
+# ---------- Môi trường, thư viện ----------
+backend/.venv/
+__pycache__/
+*.pyc
+backend/staticfiles/
+frontend/node_modules/
+frontend/dist/
+*.local
+
+# ---------- File trung gian khi dựng Word ----------
+build/
+~$*.docx
+*.asd
+
+# ---------- Cấu hình riêng của máy ----------
+.claude/settings.local.json
