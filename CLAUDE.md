@@ -531,6 +531,19 @@ PostgreSQL 18 (service `postgresql-x64-18`, DB `iot_room`) · Redis = container 
 
 ---
 
+### 0.6 Kho GitHub *(phiên 10 — 24/09/2026)*
+
+<https://github.com/B23DCAT011/IOT> — nhánh `main`, lịch sử **21 commit chia theo từng phần**
+(docs → tools → firmware → backend 5 commit → frontend 6 commit), không gộp một cục.
+
+| Việc | Chi tiết |
+|---|---|
+| ⚠️ **Firmware nay cần `secrets.h`** | `WIFI_SSID/WIFI_PASS/MQTT_USER/MQTT_PASS` chuyển từ `.ino` sang `firmware/esp8266_room01/secrets.h`, file này **nằm trong `.gitignore`**. `.ino` chỉ còn `#include "secrets.h"`. Mất file đó thì **không biên dịch được** — chép `secrets.example.h` thành `secrets.h` rồi điền lại. Arduino IDE tự mở nó thành một tab cạnh sketch |
+| Mật khẩu MQTT trong `docs/BTH2-huongdan-terminal-demo.md` | 21 chỗ đã thay bằng `<mat-khau>`. Chép lệnh từ tài liệu thì phải tự điền lại |
+| Không commit | `backend/.env` · `.venv` · `node_modules` · `dist` · `build/` · `.claude/settings.local.json` · `secrets.h` |
+| Đã quét trước khi push | Dò từng giá trị bí mật thật trên **toàn bộ** commit: `SECRET_KEY`, `DB_PASSWORD`, `MQTT_PASSWORD`, `WIFI_PASS`, `MQTT_PASS` — sạch. Tên WiFi `Luu Duc Anh` và tài khoản `iotuser` vẫn còn trong tài liệu (SSID vốn phát công khai, còn `iotuser` chỉ là tên đăng nhập) |
+| Lần sau thêm bí mật | Đừng gõ thẳng vào code. Backend: thêm biến vào `.env` + `.env.example`. Firmware: thêm vào `secrets.h` + `secrets.example.h` |
+
 ### 0.5 Mở phiên mới thì bắt đầu từ đâu
 
 1. Đọc file này (§0) — nắm trạng thái và các quyết định đã chốt.
