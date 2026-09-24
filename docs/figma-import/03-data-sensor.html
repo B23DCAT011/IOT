@@ -1,0 +1,1278 @@
+<!doctype html>
+<html lang="vi"><head>
+    
+
+    
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F4B99'/%3E%3Cpath d='M8 21l5-6 4 3 7-8' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <title>Room01 Monitor — Data Sensor</title>
+  <style type="text/css">/* Thành phần dùng chung cho mọi màn hình — chép từ docs/wireframe/*.html.
+   Chiều cao cố định: đầu thẻ 56, dòng bảng 40, ô nhập 36; mọi khoảng cách là bội số của 4. */
+
+/* ---------- thẻ ---------- */
+._card_1md8o_5 {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+._cardGrow_1md8o_10 {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+._cardHead_1md8o_16 {
+  height: 56px;
+  flex: none;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+._cardTitle_1md8o_26 {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+._cardSub_1md8o_31 {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+
+/* ---------- thanh tiêu đề ---------- */
+._stamp_1md8o_39 {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+._conn_1md8o_44 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+._dot_1md8o_51 {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ok);
+  flex: none;
+}
+._dotWarn_1md8o_58 {
+  background: var(--off);
+}
+
+/* ---------- bộ lọc ---------- */
+._filters_1md8o_63 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  flex: none;
+  padding: 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+._field_1md8o_72 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+._fieldLabel_1md8o_77 {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+._input_1md8o_83 {
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+}
+._input_1md8o_83::placeholder {
+  color: var(--ink-faint);
+}
+._input_1md8o_83:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+._input_1md8o_83:disabled {
+  background: var(--surface-2);
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+._invalid_1md8o_105,
+._invalid_1md8o_105:focus {
+  border-color: var(--bad);
+  box-shadow: 0 0 0 3px var(--bad-bg);
+}
+/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Mã hoặc tên cảm biến…" và "Ánh sáng phòng"
+   bị cắt mất đuôi. Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
+._searchBox_1md8o_112 {
+  position: relative;
+  width: 232px;
+}
+._searchBox_1md8o_112 svg {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+._searchBox_1md8o_112 ._input_1md8o_83 {
+  width: 100%;
+  padding-left: 36px;
+}
+._inputNum_1md8o_129 {
+  width: 96px;
+  font-family: var(--mono);
+  text-align: right;
+}
+._select_1md8o_134 {
+  width: 164px;
+  padding-right: 4px;
+}
+/* Ô số dòng/trang chỉ chứa số nên hẹp hơn hẳn các ô chọn khác. */
+._selectNarrow_1md8o_139 {
+  width: 76px;
+}
+/* Ô thời điểm: chữ gõ tay chiếm gần hết, chừa 32px bên phải cho nút mở lịch. */
+._dtBox_1md8o_143 {
+  position: relative;
+  /* đủ chỗ cho cả chuỗi chép từ cột Thời gian: "17/08/2026 · 17:29:54" + nút lịch */
+  width: 214px;
+}
+._dtBox_1md8o_143 ._input_1md8o_83 {
+  width: 100%;
+  padding: 0 34px 0 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+._dtBtn_1md8o_154 {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 34px;
+  border: 0;
+  border-radius: 0 3px 3px 0;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+._dtBtn_1md8o_154:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+._dtBtn_1md8o_154 svg {
+  width: 16px;
+  height: 16px;
+}
+/* Ô lịch thật của trình duyệt: phải được render (chỉ trong suốt) thì showPicker() mới chạy,
+   để display:none là Chrome ném InvalidStateError. */
+._dtPicker_1md8o_178 {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+._btn_1md8o_189 {
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  padding: 0 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+._btn_1md8o_189:hover:not(:disabled) {
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+._btn_1md8o_189:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+._btnPrimary_1md8o_212 {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+._btnPrimary_1md8o_212:hover:not(:disabled) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #ffffff;
+}
+._btnPrimary_1md8o_212:disabled {
+  opacity: 0.6;
+  color: #ffffff;
+}
+
+/* Dải chú thích dưới thanh lọc */
+._fNote_1md8o_229 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 36px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-2);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+._fNote_1md8o_229 svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--ink-faint);
+}
+._fNoteBad_1md8o_248 {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+._fNoteBad_1md8o_248 svg {
+  color: var(--bad);
+}
+
+/* ---------- bảng ---------- */
+._tbl_1md8o_257 {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  transition: opacity 0.15s;
+}
+._loading_1md8o_263 {
+  opacity: 0.55;
+}
+._table_1md8o_266 {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+}
+._table_1md8o_266 thead th {
+  height: 40px;
+  padding: 0 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+._table_1md8o_266 tbody td {
+  padding: 10px 16px;
+  line-height: 20px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+._table_1md8o_266 tbody tr:last-child td {
+  border-bottom: 0;
+}
+._table_1md8o_266 ._num_1md8o_299 {
+  text-align: right;
+}
+._table_1md8o_266 td._num_1md8o_299 {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+._table_1md8o_266 td._mono_1md8o_306 {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+._nil_1md8o_312,
+._table_1md8o_266 td._nil_1md8o_312 {
+  color: var(--ink-faint);
+}
+._code_1md8o_316 {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+._sub_1md8o_321 {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ink-faint);
+  margin-top: 1px;
+}
+._act_1md8o_327 {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+._sortcap_1md8o_331,
+._sortable_1md8o_332 {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+._sortcap_1md8o_331 {
+  color: var(--accent);
+}
+._sortcap_1md8o_331 svg {
+  width: 12px;
+  height: 12px;
+}
+._sortable_1md8o_332 {
+  color: inherit;
+}
+._sortable_1md8o_332 svg {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  color: var(--ink-faint);
+}
+._pill_1md8o_360 {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+}
+._pillSUCCESS_1md8o_370 {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+._pillFAILED_1md8o_374 {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+._pillPENDING_1md8o_378 {
+  background: var(--wait-bg);
+  color: var(--wait);
+}
+._errline_1md8o_382 {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+  white-space: normal;
+}
+
+/* ---------- chân bảng + phân trang ---------- */
+._tfoot_1md8o_391 {
+  height: 52px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+._pager_1md8o_402 {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+._pg_1md8o_407 {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+._pg_1md8o_407:hover:not(:disabled):not(._pgOn_1md8o_422) {
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+._pgOn_1md8o_422 {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  cursor: default;
+}
+._pgMute_1md8o_432,
+._pg_1md8o_407:disabled {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+/* ---------- thông báo + trạng thái rỗng ---------- */
+._banner_1md8o_441 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 16px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--bad);
+  border-radius: 3px;
+  background: var(--bad-bg);
+  font-size: 13px;
+  color: var(--ink);
+}
+._bannerText_1md8o_455 {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+}
+._bannerBtn_1md8o_460 {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+._chip_1md8o_471 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: var(--off-bg);
+  color: var(--off);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+._empty_1md8o_484 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+._dim_1md8o_495 {
+  opacity: 0.45;
+}
+</style><style type="text/css">/* Khung co giãn theo cửa sổ: rộng tối đa 1680px, cao đúng 100% (CLAUDE.md §0.2e).
+   Khối logo cao 58 = thanh tiêu đề 58 → hai vạch kẻ nối liền ngang màn hình. */
+._app_lsfxq_3 {
+  display: flex;
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  height: 100%;
+  min-height: 620px;
+  background: var(--ground);
+}
+
+/* ---------- thanh điều hướng trái ---------- */
+._side_lsfxq_14 {
+  width: 212px;
+  flex: none;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+._brand_lsfxq_23 {
+  height: 58px;
+  flex: none;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--line);
+}
+._brandName_lsfxq_32 {
+  font-family: var(--ui-display);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+._brandSub_lsfxq_39 {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+._nav_lsfxq_46 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 12px;
+}
+._navLink_lsfxq_52 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 3px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 14px;
+}
+._navLink_lsfxq_52:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+._navLink_lsfxq_52 svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+._on_lsfxq_72,
+._on_lsfxq_72:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+._spacer_lsfxq_78 {
+  flex: 1;
+}
+
+/* Khối người dùng — thêm ở bản có đăng nhập (05-API.md v2.1), bản vẽ cũ chưa có */
+._user_lsfxq_83 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 12px 20px;
+  border-top: 1px solid var(--line-soft);
+}
+._userMeta_lsfxq_90 {
+  flex: 1;
+  min-width: 0;
+}
+._userName_lsfxq_94 {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+._userRole_lsfxq_102 {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+._logout_lsfxq_111 {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+._logout_lsfxq_111:hover {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+._logout_lsfxq_111 svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- vùng nội dung ---------- */
+._main_lsfxq_134 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+._topbar_lsfxq_141 {
+  height: 58px;
+  flex: none;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+._title_lsfxq_151 {
+  font-family: var(--ui-display);
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0;
+  font-weight: 600;
+}
+._topbarRight_lsfxq_158 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+._body_lsfxq_163 {
+  flex: 1;
+  min-height: 0;
+  overflow: auto; /* cửa sổ quá thấp thì cuộn ở đây */
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+</style><style type="text/css">/* ---------- thẻ số liệu ---------- */
+._stats_19q5y_2 {
+  display: flex;
+  gap: 16px;
+  flex: none;
+  transition: opacity 0.2s;
+}
+._stat_19q5y_2 {
+  flex: 1 1 0;
+  height: 112px; /* cố định → 3 thẻ bằng nhau */
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+._tick_19q5y_19 {
+  width: 4px;
+  height: 24px;
+  border-radius: 2px;
+  flex: none;
+  margin-top: 4px;
+}
+._statMain_19q5y_26 {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+._statLabel_19q5y_33 {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+._statVal_19q5y_38 {
+  font-family: var(--mono);
+  font-size: 32px;
+  line-height: 36px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+._statValNil_19q5y_45 {
+  color: var(--ink-faint);
+}
+._statUnit_19q5y_48 {
+  font-family: var(--ui);
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+._statFoot_19q5y_55 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 20px;
+}
+._statFoot_19q5y_55 svg {
+  width: 72px;
+  height: 20px;
+  flex: none;
+  display: block;
+  overflow: visible;
+}
+._statDelta_19q5y_69 {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- biểu đồ + thiết bị ---------- */
+._chartRow_19q5y_80 {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 320px;
+}
+._chartCol_19q5y_87 {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+._chartCol_19q5y_87 > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+/* Rộng đúng 1/3 vùng nội dung → mép trái trùng mép trái thẻ số liệu thứ ba. */
+._devCol_19q5y_100 {
+  width: calc((100% - 32px) / 3);
+  flex: none;
+  display: flex;
+}
+._devCol_19q5y_100 > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+._legend_19q5y_111 {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+._legendItem_19q5y_116 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+._legendKey_19q5y_124 {
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  flex: none;
+}
+._chartBox_19q5y_130 {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+._plot_19q5y_138 {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+._plotInner_19q5y_143 {
+  position: absolute;
+  inset: 0;
+}
+._units_19q5y_147 {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+._chartEmpty_19q5y_155 {
+  flex: 1;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+/* ---------- thiết bị ---------- */
+._dev_19q5y_100 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 68px;
+  flex: none;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+._dev_19q5y_100:last-child {
+  border-bottom: 0;
+}
+._devIc_19q5y_178 {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+}
+._devIc_19q5y_178 svg {
+  width: 20px;
+  height: 20px;
+}
+._devMeta_19q5y_194 {
+  flex: 1;
+  min-width: 0;
+}
+._devName_19q5y_198 {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+._devCode_19q5y_203 {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+._swWrap_19q5y_209 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex: none;
+}
+._sw_19q5y_209 {
+  width: 48px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--off-bg);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  cursor: pointer;
+}
+._sw_19q5y_209:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+._swOn_19q5y_231 {
+  background: var(--accent);
+  border-color: var(--accent);
+  justify-content: flex-end;
+}
+._knob_19q5y_236 {
+  width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+._swOn_19q5y_231 ._knob_19q5y_236 {
+  border-color: var(--accent);
+}
+._swBusy_19q5y_246,
+._sw_19q5y_209:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+._swState_19q5y_251 {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+}
+._devEmpty_19q5y_258 {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+</style><style type="text/css">/* Màn hình đăng nhập — chưa có trong bản vẽ; dựng theo cùng bảng màu, kích thước của 4 màn hình. */
+._page_1r404_2 {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--ground);
+}
+._panel_1r404_10 {
+  width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+._brand_1r404_16 {
+  height: 58px;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--line);
+}
+._brandName_1r404_24 {
+  font-family: var(--ui-display);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+._brandSub_1r404_31 {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+._form_1r404_38 {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+._title_1r404_44 {
+  font-family: var(--ui-display);
+  font-size: 20px;
+  line-height: 28px;
+  margin: 0;
+  font-weight: 600;
+}
+._lead_1r404_51 {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+._field_1r404_56 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+._label_1r404_61 {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+._field_1r404_56 input {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+._submit_1r404_71 {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+._error_1r404_76,
+._notice_1r404_77 {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-size: 13px;
+  line-height: 18px;
+}
+._error_1r404_76 {
+  border-left: 3px solid var(--bad);
+  background: var(--bad-bg);
+}
+._notice_1r404_77 {
+  border-left: 3px solid var(--wait);
+  background: var(--wait-bg);
+}
+._mockHint_1r404_92 {
+  padding: 12px 24px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--surface-2);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+._mockHint_1r404_92 code {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+</style><style type="text/css">/* Hai cột thông tin ⟷ liên kết (CLAUDE.md §0.2e) */
+._cols_1d84t_2 {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex: none;
+}
+._col_1d84t_2 {
+  display: flex;
+  min-width: 0;
+}
+._col_1d84t_2 > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+._colA_1d84t_18 {
+  flex: 1.7;
+}
+._colB_1d84t_21 {
+  flex: 1;
+}
+._who_1d84t_24 {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  align-items: stretch;
+}
+._avatar_1d84t_30,
+._avatarImg_1d84t_31 {
+  width: 200px;
+  height: 200px;
+  flex: none;
+  border-radius: 3px;
+}
+._avatar_1d84t_30 {
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 18px;
+}
+._avatarImg_1d84t_31 {
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+._kv_1d84t_53 {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+._kvRow_1d84t_59 {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  border-bottom: 1px solid var(--line-soft);
+}
+._kvRow_1d84t_59:last-child {
+  border-bottom: 0;
+}
+._kvK_1d84t_68 {
+  width: 136px;
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+._kvV_1d84t_74 {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+._mono_1d84t_82 {
+  font-family: var(--mono);
+}
+._topic_1d84t_85 {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  margin-top: auto;
+  padding: 16px;
+  gap: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+._topicK_1d84t_94 {
+  width: 136px;
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+._topicV_1d84t_100 {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+._links_1d84t_105 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  flex: 1;
+}
+._link_1d84t_105 {
+  width: 100%;
+  flex: 1;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 16px;
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--ink);
+}
+a._link_1d84t_105:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+._link_1d84t_105 svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  flex: none;
+}
+._linkTxt_1d84t_136 {
+  min-width: 0;
+}
+._linkT_1d84t_136 {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 20px;
+}
+._linkS_1d84t_144 {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+._linkOff_1d84t_153 {
+  border-style: dashed;
+  cursor: not-allowed;
+}
+._linkOff_1d84t_153 ._linkT_1d84t_136,
+._linkOff_1d84t_153 svg {
+  color: var(--ink-faint);
+}
+</style><style type="text/css">/* Bảng màu và kích thước lấy đúng từ docs/wireframe/*.html.
+   Một bảng màu sáng duy nhất, không theo nền tối của hệ điều hành. */
+:root {
+  --ground: #f1f4f7;
+  --surface: #ffffff;
+  --surface-2: #f7f9fb;
+  --ink: #0f1e2b;
+  --ink-soft: #5b6d7c;
+  --ink-faint: #8a9aa7;
+  --line: #d3dbe2;
+  --line-soft: #e6ebef;
+  --accent: #1f4b99;
+  --accent-strong: #193f82;
+  --accent-soft: #e7edf7;
+  --temp: #c0492f;
+  --hum: #1c7b8e;
+  --light: #c98a16;
+  --ok: #2f7a4d;
+  --ok-bg: #e4f1e9;
+  --bad: #b3261e;
+  --bad-bg: #fbe7e5;
+  --wait: #c98a16;
+  --wait-bg: #fbf1dc;
+  --off: #7a8894;
+  --off-bg: #ebeff2;
+  --ui: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ui-display: 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Cascadia Mono', Consolas, 'Roboto Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  background: var(--ground);
+}
+
+body {
+  margin: 0;
+  min-width: 1100px; /* dưới mức này bố cục 2 cột không còn đủ chỗ */
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}
+</style><style>:root{--ui:"Segoe UI",sans-serif;--ui-display:"Segoe UI",sans-serif;--mono:Consolas,monospace}html,body,#root{height:auto;min-width:0;background:#f1f4f7}body{margin:0}</style><style>:root{--ui:"Segoe UI",sans-serif;--ui-display:"Segoe UI",sans-serif;--mono:Consolas,monospace}html,body,#root{height:auto;min-width:0;background:#f1f4f7}body{margin:0}</style><style>:root{--ui:"Segoe UI",sans-serif;--ui-display:"Segoe UI",sans-serif;--mono:Consolas,monospace}html,body,#root{height:auto;min-width:0;background:#f1f4f7}body{margin:0}</style></head>
+  <body>
+    <div id="root"><div class="_app_lsfxq_3" style="height: auto; min-height: 900px; width: 1440px; max-width: 1440px; margin: 0px;"><aside class="_side_lsfxq_14"><div class="_brand_lsfxq_23"><div class="_brandName_lsfxq_32">Room01 Monitor</div><div class="_brandSub_lsfxq_39">ESP8266 · PHÒNG 01</div></div><nav class="_nav_lsfxq_46"><a class="_navLink_lsfxq_52 " href="/" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>Dashboard</a><a aria-current="page" class="_navLink_lsfxq_52 _on_lsfxq_72" href="/data-sensor" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg>Data Sensor</a><a class="_navLink_lsfxq_52 " href="/action-history" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M12 8v4l3 2"></path><circle cx="12" cy="12" r="9"></circle></svg>Action History</a><a class="_navLink_lsfxq_52 " href="/profile" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Profile</a></nav><div class="_spacer_lsfxq_78"></div><div class="_user_lsfxq_83"><div class="_userMeta_lsfxq_90"><div class="_userName_lsfxq_94">Lưu Đức Anh</div><div class="_userRole_lsfxq_102">admin · Quản trị</div></div><button type="button" class="_logout_lsfxq_111" title="Đăng xuất" aria-label="Đăng xuất"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l-5-5 5-5"></path><path d="M5 12h11"></path></svg></button></div></aside><div class="_main_lsfxq_134"><header class="_topbar_lsfxq_141"><h1 class="_title_lsfxq_151">Data Sensor</h1><div class="_topbarRight_lsfxq_158"><div class="_stamp_1md8o_39">36.134 bản ghi</div></div></header><main class="_body_lsfxq_163" style="overflow: visible;"><section class="_card_1md8o_5 _cardGrow_1md8o_10"><div class="_filters_1md8o_63"><label class="_field_1md8o_72"><span class="_fieldLabel_1md8o_77">Tìm kiếm</span><div class="_searchBox_1md8o_112"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input class="_input_1md8o_83" placeholder="Mã hoặc tên cảm biến…" type="search" value=""></div></label><label class="_field_1md8o_72"><span class="_fieldLabel_1md8o_77">Cảm biến</span><select class="_input_1md8o_83 _select_1md8o_134"><option value="" selected="">Tất cả</option><option value="room01_temp">Nhiệt độ phòng</option><option value="room01_humi">Độ ẩm phòng</option><option value="room01_lux">Ánh sáng phòng</option></select></label><label class="_field_1md8o_72"><span class="_fieldLabel_1md8o_77">Giá trị từ</span><input step="any" class="_input_1md8o_83 _inputNum_1md8o_129 " disabled="" placeholder="—" type="number" value=""></label><label class="_field_1md8o_72"><span class="_fieldLabel_1md8o_77">Đến</span><input step="any" class="_input_1md8o_83 _inputNum_1md8o_129 " disabled="" placeholder="—" type="number" value=""></label><label class="_field_1md8o_72"><span class="_fieldLabel_1md8o_77">Thời điểm</span><div class="_dtBox_1md8o_143"><input inputmode="numeric" autocomplete="off" class="_input_1md8o_83 " placeholder="dd/mm/yyyy hh/mm/ss" type="text" value=""><button type="button" class="_dtBtn_1md8o_154" title="Chọn từ lịch" aria-label="Chọn từ lịch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="1.5"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg></button><input step="1" class="_dtPicker_1md8o_178" tabindex="-1" aria-hidden="true" type="datetime-local" value=""></div></label><label class="_field_1md8o_72"><span class="_fieldLabel_1md8o_77">Dòng/trang</span><select class="_input_1md8o_83 _select_1md8o_134 _selectNarrow_1md8o_139"><option value="8">8</option><option value="10" selected="">10</option><option value="12">12</option><option value="20">20</option></select></label><button type="button" class="_btn_1md8o_189" disabled="">Xóa bộ lọc</button></div><div class="_tbl_1md8o_257 " style="overflow: visible;"><table class="_table_1md8o_266"><colgroup><col style="width: 8%;"><col style="width: 20%;"><col style="width: 20%;"><col style="width: 13%;"><col style="width: 10%;"><col style="width: 29%;"></colgroup><thead><tr><th class="_num_1md8o_299" style="position: static;"><button type="button" class="_sortable_1md8o_332" aria-sort="none">ID<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"></path></svg></button></th><th style="position: static;">Mã cảm biến</th><th style="position: static;">Cảm biến</th><th class="_num_1md8o_299" style="position: static;"><button type="button" class="_sortable_1md8o_332" aria-sort="none">Giá trị<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"></path></svg></button></th><th style="position: static;">Đơn vị</th><th style="position: static;"><button type="button" class="_sortcap_1md8o_331" aria-sort="descending">Thời gian<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="2.4"><path d="M6 15l6 6 6-6"></path></svg></button></th></tr></thead><tbody><tr><td class="_num_1md8o_299">36132</td><td class="_mono_1md8o_306">room01_temp</td><td>Nhiệt độ phòng</td><td class="_num_1md8o_299">28.5</td><td>°C</td><td class="_mono_1md8o_306">17/08/2026 · 17:30:02</td></tr><tr><td class="_num_1md8o_299">36133</td><td class="_mono_1md8o_306">room01_humi</td><td>Độ ẩm phòng</td><td class="_num_1md8o_299">72.0</td><td>%</td><td class="_mono_1md8o_306">17/08/2026 · 17:30:02</td></tr><tr><td class="_num_1md8o_299">36134</td><td class="_mono_1md8o_306">room01_lux</td><td>Ánh sáng phòng</td><td class="_num_1md8o_299">350</td><td>lux</td><td class="_mono_1md8o_306">17/08/2026 · 17:30:02</td></tr><tr><td class="_num_1md8o_299">36129</td><td class="_mono_1md8o_306">room01_temp</td><td>Nhiệt độ phòng</td><td class="_num_1md8o_299">28.5</td><td>°C</td><td class="_mono_1md8o_306">17/08/2026 · 17:30:00</td></tr><tr><td class="_num_1md8o_299">36130</td><td class="_mono_1md8o_306">room01_humi</td><td>Độ ẩm phòng</td><td class="_num_1md8o_299">71.9</td><td>%</td><td class="_mono_1md8o_306">17/08/2026 · 17:30:00</td></tr><tr><td class="_num_1md8o_299">36131</td><td class="_mono_1md8o_306">room01_lux</td><td>Ánh sáng phòng</td><td class="_num_1md8o_299">351</td><td>lux</td><td class="_mono_1md8o_306">17/08/2026 · 17:30:00</td></tr><tr><td class="_num_1md8o_299">36126</td><td class="_mono_1md8o_306">room01_temp</td><td>Nhiệt độ phòng</td><td class="_num_1md8o_299">28.6</td><td>°C</td><td class="_mono_1md8o_306">17/08/2026 · 17:29:58</td></tr><tr><td class="_num_1md8o_299">36127</td><td class="_mono_1md8o_306">room01_humi</td><td>Độ ẩm phòng</td><td class="_num_1md8o_299">71.6</td><td>%</td><td class="_mono_1md8o_306">17/08/2026 · 17:29:58</td></tr><tr><td class="_num_1md8o_299">36128</td><td class="_mono_1md8o_306">room01_lux</td><td>Ánh sáng phòng</td><td class="_num_1md8o_299">348</td><td>lux</td><td class="_mono_1md8o_306">17/08/2026 · 17:29:58</td></tr><tr><td class="_num_1md8o_299">36123</td><td class="_mono_1md8o_306">room01_temp</td><td>Nhiệt độ phòng</td><td class="_num_1md8o_299">28.5</td><td>°C</td><td class="_mono_1md8o_306">17/08/2026 · 17:29:56</td></tr></tbody></table></div><div class="_tfoot_1md8o_391"><span>Hiển thị 1–10 trong 36.134 bản ghi · 3 dòng mỗi chu kỳ</span><nav class="_pager_1md8o_402" aria-label="Phân trang"><button type="button" class="_pg_1md8o_407" disabled="" aria-label="Trang trước">‹</button><button type="button" class="_pg_1md8o_407 _pgOn_1md8o_422" aria-current="page">1</button><button type="button" class="_pg_1md8o_407 ">2</button><button type="button" class="_pg_1md8o_407 ">3</button><span class="_pg_1md8o_407 _pgMute_1md8o_432">…</span><button type="button" class="_pg_1md8o_407 ">3614</button><button type="button" class="_pg_1md8o_407" aria-label="Trang sau">›</button></nav></div></section></main></div></div></div>
+    
+  
+
+<span id="recharts_measurement_span" aria-hidden="true" style="position: absolute; top: -20000px; left: 0px; padding: 0px; margin: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; white-space: pre; font-size: 12px; letter-spacing: normal;">0</span></body></html>

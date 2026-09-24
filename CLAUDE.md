@@ -548,9 +548,9 @@ PostgreSQL 18 (service `postgresql-x64-18`, DB `iot_room`) · Redis = container 
 
 ### 0.7 HTML cho Figma — `docs/figma-import/` *(phiên 10)*
 
-Ba file `01-login.html · 02-data-sensor.html · 03-action-history.html` **trích thẳng từ ứng dụng
-React đang chạy** (DOM + CSS thật, lấy qua Chrome DevTools Protocol), dùng cho plugin
-**html.to.design**. Cách nhập ghi ở `docs/figma-import/README.md`.
+Năm file `01-login · 02-dashboard · 03-data-sensor · 04-action-history · 05-profile` **trích
+thẳng từ ứng dụng React đang chạy** (DOM + CSS thật, lấy qua Chrome DevTools Protocol), dùng cho
+plugin **html.to.design**. Cách nhập ghi ở `docs/figma-import/README.md`.
 
 > ⚠️ **`docs/wireframe/*.html` nay là bản lạc hậu** — vẽ tay từ phiên 5, còn 2 ô ngày, cột Thời
 > gian để giờ trước, chưa có ô Dòng/trang, không có màn Login. Muốn ảnh khớp ứng dụng thì lấy
@@ -561,6 +561,8 @@ Bốn chỗ phải xử lý khi trích (đều đã gặp thật, script trong s
 2. **Tắt mọi vùng cuộn** (`overflow: visible`, bỏ `position: sticky`) và để `height: auto; min-height: 900px` — ghim cứng 900px thì Action History (cao ~960) bị dòng cuối đè lên thanh phân trang.
 3. Xoá `data-vite-dev-id` — Vite nhét **đường dẫn tuyệt đối trên máy** vào từng thẻ `<style>`.
 4. Xoá ô gợi ý tài khoản MSW ở màn Login bằng `[class*=mockHint]`; tìm theo chữ thì `__byText('div', …)` trả về thẻ bọc ngoài cùng và xoá nhầm cả khối đăng nhập.
+5. **Dashboard phải dừng đồng hồ của dữ liệu giả trước khi chụp** (`for (let i=1;i<9999;i++) clearInterval(i)`): MSW đẩy chu kỳ mới mỗi 2 giây, chờ bố cục ổn định một nhịp là thẻ số lệch khỏi bộ mẫu §0.2f. Điều kiện chờ cũng phải là `.recharts-line`, không phải `svg path` — cái đó khớp nhầm icon ở sidebar nên trang bị chụp lúc còn "Đang tải…".
+6. **Recharts `ResponsiveContainer` chỉ đo lại qua `ResizeObserver`** — `dispatchEvent(new Event('resize'))` vô tác dụng. Phải đổi kích thước thật một nhịp (`height: 899px` → `900px`), nếu không biểu đồ chỉ cao bằng nửa thẻ vì giữ nguyên kích thước đo lần đầu.
 
 > ⚠️ **Heredoc `<<'EOF'` của Bash trên máy này vẫn nuốt dấu `\`** (đã dính 2 lần: đường dẫn Chrome và `'...
 '` trong chuỗi JS). Viết script nhiều escape thì tạo file bằng Python, hoặc tránh escape (`String.fromCharCode(10)`).
