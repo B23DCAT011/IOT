@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>01 Dashboard — Room01 Monitor</title>
+<style>
+/* ============================================================
+   Room01 Monitor — wireframe co gian theo cua so trinh duyet
+
+   NGUYEN TAC CAN CHINH:
+   - Khung ban ve lap day cua so: rong 100% (toi da 1680px, can giua),
+     cao dung 100% chieu cao cua so. Khong con vien xam thua hai ben
+     nhu ban ghim cung 1180 x 660 truoc day.
+   - Chieu cao co dinh cho thanh phan lap lai (thanh tieu de 58,
+     dau the 56, dong bang 40, o nhap 36) de duong ke luon trung nhau.
+     Phan con lai (bieu do, than bang) tu gian ra cho het cho trong.
+   - Moi khoang cach la boi so cua 4.
+   - Khoi logo cao dung 58 => vach ke duoi no trung voi vach ke
+     duoi thanh tieu de, tao mot duong lien mach ngang man hinh.
+   - Cot thiet bi rong dung 1/3 vung noi dung => mep trai cua no luon
+     trung mep trai the so lieu thu ba, o moi be ngang cua so.
+
+   CHU Y KHI NHAP VAO FIGMA:
+   - Dat cua so trinh duyet dung kich thuoc khung muon co (vi du
+     1440 x 900) roi moi chup man hinh / nhap vao Figma.
+   - Chi mot bang mau sang, khong theo nen toi cua he dieu hanh.
+   - Bo cuc bang flex + gap, khong dung grid.
+   - Khong dung ::before / ::after cho phan nhin thay duoc.
+   ============================================================ */
+
+:root{
+  --ground:#F1F4F7;
+  --surface:#FFFFFF;
+  --surface-2:#F7F9FB;
+  --ink:#0F1E2B;
+  --ink-soft:#5B6D7C;
+  --ink-faint:#8A9AA7;
+  --line:#D3DBE2;
+  --line-soft:#E6EBEF;
+  --accent:#1F4B99;
+  --accent-soft:#E7EDF7;
+  --temp:#C0492F;
+  --hum:#1C7B8E;
+  --light:#C98A16;
+  --ok:#2F7A4D;
+  --ok-bg:#E4F1E9;
+  --bad:#B3261E;
+  --bad-bg:#FBE7E5;
+  --wait:#C98A16;
+  --wait-bg:#FBF1DC;
+  --off:#7A8894;
+  --off-bg:#EBEFF2;
+  --ui:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --ui-display:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Mono",Consolas,"Roboto Mono",ui-monospace,monospace;
+}
+
+*{box-sizing:border-box}
+
+html,body{height:100%}
+html{background:var(--ground)}
+
+body{
+  margin:0;
+  min-width:1100px;             /* duoi muc nay bo cuc 2 cot khong con du cho */
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--ui);
+  font-size:14px;
+  line-height:20px;
+  -webkit-font-smoothing:antialiased;
+}
+
+.app{
+  display:flex;
+  width:100%;max-width:1680px;margin:0 auto;
+  height:100%;min-height:620px;
+  background:var(--ground);
+}
+
+/* ---------- thanh dieu huong ben trai ---------- */
+.side{
+  width:212px;flex:none;
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;min-height:0;
+}
+.brand{
+  height:58px;flex:none;             /* trung voi .topbar */
+  padding:0 20px;
+  display:flex;flex-direction:column;justify-content:center;
+  border-bottom:1px solid var(--line);
+}
+.brand-name{font-family:var(--ui-display);font-weight:600;font-size:16px;line-height:20px;letter-spacing:-.01em}
+.brand-sub{font-family:var(--mono);font-size:10px;line-height:14px;color:var(--ink-faint);letter-spacing:.06em}
+.nav{display:flex;flex-direction:column;gap:4px;padding:16px 12px}
+.nav a{
+  display:flex;align-items:center;gap:12px;
+  height:36px;padding:0 12px;border-radius:3px;
+  color:var(--ink-soft);text-decoration:none;font-size:14px;
+}
+.nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav svg{width:16px;height:16px;flex:none}
+.side-spacer{flex:1}
+.side-foot{
+  height:44px;flex:none;display:flex;align-items:center;padding:0 20px;
+  border-top:1px solid var(--line-soft);
+  font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+}
+
+/* ---------- vung noi dung ---------- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.topbar{
+  height:58px;flex:none;
+  background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+}
+.topbar h1{font-family:var(--ui-display);font-size:18px;line-height:24px;margin:0;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.conn{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft)}
+.dot{width:8px;height:8px;border-radius:4px;background:var(--ok);flex:none}
+.dot.warn{background:var(--off)}
+.stamp{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.body{
+  flex:1;min-height:0;overflow:auto;      /* cua so qua thap thi cuon o day */
+  padding:24px;display:flex;flex-direction:column;gap:16px;
+}
+
+/* ---------- the ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:3px}
+.card.grow{flex:1;min-height:0;display:flex;flex-direction:column}  /* lap day chieu cao con lai */
+.card-head{
+  height:56px;flex:none;padding:0 16px;
+  border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.card-title{font-weight:600;font-size:14px;line-height:20px}
+.card-sub{font-family:var(--mono);font-size:11px;line-height:16px;color:var(--ink-faint)}
+
+/* ---------- the so lieu ---------- */
+.stats{display:flex;gap:16px;flex:none}
+.stat{
+  flex:1 1 0;height:112px;            /* co dinh -> 3 the bang nhau */
+  background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  padding:16px;display:flex;gap:12px;min-width:0;
+}
+.tick{width:4px;height:24px;border-radius:2px;flex:none;margin-top:4px}
+.stat-main{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.stat-label{font-size:12px;line-height:16px;color:var(--ink-soft)}
+.stat-val{font-family:var(--mono);font-size:32px;line-height:36px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat-unit{font-size:16px;color:var(--ink-soft);margin-left:4px}
+.stat-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;height:20px}
+.stat-foot svg{width:72px;height:20px;flex:none;display:block}
+.stat-delta{
+  font-family:var(--mono);font-size:11px;line-height:16px;color:var(--ink-faint);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ---------- bieu do + thiet bi ---------- */
+.chart-row{display:flex;gap:16px;align-items:stretch;flex:1;min-height:0}
+.chart-col{flex:1;min-width:0;display:flex}
+.chart-col>.card{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+/* Dung 1/3 be ngang vung noi dung (tru 2 khe 16) => trung mep the so lieu thu ba. */
+.dev-col{width:calc((100% - 32px)/3);flex:none;display:flex}
+.dev-col>.card{flex:1;display:flex;flex-direction:column;min-height:0}
+.legend{display:flex;gap:16px;align-items:center}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft);white-space:nowrap}
+.legend-key{width:12px;height:3px;border-radius:2px;flex:none}
+
+/* Vung ve: SVG keo gian tu do theo ca hai chieu (preserveAspectRatio="none"),
+   net ve giu nguyen do day nho vector-effect. Nhan truc va cham cuoi duong
+   nam ngoai SVG (HTML) nen khong bi bien dang khi keo gian. */
+.chart-box{flex:1;min-height:0;padding:16px;display:flex;flex-direction:column;gap:8px}
+.plot{flex:1;min-height:0;position:relative;padding:0 52px}
+.plot-area{position:relative;width:100%;height:100%}
+svg.chart{position:absolute;inset:0;width:100%;height:100%;display:block}
+.yax{
+  position:absolute;top:0;bottom:0;width:44px;
+  font-family:var(--mono);font-size:12px;line-height:16px;color:var(--ink-faint);
+}
+.yax.l{left:0;text-align:right}
+.yax.r{right:0;text-align:left}
+.yax span{position:absolute;left:0;right:0;transform:translateY(-50%)}
+.dot-end{position:absolute;left:100%;width:9px;height:9px;border-radius:5px;transform:translate(-50%,-50%)}
+.xax{
+  position:relative;height:16px;margin:0 52px;
+  font-family:var(--mono);font-size:12px;line-height:16px;color:var(--ink-faint);
+}
+.xax span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.xax span.first{left:0;transform:none}
+.xax span.last{right:0;transform:none}
+.units{
+  display:flex;justify-content:space-between;
+  font-family:var(--mono);font-size:12px;line-height:16px;color:var(--ink-faint);
+}
+
+/* ---------- thiet bi ---------- */
+.dev{display:flex;align-items:center;gap:12px;height:68px;flex:none;padding:0 16px;border-bottom:1px solid var(--line-soft)}
+.dev:last-child{border-bottom:0}
+.dev-ic{
+  width:36px;height:36px;flex:none;border-radius:3px;
+  background:var(--surface-2);border:1px solid var(--line-soft);
+  display:flex;align-items:center;justify-content:center;color:var(--ink-soft);
+}
+.dev-ic svg{width:20px;height:20px}
+.dev-meta{flex:1;min-width:0}
+.dev-name{font-weight:600;font-size:14px;line-height:20px}
+.dev-code{font-family:var(--mono);font-size:11px;line-height:16px;color:var(--ink-faint)}
+.sw-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.sw{
+  width:48px;height:24px;border-radius:12px;
+  background:var(--off-bg);border:1px solid var(--line);
+  display:flex;align-items:center;padding:2px;
+}
+.sw .knob{width:18px;height:18px;border-radius:9px;background:var(--surface);border:1px solid var(--line)}
+.sw.on{background:var(--accent);border-color:var(--accent);justify-content:flex-end}
+.sw.on .knob{border-color:var(--accent)}
+.sw.busy{opacity:.5}
+.sw-state{font-family:var(--mono);font-size:10px;line-height:14px;color:var(--ink-faint);letter-spacing:.05em}
+
+/* ---------- thanh bo loc ---------- */
+.filters{
+  display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;flex:none;padding:16px;
+  border-bottom:1px solid var(--line-soft);
+}
+.f{display:flex;flex-direction:column;gap:4px}
+.f-label{font-size:11px;line-height:16px;color:var(--ink-soft)}
+.inp{
+  height:36px;border:1px solid var(--line);border-radius:3px;
+  background:var(--surface);padding:0 12px;
+  display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--ink);white-space:nowrap;
+}
+.inp.ph{color:var(--ink-faint)}
+.inp svg{width:16px;height:16px;color:var(--ink-faint);flex:none}
+.inp.search{width:160px;overflow:hidden}
+.inp.search.wide{width:200px}
+.inp.num{font-family:var(--mono);width:72px;justify-content:flex-end}
+.inp.sel{width:128px;justify-content:space-between}
+.inp.date{font-family:var(--mono);font-size:12px;width:116px}
+.btn{
+  height:36px;border:1px solid var(--line);border-radius:3px;
+  background:var(--surface);padding:0 16px;font-size:13px;color:var(--ink-soft);
+  display:flex;align-items:center;white-space:nowrap;
+}
+/* Dai chu thich duoi thanh loc — canh bao ban ghi thieu so do bi loai
+   (UC-04 luu y cuoi, 05-API.md §4.3). Dat thanh mot dai rieng thay vi
+   nhet vao thanh loc de khong bi vo bo cuc khi cua so hep. */
+.f-note{
+  display:flex;align-items:center;gap:8px;flex:none;
+  min-height:36px;padding:8px 16px;
+  border-bottom:1px solid var(--line-soft);background:var(--surface-2);
+  font-size:11px;line-height:16px;color:var(--ink-soft);
+}
+.f-note svg{width:14px;height:14px;flex:none;color:var(--ink-faint)}
+
+/* ---------- bang ---------- */
+.tbl{flex:1;min-height:0;overflow:auto}   /* than bang lap day, tu cuon khi thieu cho */
+table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
+thead th{
+  height:40px;padding:0 16px;
+  text-align:left;font-weight:600;font-size:11px;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);
+  border-bottom:1px solid var(--line);background:var(--surface-2);
+  white-space:nowrap;position:sticky;top:0;z-index:1;
+}
+thead th.num{text-align:right}
+tbody td{
+  padding:10px 16px;line-height:20px;
+  border-bottom:1px solid var(--line-soft);
+  vertical-align:top;                 /* dong cao thap deu bat dau cung mot muc */
+}
+tbody tr:last-child td{border-bottom:0}
+td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.mono{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+td.nil{color:var(--ink-faint)}
+.sortcap{display:inline-flex;align-items:center;gap:4px;color:var(--accent)}   /* cot dang sap xep */
+.sortcap svg{width:12px;height:12px}
+.sortable{display:inline-flex;align-items:center;gap:4px;color:inherit}       /* cot co the sap xep */
+.sortable svg{width:10px;height:10px;flex:none;color:var(--ink-faint)}
+.pill{
+  display:inline-flex;align-items:center;height:20px;padding:0 8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;border-radius:2px;
+}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.wait{background:var(--wait-bg);color:var(--wait)}
+.errline{font-size:11px;line-height:16px;color:var(--ink-faint);margin-top:2px}
+.act{font-family:var(--mono);font-size:12px}
+.tfoot{
+  height:52px;flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--ink-soft);
+}
+.pager{display:flex;gap:4px;align-items:center}
+.pg{
+  min-width:32px;height:32px;padding:0 8px;
+  border:1px solid var(--line);border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;
+  background:var(--surface);color:var(--ink-soft);
+}
+.pg.on{background:var(--accent);border-color:var(--accent);color:#FFFFFF}
+.pg.mute{border-color:transparent;background:transparent;color:var(--ink-faint)}
+
+/* ---------- profile ---------- */
+.pcols{display:flex;gap:16px;align-items:stretch;flex:none}
+.pcol{display:flex;min-width:0}
+.pcol>.card{flex:1;display:flex;flex-direction:column;min-width:0}
+.pcol-a{flex:1.7}
+.pcol-b{flex:1}
+.who{display:flex;gap:16px;padding:16px;align-items:stretch}
+.avatar{
+  width:200px;height:200px;flex:none;border-radius:3px;
+  background:var(--surface-2);border:1px dashed var(--line);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  color:var(--ink-faint);font-family:var(--mono);font-size:11px;line-height:18px;
+}
+.kv{flex:1;min-width:0;display:flex;flex-direction:column}
+.kv-row{display:flex;height:40px;align-items:center;border-bottom:1px solid var(--line-soft)}
+.kv-row:last-child{border-bottom:0}
+.kv-k{width:136px;flex:none;font-size:13px;color:var(--ink-soft)}
+.kv-v{flex:1;min-width:0;font-size:13px}
+.kv-v.mono{font-family:var(--mono)}
+.topic{
+  display:flex;align-items:center;min-height:56px;margin-top:auto;padding:16px;gap:16px;
+  border-top:1px solid var(--line-soft);
+}
+.topic-k{width:136px;flex:none;font-size:13px;color:var(--ink-soft)}
+.topic-v{flex:1;font-size:13px;font-weight:600}
+.links{display:flex;flex-direction:column;gap:12px;padding:16px;flex:1}
+.link{
+  width:100%;flex:1;min-height:64px;
+  display:flex;align-items:center;gap:12px;
+  border:1px solid var(--line);border-radius:3px;padding:0 16px;background:var(--surface);
+}
+.link svg{width:20px;height:20px;color:var(--accent);flex:none}
+.link-txt{min-width:0}
+.link-t{font-weight:600;font-size:13px;line-height:20px}
+.link-s{font-family:var(--mono);font-size:11px;line-height:16px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.link.off{border-style:dashed}
+.link.off .link-t{color:var(--ink-faint)}
+.link.off svg{color:var(--ink-faint)}
+
+/* ---------- trang trang thai phu (05-trang-thai.html) ---------- */
+.states{display:flex;flex-direction:column;gap:20px;flex:none}
+.state{display:flex;flex-direction:column;gap:8px}
+.state-cap{font-size:12px;line-height:18px;color:var(--ink-soft)}
+.state-cap b{color:var(--ink);font-weight:600}
+.state-cap code{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.banner{
+  display:flex;align-items:center;gap:12px;min-height:44px;padding:0 16px;
+  border:1px solid var(--line);border-left:3px solid var(--bad);border-radius:3px;
+  background:var(--bad-bg);font-size:13px;color:var(--ink);
+}
+.banner .btn{margin-left:auto;height:28px;padding:0 12px;background:var(--surface)}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;
+  border-radius:12px;background:var(--off-bg);color:var(--off);
+  font-size:12px;line-height:16px;white-space:nowrap;
+}
+.dim{opacity:.45}
+.pad{padding:16px}
+.stat-val.nil{color:var(--ink-faint)}
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  padding:36px 16px;text-align:center;font-size:13px;color:var(--ink-faint);
+}
+.chart-empty{
+  min-height:160px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--ink-faint);
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-name">Room01 Monitor</div>
+      <div class="brand-sub">ESP8266 · PHÒNG 01</div>
+    </div>
+    <nav class="nav">
+      <a href="01-dashboard.html" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+      <a href="02-data-sensor.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Data Sensor</a>
+      <a href="03-action-history.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Action History</a>
+      <a href="04-profile.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+    </nav>
+    <div class="side-spacer"></div>
+    <div class="side-foot">v1.0 · LAN 192.168.1.8</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-right">
+        <div class="conn"><span class="dot"></span>Đang nhận dữ liệu</div>
+        <div class="stamp">Cập nhật 17:30:02</div>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <div class="stats">
+        <div class="stat">
+          <div class="tick" style="background:#C0492F"></div>
+          <div class="stat-main">
+            <div class="stat-label">Nhiệt độ</div>
+            <div class="stat-val">28.5<span class="stat-unit">°C</span></div>
+            <div class="stat-foot">
+              <!-- Bien thien = gia tri hien tai tru gia tri cua 10 mau truoc (10 x 2s = 20 giay).
+                   Ca ba the dung cung moc 20 giay de doc duoc canh nhau. -->
+              <span class="stat-delta">−0.1 trong 20 giây</span>
+              <svg width="72" height="22" viewBox="0 0 72 22" fill="none"><polyline points="0,16 12,15 24,14 36,12 48,11 60,11 72,12" stroke="#C0492F" stroke-width="1.5"/><circle cx="72" cy="12" r="2.2" fill="#C0492F"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="tick" style="background:#1C7B8E"></div>
+          <div class="stat-main">
+            <div class="stat-label">Độ ẩm</div>
+            <div class="stat-val">72.0<span class="stat-unit">%</span></div>
+            <div class="stat-foot">
+              <span class="stat-delta">−14.4 trong 20 giây</span>
+              <svg width="72" height="22" viewBox="0 0 72 22" fill="none"><polyline points="0,16 12,15 24,3 36,6 48,12 60,15 72,15" stroke="#1C7B8E" stroke-width="1.5"/><circle cx="72" cy="15" r="2.2" fill="#1C7B8E"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="tick" style="background:#C98A16"></div>
+          <div class="stat-main">
+            <div class="stat-label">Ánh sáng</div>
+            <div class="stat-val">350<span class="stat-unit">lux</span></div>
+            <div class="stat-foot">
+              <span class="stat-delta">+262 trong 20 giây</span>
+              <svg width="72" height="22" viewBox="0 0 72 22" fill="none"><polyline points="0,7 12,7 24,18 36,19 48,14 60,8 72,7" stroke="#C98A16" stroke-width="1.5"/><circle cx="72" cy="7" r="2.2" fill="#C98A16"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-col">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <div class="card-title">Diễn biến 20 mẫu gần nhất</div>
+                <div class="card-sub">17:29:24 → 17:30:02 · chu kỳ 2 giây · 1 mẫu thiếu độ ẩm</div>
+              </div>
+              <div class="legend">
+                <span class="legend-item"><span class="legend-key" style="background:#C0492F"></span>Nhiệt độ</span>
+                <span class="legend-item"><span class="legend-key" style="background:#1C7B8E"></span>Độ ẩm</span>
+                <span class="legend-item"><span class="legend-key" style="background:#C98A16"></span>Ánh sáng</span>
+              </div>
+            </div>
+            <div class="chart-box">
+              <div class="plot">
+                <div class="yax l">
+                  <span style="top:0%">100</span>
+                  <span style="top:25%">80</span>
+                  <span style="top:50%">60</span>
+                  <span style="top:75%">40</span>
+                  <span style="top:100%">20</span>
+                </div>
+                <div class="yax r">
+                  <span style="top:0%">500</span>
+                  <span style="top:25%">375</span>
+                  <span style="top:50%">250</span>
+                  <span style="top:75%">125</span>
+                  <span style="top:100%">0</span>
+                </div>
+                <div class="plot-area">
+                  <!-- Vung ve keo gian tu do: preserveAspectRatio="none".
+                       vector-effect giu net ve day 2.5px du khung bi keo ngang. -->
+                  <svg class="chart" viewBox="48 20 623 336" preserveAspectRatio="none" fill="none" role="img" aria-label="Biểu đồ đường ba chuỗi: nhiệt độ, độ ẩm, ánh sáng">
+                    <g stroke="#E6EBEF" stroke-width="1.3">
+                      <line x1="48" y1="20" x2="671" y2="20" vector-effect="non-scaling-stroke"/>
+                      <line x1="48" y1="104" x2="671" y2="104" vector-effect="non-scaling-stroke"/>
+                      <line x1="48" y1="188" x2="671" y2="188" vector-effect="non-scaling-stroke"/>
+                      <line x1="48" y1="272" x2="671" y2="272" vector-effect="non-scaling-stroke"/>
+                      <line x1="48" y1="356" x2="671" y2="356" vector-effect="non-scaling-stroke"/>
+                    </g>
+                    <polyline points="48,119.5 81,121.5 114,120.1 146,122.1 179,120.8 212,122.8 245,124.8 278,275.4 310,294.2 343,296.9 376,292.2 409,235 442,154.4 474,126.8 507,121.5 540,119.5 573,120.8 606,122.1 638,120.1 671,120.8" stroke="#C98A16" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                    <!-- Do am ngat quang tai mau 17:29:54 (x=540): ban ghi 12041 co humidity = null
+                         do cam bien doc loi (UC-07 luong A2). Duong ve dut doan dung cho do,
+                         khop voi dau "—" o bang Data Sensor. -->
+                    <polyline points="48,145.2 81,143.9 114,142.6 146,141.8 179,140.1 212,128.4 245,105.7 278,82.6 310,69.1 343,77.1 376,95.6 409,111.6 442,123.3 474,130.9 507,135.5" stroke="#1C7B8E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                    <polyline points="573,138.4 606,139.3 638,138 671,137.6" stroke="#1C7B8E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                    <polyline points="48,324.1 81,323.2 114,322.8 146,322 179,322.4 212,321.6 245,320.7 278,321.1 310,320.3 343,319.9 376,320.7 409,321.1 442,320.3 474,319.5 507,319.9 540,320.7 573,320.3 606,319.9 638,320.3 671,320.3" stroke="#C0492F" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+                  </svg>
+                  <!-- Cham cuoi duong ve bang HTML de khong bi keo thanh hinh bau duc -->
+                  <span class="dot-end" style="top:30%;background:#C98A16"></span>
+                  <span class="dot-end" style="top:35%;background:#1C7B8E"></span>
+                  <span class="dot-end" style="top:89.4%;background:#C0492F"></span>
+                </div>
+              </div>
+              <div class="xax">
+                <span class="first">17:29:24</span>
+                <span style="left:31.6%">17:29:36</span>
+                <span style="left:63.2%">17:29:48</span>
+                <span class="last">17:30:02</span>
+              </div>
+              <div class="units"><span>°C / %</span><span>lux</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dev-col">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Thiết bị</div>
+              <div class="card-sub">2 thiết bị</div>
+            </div>
+            <div class="dev">
+              <div class="dev-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z"/></svg></div>
+              <div class="dev-meta">
+                <div class="dev-name">Đèn phòng</div>
+                <div class="dev-code">room01_lamp · D5</div>
+              </div>
+              <!-- Đèn phòng OFF: lệnh thành công gần nhất của room01_lamp là OFF lúc 17:15:33
+                   (Action History id 84 — trùng devices.updated_at trong 05-API.md §4.4) -->
+              <div class="sw-wrap">
+                <div class="sw"><div class="knob"></div></div>
+                <span class="sw-state">OFF</span>
+              </div>
+            </div>
+            <div class="dev">
+              <div class="dev-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 3-7s2 4-1 6M14 12c4 0 7 1 7 3s-4 2-6-1M12 14c0 4-1 7-3 7s-2-4 1-6M10 12c-4 0-7-1-7-3s4-2 6 1"/></svg></div>
+              <div class="dev-meta">
+                <div class="dev-name">Quạt trần</div>
+                <div class="dev-code">room01_fan · D6</div>
+              </div>
+              <!-- Quạt trần ON: lệnh thành công gần nhất của room01_fan là ON lúc 17:28:07
+                   (Action History id 87 — trùng devices.updated_at trong 05-API.md §4.4) -->
+              <div class="sw-wrap">
+                <div class="sw on"><div class="knob"></div></div>
+                <span class="sw-state">ON</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,987 @@
+<title>Giao diện Room01</title>
+
+<style>
+:root{
+  --ground:#F1F4F7;
+  --surface:#FFFFFF;
+  --surface-2:#F7F9FB;
+  --ink:#0F1E2B;
+  --ink-soft:#5B6D7C;
+  --ink-faint:#8A9AA7;
+  --line:#D3DBE2;
+  --line-soft:#E6EBEF;
+  --accent:#1F4B99;
+  --accent-soft:#E7EDF7;
+  --temp:#C0492F;
+  --hum:#1C7B8E;
+  --light:#C98A16;
+  --ok:#2F7A4D;
+  --ok-bg:#E4F1E9;
+  --bad:#B3261E;
+  --bad-bg:#FBE7E5;
+  --wait:#C98A16;
+  --wait-bg:#FBF1DC;
+  --off:#7A8894;
+  --off-bg:#EBEFF2;
+  --shadow:0 1px 2px rgba(15,30,43,.06),0 8px 24px rgba(15,30,43,.07);
+  --ui:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --ui-display:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --mono:"Cascadia Mono",Consolas,"Roboto Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C151D;
+    --surface:#132230;
+    --surface-2:#0F1C27;
+    --ink:#E7EEF3;
+    --ink-soft:#9DB0BF;
+    --ink-faint:#6D8090;
+    --line:#263B4C;
+    --line-soft:#1C2E3D;
+    --accent:#69A2E8;
+    --accent-soft:#17304C;
+    --temp:#E8785C;
+    --hum:#4EB8CC;
+    --light:#E8B54A;
+    --ok:#5FBF8B;
+    --ok-bg:#14301F;
+    --bad:#E8776D;
+    --bad-bg:#361A19;
+    --wait:#E8B54A;
+    --wait-bg:#33280F;
+    --off:#8DA0AE;
+    --off-bg:#1B2A36;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C151D;
+  --surface:#132230;
+  --surface-2:#0F1C27;
+  --ink:#E7EEF3;
+  --ink-soft:#9DB0BF;
+  --ink-faint:#6D8090;
+  --line:#263B4C;
+  --line-soft:#1C2E3D;
+  --accent:#69A2E8;
+  --accent-soft:#17304C;
+  --temp:#E8785C;
+  --hum:#4EB8CC;
+  --light:#E8B54A;
+  --ok:#5FBF8B;
+  --ok-bg:#14301F;
+  --bad:#E8776D;
+  --bad-bg:#361A19;
+  --wait:#E8B54A;
+  --wait-bg:#33280F;
+  --off:#8DA0AE;
+  --off-bg:#1B2A36;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--ui);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:48px 24px 96px}
+
+/* ---------- page header ---------- */
+.masthead{
+  border-bottom:2px solid var(--ink);
+  padding-bottom:20px;
+  margin-bottom:44px;
+}
+.masthead h1{
+  font-family:var(--ui-display);
+  font-size:34px;
+  line-height:1.15;
+  margin:0 0 8px;
+  letter-spacing:-.02em;
+  text-wrap:balance;
+}
+.masthead p{margin:0;max-width:62ch;color:var(--ink-soft)}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin:0 0 10px;
+}
+.meta{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;
+}
+.meta span{
+  font-family:var(--mono);font-size:11.5px;
+  border:1px solid var(--line);border-radius:2px;
+  padding:3px 8px;color:var(--ink-soft);background:var(--surface);
+}
+
+/* ---------- plates ---------- */
+.plate{margin-bottom:72px}
+.plate-head{margin-bottom:16px}
+.plate-head h2{
+  font-family:var(--ui-display);
+  font-size:23px;margin:0 0 6px;letter-spacing:-.01em;
+}
+.plate-head p{margin:0;color:var(--ink-soft);max-width:70ch}
+.frame-scroll{
+  overflow-x:auto;
+  border:1px solid var(--line);
+  border-radius:3px;
+  background:var(--surface-2);
+  box-shadow:var(--shadow);
+}
+.notes{
+  margin:16px 0 0;padding:0;list-style:none;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 24px;
+}
+.notes li{
+  font-size:13.5px;color:var(--ink-soft);
+  padding-left:16px;position:relative;
+}
+.notes li::before{
+  content:"";position:absolute;left:0;top:9px;
+  width:6px;height:6px;background:var(--accent);border-radius:1px;
+}
+.notes b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.9em;background:var(--surface);border:1px solid var(--line-soft);border-radius:2px;padding:1px 4px}
+
+/* ---------- app frame ---------- */
+.app{
+  width:1180px;
+  min-height:660px;
+  display:grid;
+  grid-template-columns:212px 1fr;
+  background:var(--ground);
+  font-size:14px;
+}
+.side{
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  padding:22px 0;
+  display:flex;flex-direction:column;
+}
+.brand{padding:0 20px 22px;border-bottom:1px solid var(--line-soft);margin-bottom:14px}
+.brand-name{font-family:var(--ui-display);font-weight:600;font-size:16px;letter-spacing:-.01em}
+.brand-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.06em;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+.nav a{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:3px;
+  color:var(--ink-soft);text-decoration:none;font-size:14px;
+}
+.nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav svg{width:16px;height:16px;flex:none}
+.side-foot{margin-top:auto;padding:16px 20px 0;border-top:1px solid var(--line-soft);font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{
+  height:58px;flex:none;
+  background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+}
+.topbar h3{font-family:var(--ui-display);font-size:17px;margin:0;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.conn{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-soft)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none}
+.dot.warn{background:var(--off)}
+.stamp{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+.body{padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:3px;
+}
+.card-head{
+  padding:13px 18px;border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{font-weight:600;font-size:14px}
+.card-sub{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:15px 17px;position:relative;overflow:hidden}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.stat-label{font-size:12.5px;color:var(--ink-soft);letter-spacing:.01em}
+.stat-val{font-family:var(--mono);font-size:31px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat-unit{font-size:15px;color:var(--ink-soft);margin-left:3px}
+.stat-foot{display:flex;align-items:flex-end;justify-content:space-between;margin-top:8px}
+.stat-delta{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+.tick{width:4px;height:22px;border-radius:1px;position:absolute;left:0;top:15px}
+
+/* ---------- chart ---------- */
+.chart-row{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+.legend{display:flex;gap:16px;align-items:center}
+.legend i{display:inline-block;width:11px;height:2.5px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.legend span{font-size:12px;color:var(--ink-soft);white-space:nowrap}
+.chart-box{padding:14px 16px 8px}
+svg.chart{display:block;width:100%;height:auto}
+
+/* ---------- device panel ---------- */
+.dev{display:flex;align-items:center;gap:13px;padding:15px 18px;border-bottom:1px solid var(--line-soft)}
+.dev:last-child{border-bottom:0}
+.dev-ic{
+  width:36px;height:36px;flex:none;border-radius:3px;
+  background:var(--surface-2);border:1px solid var(--line-soft);
+  display:grid;place-items:center;color:var(--ink-soft);
+}
+.dev-ic svg{width:19px;height:19px}
+.dev-meta{flex:1;min-width:0}
+.dev-name{font-weight:600;font-size:14px}
+.dev-code{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.sw{
+  width:46px;height:25px;border-radius:13px;flex:none;position:relative;
+  background:var(--off-bg);border:1px solid var(--line);
+}
+.sw::after{
+  content:"";position:absolute;top:2px;left:2px;
+  width:19px;height:19px;border-radius:50%;background:var(--surface);
+  border:1px solid var(--line);
+}
+.sw.on{background:var(--accent);border-color:var(--accent)}
+.sw.on::after{left:auto;right:2px;border-color:var(--accent)}
+.sw.busy{opacity:.5}
+.sw-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.sw-state{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.05em}
+
+/* ---------- filter bar ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:15px 18px}
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-size:11.5px;color:var(--ink-soft);letter-spacing:.02em}
+.inp{
+  height:34px;border:1px solid var(--line);border-radius:3px;
+  background:var(--surface);padding:0 10px;
+  display:flex;align-items:center;gap:7px;
+  font-size:13px;color:var(--ink);
+}
+.inp.ph{color:var(--ink-faint)}
+.inp svg{width:14px;height:14px;color:var(--ink-faint);flex:none}
+.inp.num{font-family:var(--mono);width:88px;justify-content:flex-end}
+.inp.sel{justify-content:space-between;min-width:132px}
+.inp.date{font-family:var(--mono);font-size:12.5px;width:150px}
+.btn{
+  height:34px;border:1px solid var(--line);border-radius:3px;
+  background:var(--surface);padding:0 13px;font-size:13px;color:var(--ink-soft);
+  display:flex;align-items:center;
+}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{
+  text-align:left;font-weight:600;font-size:12px;
+  color:var(--ink-soft);letter-spacing:.03em;
+  padding:10px 18px;border-bottom:1px solid var(--line);
+  background:var(--surface-2);white-space:nowrap;
+}
+thead th.num{text-align:right}
+tbody td{padding:9px 18px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+td.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+td.nil{color:var(--ink-faint)}
+.sortcap{display:inline-flex;align-items:center;gap:5px;color:var(--accent)}
+.sortcap svg{width:11px;height:11px}
+.sortable{display:inline-flex;align-items:center;gap:5px;color:inherit}
+.sortable svg{width:9px;height:9px;color:var(--ink-faint)}
+.f-note{display:flex;align-items:center;gap:8px;padding:9px 18px;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);background:var(--surface-2);font-size:11.5px;color:var(--ink-soft)}
+.f-note svg{width:14px;height:14px;flex:none;color:var(--ink-faint)}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  padding:2.5px 8px;border-radius:2px;
+}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.wait{background:var(--wait-bg);color:var(--wait)}
+.errline{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+.act{font-family:var(--mono);font-size:12px}
+
+.tfoot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--ink-soft);
+}
+.pager{display:flex;gap:4px;align-items:center}
+.pg{
+  min-width:29px;height:29px;border:1px solid var(--line);border-radius:3px;
+  display:grid;place-items:center;font-family:var(--mono);font-size:12.5px;
+  background:var(--surface);color:var(--ink-soft);padding:0 6px;
+}
+.pg.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pg.mute{border-color:transparent;background:transparent;color:var(--ink-faint)}
+
+/* ---------- profile ---------- */
+.prof{display:grid;grid-template-columns:236px 1fr;gap:20px;align-items:start}
+.avatar{
+  width:100%;aspect-ratio:1;border-radius:3px;
+  background:var(--surface-2);border:1px dashed var(--line);
+  display:grid;place-items:center;text-align:center;
+  color:var(--ink-faint);font-family:var(--mono);font-size:11.5px;line-height:1.7;
+}
+.kv{display:grid;grid-template-columns:132px 1fr;gap:0}
+.kv dt{padding:10px 0;font-size:13px;color:var(--ink-soft);border-bottom:1px solid var(--line-soft)}
+.kv dd{padding:10px 0;margin:0;font-size:13.5px;border-bottom:1px solid var(--line-soft)}
+.links{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px 18px}
+.link{
+  display:flex;align-items:center;gap:11px;
+  border:1px solid var(--line);border-radius:3px;padding:12px 14px;background:var(--surface);
+}
+.link svg{width:17px;height:17px;color:var(--accent);flex:none}
+.link-t{font-weight:600;font-size:13.5px}
+.link-s{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.link.off{opacity:.55;border-style:dashed}
+.link.off svg{color:var(--ink-faint)}
+
+/* ---------- states ---------- */
+.states{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.state{background:var(--surface);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.state-h{padding:10px 15px;border-bottom:1px solid var(--line-soft);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.state-h b{font-size:13px}
+.state-h span{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);white-space:nowrap}
+.state-b{padding:18px 15px;background:var(--surface-2);min-height:104px;display:flex;align-items:center;justify-content:center}
+.state-n{padding:10px 15px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line-soft)}
+.empty{text-align:center;color:var(--ink-faint)}
+.empty svg{width:26px;height:26px;margin-bottom:6px}
+.empty p{margin:0;font-size:13px}
+.toast{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--bad);
+  border-radius:3px;padding:11px 14px;max-width:290px;
+}
+.toast svg{width:16px;height:16px;color:var(--bad);flex:none;margin-top:1px}
+.toast b{display:block;font-size:13px}
+.toast p{margin:2px 0 0;font-size:12px;color:var(--ink-soft)}
+.badge-off{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--off-bg);color:var(--off);
+  font-size:12px;padding:4px 10px;border-radius:2px;
+}
+
+/* ---------- tokens ---------- */
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sw-item{background:var(--surface);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.sw-chip{height:44px}
+.sw-meta{padding:8px 11px}
+.sw-meta b{display:block;font-size:12.5px}
+.sw-meta code{background:none;border:0;padding:0;font-size:11.5px;color:var(--ink-faint)}
+.spec-table td,.spec-table th{font-size:13px}
+.spec-table th{background:var(--surface-2)}
+.spec-table{border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--surface)}
+
+@media (max-width:720px){
+  .wrap{padding:32px 14px 64px}
+  .masthead h1{font-size:26px}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Bản vẽ giao diện · v1.0 · 17/08/2026</p>
+    <h1>Giao diện Room01</h1>
+    <p>Bốn màn hình của hệ thống giám sát và điều khiển môi trường phòng. Mọi số liệu, tên cột và trạng thái trên bản vẽ đều lấy đúng dữ liệu mà API trả về theo <code>05-API.md</code> §4 — không có trường nào được bịa thêm.</p>
+    <p style="margin-top:12px;padding:12px 14px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 3px 3px 0"><b>Bản có hiệu lực là 4 file rời trong <code>docs/wireframe/</code></b> — chúng đã qua lượt căn chỉnh theo lưới 4 px và là bản dùng để chụp ảnh cho báo cáo cũng như nhập vào Figma. Bốn màn hình nhúng dưới đây là bản nháp trước đó, giữ lại vì phần ghi chú thiết kế đi kèm; <b>bảng thông số ở cuối trang thì đã cập nhật theo bản mới</b>.</p>
+    <div class="meta">
+      <span>1180 × 660 px</span>
+      <span>Tối thiểu 1366 × 768 (NFR-07)</span>
+      <span>Sidebar 212 px</span>
+      <span>Lưới 4 px</span>
+      <span>Bo góc 3 px</span>
+    </div>
+  </header>
+
+  <!-- ============ 1. DASHBOARD ============ -->
+  <section class="plate">
+    <div class="plate-head">
+      <p class="eyebrow">Hình 3.8 · Màn hình 1 / 4 · UC-01, UC-02</p>
+      <h2>Dashboard</h2>
+      <p>Màn hình mặc định. Ba thẻ số liệu và biểu đồ cập nhật qua WebSocket; panel bên phải điều khiển thiết bị.</p>
+    </div>
+
+    <div class="frame-scroll">
+      <div class="app">
+        <!-- sidebar -->
+        <aside class="side">
+          <div class="brand">
+            <div class="brand-name">Room01 Monitor</div>
+            <div class="brand-sub">ESP8266 · PHÒNG 01</div>
+          </div>
+          <nav class="nav">
+            <a href="#" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Data Sensor</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Action History</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+          </nav>
+          <div class="side-foot">v1.0 · LAN 192.168.1.8</div>
+        </aside>
+
+        <!-- main -->
+        <div class="main">
+          <div class="topbar">
+            <h3>Dashboard</h3>
+            <div class="topbar-right">
+              <div class="conn"><i class="dot"></i>Đang nhận dữ liệu</div>
+              <div class="stamp">Cập nhật 17:30:02</div>
+            </div>
+          </div>
+
+          <div class="body">
+            <!-- stat cards -->
+            <div class="stats">
+              <div class="stat">
+                <div class="tick" style="background:var(--temp)"></div>
+                <div class="stat-top"><span class="stat-label">Nhiệt độ</span></div>
+                <div class="stat-val">28.5<span class="stat-unit">°C</span></div>
+                <div class="stat-foot">
+                  <span class="stat-delta">−0.1 trong 20 giây</span>
+                  <svg width="72" height="22" viewBox="0 0 72 22" fill="none"><polyline points="0,16 12,15 24,14 36,12 48,11 60,11 72,12" stroke="var(--temp)" stroke-width="1.5"/><circle cx="72" cy="12" r="2.2" fill="var(--temp)"/></svg>
+                </div>
+              </div>
+              <div class="stat">
+                <div class="tick" style="background:var(--hum)"></div>
+                <div class="stat-top"><span class="stat-label">Độ ẩm</span></div>
+                <div class="stat-val">72.0<span class="stat-unit">%</span></div>
+                <div class="stat-foot">
+                  <span class="stat-delta">−14.4 trong 20 giây</span>
+                  <svg width="72" height="22" viewBox="0 0 72 22" fill="none"><polyline points="0,16 12,15 24,3 36,6 48,12 60,15 72,15" stroke="var(--hum)" stroke-width="1.5"/><circle cx="72" cy="15" r="2.2" fill="var(--hum)"/></svg>
+                </div>
+              </div>
+              <div class="stat">
+                <div class="tick" style="background:var(--light)"></div>
+                <div class="stat-top"><span class="stat-label">Ánh sáng</span></div>
+                <div class="stat-val">350<span class="stat-unit">lux</span></div>
+                <div class="stat-foot">
+                  <span class="stat-delta">+262 trong 20 giây</span>
+                  <svg width="72" height="22" viewBox="0 0 72 22" fill="none"><polyline points="0,7 12,7 24,18 36,19 48,14 60,8 72,7" stroke="var(--light)" stroke-width="1.5"/><circle cx="72" cy="7" r="2.2" fill="var(--light)"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- chart + devices -->
+            <div class="chart-row">
+              <div class="card">
+                <div class="card-head">
+                  <div>
+                    <div class="card-title">Diễn biến 20 mẫu gần nhất</div>
+                    <div class="card-sub">17:29:24 → 17:30:02 · chu kỳ 2 giây · 1 mẫu thiếu độ ẩm</div>
+                  </div>
+                  <div class="legend">
+                    <span><i style="background:var(--temp)"></i>Nhiệt độ</span>
+                    <span><i style="background:var(--hum)"></i>Độ ẩm</span>
+                    <span><i style="background:var(--light)"></i>Ánh sáng</span>
+                  </div>
+                </div>
+                <div class="chart-box">
+                  <svg class="chart" viewBox="0 0 720 214" fill="none" role="img" aria-label="Biểu đồ đường ba chuỗi: nhiệt độ, độ ẩm, ánh sáng">
+                    <!-- grid -->
+                    <g stroke="var(--line-soft)" stroke-width="1">
+                      <line x1="48" y1="16" x2="671" y2="16"/>
+                      <line x1="48" y1="56" x2="671" y2="56"/>
+                      <line x1="48" y1="96" x2="671" y2="96"/>
+                      <line x1="48" y1="136" x2="671" y2="136"/>
+                      <line x1="48" y1="176" x2="671" y2="176"/>
+                    </g>
+                    <!-- left axis labels: 20-100 -->
+                    <g fill="var(--ink-faint)" font-family="Consolas,monospace" font-size="10" text-anchor="end">
+                      <text x="40" y="20">100</text>
+                      <text x="40" y="60">80</text>
+                      <text x="40" y="100">60</text>
+                      <text x="40" y="140">40</text>
+                      <text x="40" y="180">20</text>
+                    </g>
+                    <!-- right axis labels: 0-500 lux -->
+                    <g fill="var(--ink-faint)" font-family="Consolas,monospace" font-size="10" text-anchor="start">
+                      <text x="679" y="20">500</text>
+                      <text x="679" y="60">375</text>
+                      <text x="679" y="100">250</text>
+                      <text x="679" y="140">125</text>
+                      <text x="679" y="180">0</text>
+                    </g>
+                    <!-- series -->
+                    <polyline points="48,63.4 81,64.3 114,63.7 146,64.6 179,64 212,64.9 245,65.9 278,137.6 310,146.6 343,147.8 376,145.6 409,118.4 442,80 474,66.9 507,64.3 540,63.4 573,64 606,64.6 638,63.7 671,64" stroke="var(--light)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                    <polyline points="48,75.6 81,75 114,74.4 146,74 179,73.2 212,67.6 245,56.8 278,45.8 310,39.4 343,43.2 376,52 409,59.6 442,65.2 474,68.8 507,71" stroke="var(--hum)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                    <polyline points="573,72.4 606,72.8 638,72.2 671,72" stroke="var(--hum)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                    <polyline points="48,160.8 81,160.4 114,160.2 146,159.8 179,160 212,159.6 245,159.2 278,159.4 310,159 343,158.8 376,159.2 409,159.4 442,159 474,158.6 507,158.8 540,159.2 573,159 606,158.8 638,159 671,159" stroke="var(--temp)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                    <!-- endpoints -->
+                    <circle cx="671" cy="64" r="3.2" fill="var(--light)"/>
+                    <circle cx="671" cy="72" r="3.2" fill="var(--hum)"/>
+                    <circle cx="671" cy="159" r="3.2" fill="var(--temp)"/>
+                    <!-- x labels -->
+                    <g fill="var(--ink-faint)" font-family="Consolas,monospace" font-size="10" text-anchor="middle">
+                      <text x="48" y="196">17:29:24</text>
+                      <text x="245" y="196">17:29:36</text>
+                      <text x="442" y="196">17:29:48</text>
+                      <text x="671" y="196">17:30:02</text>
+                    </g>
+                    <g fill="var(--ink-faint)" font-family="Consolas,monospace" font-size="9.5">
+                      <text x="8" y="210">°C / %</text>
+                      <text x="712" y="210" text-anchor="end">lux</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-head">
+                  <div class="card-title">Thiết bị</div>
+                  <div class="card-sub">2 thiết bị</div>
+                </div>
+                <div class="dev">
+                  <div class="dev-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z"/></svg></div>
+                  <div class="dev-meta">
+                    <div class="dev-name">Đèn phòng</div>
+                    <div class="dev-code">room01_lamp · D5</div>
+                  </div>
+                  <div class="sw-wrap">
+                    <div class="sw"></div>
+                    <span class="sw-state">OFF</span>
+                  </div>
+                </div>
+                <div class="dev">
+                  <div class="dev-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="2"/><path d="M12 10c0-4 1-7 3-7s2 4-1 6M14 12c4 0 7 1 7 3s-4 2-6-1M12 14c0 4-1 7-3 7s-2-4 1-6M10 12c-4 0-7-1-7-3s4-2 6 1"/></svg></div>
+                  <div class="dev-meta">
+                    <div class="dev-name">Quạt trần</div>
+                    <div class="dev-code">room01_fan · D6</div>
+                  </div>
+                  <div class="sw-wrap">
+                    <div class="sw on"></div>
+                    <span class="sw-state">ON</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li><b>Hai trục tung.</b> Trục trái 20–100 dùng chung cho °C và %; trục phải 0–500 cho lux. Ba đại lượng khác đơn vị nên không thể chung một trục.</li>
+      <li><b>Dữ liệu trên hình là kịch bản T-02 và T-03.</b> Độ ẩm vọt lên khi hà hơi vào DHT11, ánh sáng sụt khi che quang trở — dùng luôn ảnh này minh họa phần nghiệm thu.</li>
+      <li><b>Chấm tròn ở cuối mỗi đường</b> đánh dấu mẫu mới nhất, giúp mắt bắt được điểm đang chạy khi biểu đồ tự cập nhật.</li>
+      <li><b>Công tắc lấy trạng thái từ <code>current_state</code></b>, không phải từ thao tác của người dùng — bóng đèn chưa xác nhận thì công tắc chưa đổi. Trên hình: đèn OFF vì lệnh thành công gần nhất của nó là OFF lúc 17:15:33, quạt ON vì lệnh thành công gần nhất là ON lúc 17:28:07 — đúng hai dòng tương ứng ở màn hình Action History.</li>
+      <li><b>Đường độ ẩm đứt một đoạn ở gần mốc 17:29:54</b>: bản ghi 12041 đọc lỗi độ ẩm nên API trả <code>null</code>. Nối liền qua điểm rỗng sẽ mâu thuẫn với dấu <code>—</code> ở bảng Data Sensor.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 2. DATA SENSOR ============ -->
+  <section class="plate">
+    <div class="plate-head">
+      <p class="eyebrow">Hình 3.9 · Màn hình 2 / 4 · UC-03, UC-04</p>
+      <h2>Data Sensor</h2>
+      <p>Tra cứu số liệu cảm biến. Bộ lọc gồm khoảng thời gian và khoảng giá trị của một cột số, kết hợp được với nhau.</p>
+    </div>
+
+    <div class="frame-scroll">
+      <div class="app">
+        <aside class="side">
+          <div class="brand">
+            <div class="brand-name">Room01 Monitor</div>
+            <div class="brand-sub">ESP8266 · PHÒNG 01</div>
+          </div>
+          <nav class="nav">
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+            <a href="#" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Data Sensor</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Action History</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+          </nav>
+          <div class="side-foot">v1.0 · LAN 192.168.1.8</div>
+        </aside>
+
+        <div class="main">
+          <div class="topbar">
+            <h3>Data Sensor</h3>
+            <div class="topbar-right"><div class="stamp">36.134 bản ghi</div></div>
+          </div>
+
+          <div class="body">
+            <div class="card">
+              <div class="filters">
+                <div class="f">
+                  <label>Tìm kiếm</label>
+                  <div class="inp ph" style="width:212px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Mã hoặc tên cảm biến…</div>
+                </div>
+                <div class="f">
+                  <label>Cảm biến</label>
+                  <div class="inp sel">Tất cả<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+                </div>
+                <div class="f"><label>Giá trị từ</label><div class="inp num ph">—</div></div>
+                <div class="f"><label>Đến</label><div class="inp num ph">—</div></div>
+                <div class="f"><label>Từ ngày</label><div class="inp date">17/08/2026 00:00</div></div>
+                <div class="f"><label>Đến ngày</label><div class="inp date">17/08/2026 23:59</div></div>
+                <div class="btn">Xóa bộ lọc</div>
+              </div>
+              <div class="f-note">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+                Hai ô <b>Giá trị</b> đang bị vô hiệu vì chưa chọn cảm biến — ba đại lượng có đơn vị khác nhau nên “giá trị từ 28 đến 30” áp cho cả bảng là vô nghĩa (28&nbsp;°C và 28&nbsp;lux). Chọn một cảm biến thì hai ô này mở ra và bảng chỉ còn dòng của cảm biến đó.
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num"><span class="sortable">ID<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+                    <th>Mã cảm biến</th>
+                    <th>Cảm biến</th>
+                    <th class="num"><span class="sortable">Giá trị<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+                    <th>Đơn vị</th>
+                    <th><span class="sortcap">Thời gian<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 15l6 6 6-6"/></svg></span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td class="num">36132</td><td class="mono">room01_temp</td><td>Nhiệt độ phòng</td><td class="num">28.5</td><td>°C</td><td class="mono">17:30:02</td></tr>
+                  <tr><td class="num">36133</td><td class="mono">room01_humi</td><td>Độ ẩm phòng</td><td class="num">72.0</td><td>%</td><td class="mono">17:30:02</td></tr>
+                  <tr><td class="num">36134</td><td class="mono">room01_lux</td><td>Ánh sáng phòng</td><td class="num">350</td><td>lux</td><td class="mono">17:30:02</td></tr>
+                  <tr><td class="num">36129</td><td class="mono">room01_temp</td><td>Nhiệt độ phòng</td><td class="num">28.5</td><td>°C</td><td class="mono">17:30:00</td></tr>
+                  <tr><td class="num">36130</td><td class="mono">room01_humi</td><td>Độ ẩm phòng</td><td class="num">71.9</td><td>%</td><td class="mono">17:30:00</td></tr>
+                  <tr><td class="num">36131</td><td class="mono">room01_lux</td><td>Ánh sáng phòng</td><td class="num">351</td><td>lux</td><td class="mono">17:30:00</td></tr>
+                  <tr><td class="num">36126</td><td class="mono">room01_temp</td><td>Nhiệt độ phòng</td><td class="num">28.6</td><td>°C</td><td class="mono">17:29:58</td></tr>
+                  <tr><td class="num">36127</td><td class="mono">room01_humi</td><td>Độ ẩm phòng</td><td class="num">71.6</td><td>%</td><td class="mono">17:29:58</td></tr>
+                  <tr><td class="num">36128</td><td class="mono">room01_lux</td><td>Ánh sáng phòng</td><td class="num">348</td><td>lux</td><td class="mono">17:29:58</td></tr>
+                  <tr><td class="num">36123</td><td class="mono">room01_temp</td><td>Nhiệt độ phòng</td><td class="num">28.5</td><td>°C</td><td class="mono">17:29:56</td></tr>
+                </tbody>
+              </table>
+              <div class="tfoot">
+                <span>Hiển thị 1–10 trong 36.134 bản ghi &nbsp;·&nbsp; 3 dòng mỗi chu kỳ</span>
+                <div class="pager">
+                  <div class="pg mute">‹</div>
+                  <div class="pg on">1</div>
+                  <div class="pg">2</div>
+                  <div class="pg">3</div>
+                  <div class="pg mute">…</div>
+                  <div class="pg">3614</div>
+                  <div class="pg">›</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li><b>Mỗi dòng là một số đo của một cảm biến</b>, không phải một cụm ba số đo. Ba dòng liên tiếp thuộc cùng một chu kỳ lấy mẫu nên mang <em>cùng một mốc thời gian</em>, và hiện theo đúng thứ tự danh mục: Nhiệt độ → Độ ẩm → Ánh sáng.</li>
+      <li><b>Chu kỳ <code>17:29:54</code> chỉ có 2 dòng</b> — DHT11 đọc lỗi độ ẩm nên <em>không có bản ghi nào</em> cho cảm biến đó, thay vì một ô rỗng như bản cũ. Trên biểu đồ Dashboard, đường độ ẩm đứt một đoạn đúng tại mốc này.</li>
+      <li><b>Một trang 10 dòng chỉ chứa 3⅓ chu kỳ</b> — trước kia 10 dòng là 10 mốc thời gian (20 giây dữ liệu), nay chỉ còn khoảng 6 giây. Giao diện nên có sẵn lựa chọn 15 hoặc 30 dòng/trang.</li>
+      <li><b>Hai ô "Giá trị từ / đến" bị vô hiệu khi chưa chọn cảm biến</b> — ba đại lượng có đơn vị khác nhau nên so sánh chung là vô nghĩa. Đây cũng là ô kiểu số nên không gõ được chữ, luồng ngoại lệ UC-04 E1 tự hết hiệu lực.</li>
+      <li><b>Hai cột "Mã cảm biến" và "Cảm biến"</b> là hai cột chuỗi của bảng, và là phạm vi tác động của ô tìm kiếm — gõ <code>temp</code> hay <code>nhiệt</code> đều ra đúng tập bản ghi.</li>
+      <li><b>Mũi tên trên tiêu đề "Thời gian"</b> báo cột đang sắp xếp; mặc định giảm dần theo BR-09. Cột phụ để phá hòa là mã cảm biến — thiếu nó thì lật trang có dòng bị lặp hoặc mất.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 3. ACTION HISTORY ============ -->
+  <section class="plate">
+    <div class="plate-head">
+      <p class="eyebrow">Hình 3.10 · Màn hình 3 / 4 · UC-05, UC-04</p>
+      <h2>Action History</h2>
+      <p>Lịch sử điều khiển. Mỗi lệnh sinh đúng một dòng, kể cả khi thất bại (BR-05).</p>
+    </div>
+
+    <div class="frame-scroll">
+      <div class="app">
+        <aside class="side">
+          <div class="brand">
+            <div class="brand-name">Room01 Monitor</div>
+            <div class="brand-sub">ESP8266 · PHÒNG 01</div>
+          </div>
+          <nav class="nav">
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Data Sensor</a>
+            <a href="#" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Action History</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+          </nav>
+          <div class="side-foot">v1.0 · LAN 192.168.1.8</div>
+        </aside>
+
+        <div class="main">
+          <div class="topbar">
+            <h3>Action History</h3>
+            <div class="topbar-right"><div class="stamp">88 thao tác</div></div>
+          </div>
+
+          <div class="body">
+            <div class="card">
+              <div class="filters">
+                <div class="f">
+                  <label>Tìm kiếm</label>
+                  <div class="inp ph" style="width:210px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Tên hoặc mã thiết bị…</div>
+                </div>
+                <div class="f">
+                  <label>Thiết bị</label>
+                  <div class="inp sel">Tất cả<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+                </div>
+                <div class="f">
+                  <label>Trạng thái</label>
+                  <div class="inp sel">Tất cả<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+                </div>
+                <div class="f">
+                  <label>Hành động</label>
+                  <div class="inp sel">Tất cả<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+                </div>
+                <div class="f">
+                  <label>Người thao tác</label>
+                  <div class="inp sel">Tất cả<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
+                </div>
+                <div class="f"><label>Từ ngày</label><div class="inp date ph">—</div></div>
+                <div class="f"><label>Đến ngày</label><div class="inp date ph">—</div></div>
+                <div class="btn">Xóa bộ lọc</div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th class="num"><span class="sortable">ID<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+                    <th>Thiết bị</th>
+                    <th><span class="sortable">Hành động<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+                    <th>Người thao tác</th>
+                    <th><span class="sortable">Trạng thái<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"/></svg></span></th>
+                    <th class="num">Độ trễ</th>
+                    <th><span class="sortcap">Thời gian<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 15l6 6 6-6"/></svg></span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td class="num">88</td><td>room01_lamp · Đèn phòng</td><td class="act">ON</td><td>Lưu Đức Anh</td><td><span class="pill wait">PENDING</span></td><td class="num nil">—</td><td class="mono">17:31:44</td></tr>
+                  <tr><td class="num">87</td><td>room01_fan · Quạt trần</td><td class="act">ON</td><td>Lưu Đức Anh</td><td><span class="pill ok">SUCCESS</span></td><td class="num">412 ms</td><td class="mono">17:28:07</td></tr>
+                  <tr>
+                    <td class="num">86</td><td>room01_fan · Quạt trần</td><td class="act">ON</td><td>Lưu Đức Anh</td>
+                    <td>
+                      <span class="pill bad">FAILED</span>
+                      <div class="errline">Timeout: không nhận được device_respond trong 5 giây</div>
+                    </td>
+                    <td class="num">5.523 ms</td><td class="mono">17:20:02</td>
+                  </tr>
+                  <tr><td class="num">85</td><td>room01_fan · Quạt trần</td><td class="act">OFF</td><td>Người vận hành</td><td><span class="pill ok">SUCCESS</span></td><td class="num">455 ms</td><td class="mono">17:17:26</td></tr>
+                  <tr><td class="num">84</td><td>room01_lamp · Đèn phòng</td><td class="act">OFF</td><td>Người vận hành</td><td><span class="pill ok">SUCCESS</span></td><td class="num">388 ms</td><td class="mono">17:15:33</td></tr>
+                  <tr><td class="num">83</td><td>room01_lamp · Đèn phòng</td><td class="act">ON</td><td>Lưu Đức Anh</td><td><span class="pill ok">SUCCESS</span></td><td class="num">401 ms</td><td class="mono">17:12:19</td></tr>
+                  <tr><td class="num">82</td><td>room01_fan · Quạt trần</td><td class="act">ON</td><td>Người vận hành</td><td><span class="pill ok">SUCCESS</span></td><td class="num">443 ms</td><td class="mono">17:08:51</td></tr>
+                  <tr><td class="num">81</td><td>room01_lamp · Đèn phòng</td><td class="act">OFF</td><td>Lưu Đức Anh</td><td><span class="pill ok">SUCCESS</span></td><td class="num">377 ms</td><td class="mono">17:02:40</td></tr>
+                  <tr><td class="num">80</td><td>room01_lamp · Đèn phòng</td><td class="act">ON</td><td>Lưu Đức Anh</td><td><span class="pill ok">SUCCESS</span></td><td class="num">396 ms</td><td class="mono">16:58:12</td></tr>
+                  <tr><td class="num">79</td><td>room01_fan · Quạt trần</td><td class="act">OFF</td><td class="nil">—</td><td><span class="pill ok">SUCCESS</span></td><td class="num">421 ms</td><td class="mono">16:55:07</td></tr>
+                </tbody>
+              </table>
+              <div class="tfoot">
+                <span>Hiển thị 1–10 trong 88 bản ghi</span>
+                <div class="pager">
+                  <div class="pg mute">‹</div>
+                  <div class="pg on">1</div>
+                  <div class="pg">2</div>
+                  <div class="pg">3</div>
+                  <div class="pg mute">…</div>
+                  <div class="pg">9</div>
+                  <div class="pg">›</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li><b>Cột "Người thao tác"</b> trả lời trực tiếp câu hỏi <em>ai đã bật cái đèn này</em> (FR-18). Dòng <code>id 79</code> để dấu <code>—</code>: lệnh phát bằng <code>mosquitto_pub</code> khi kiểm thử nên không xác định được người. Giao diện <em>không</em> ghi "Hệ thống" hay "Ẩn danh" — hai chữ đó gợi ý rằng tồn tại một tài khoản mang tên như vậy.</li>
+      <li><b>Cột "Thiết bị" hiện cả mã lẫn tên</b> (<code>room01_lamp · Đèn phòng</code>): mã là thứ đi trong payload MQTT và xuất hiện trong log, tên là thứ người dùng đọc. Quy ước mã <code>&lt;vị trí&gt;_&lt;vai trò&gt;</code> giúp nhìn là biết thiết bị thuộc phòng nào khi lắp thêm bo mạch thứ hai.</li>
+      <li><b>Ba màu trạng thái là màu ngữ nghĩa</b>, tách khỏi màu nhấn của giao diện: xanh lá = thành công, đỏ = thất bại, hổ phách = đang chờ.</li>
+      <li><b>Dòng FAILED mang thêm một dòng phụ</b> chứa <code>error_message</code> — người dùng biết vì sao thất bại mà không phải bấm vào đâu.</li>
+      <li><b>Cột Độ trễ</b> tính từ <code>responded_at − created_at</code>, không lưu trong CSDL. Dòng đang <code>PENDING</code> hiển thị <code>—</code>.</li>
+      <li><b>Màn hình này không tự cập nhật</b> để dòng đang đọc không bị trôi; riêng dòng <code>PENDING</code> được cập nhật tại chỗ khi lệnh kết thúc.</li>
+    </ul>
+  </section>
+
+  <!-- ============ 4. PROFILE ============ -->
+  <section class="plate">
+    <div class="plate-head">
+      <p class="eyebrow">Hình 3.11 · Màn hình 4 / 4 · UC-06</p>
+      <h2>Profile</h2>
+      <p>Thông tin sinh viên và các liên kết bàn giao. Nội dung đọc từ <code>.env</code>, không viết cứng trong mã Frontend.</p>
+    </div>
+
+    <div class="frame-scroll">
+      <div class="app">
+        <aside class="side">
+          <div class="brand">
+            <div class="brand-name">Room01 Monitor</div>
+            <div class="brand-sub">ESP8266 · PHÒNG 01</div>
+          </div>
+          <nav class="nav">
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Data Sensor</a>
+            <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>Action History</a>
+            <a href="#" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Profile</a>
+          </nav>
+          <div class="side-foot">v1.0 · LAN 192.168.1.8</div>
+        </aside>
+
+        <div class="main">
+          <div class="topbar"><h3>Profile</h3></div>
+          <div class="body">
+            <div class="prof">
+              <div class="avatar">Ảnh đại diện<br>236 × 236</div>
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div class="card">
+                  <div class="card-head"><div class="card-title">Sinh viên thực hiện</div></div>
+                  <div style="padding:4px 18px 12px">
+                    <dl class="kv">
+                      <dt>Họ và tên</dt><dd>Lưu Đức Anh</dd>
+                      <dt>Mã sinh viên</dt><dd style="font-family:var(--mono)">B23DCAT011</dd>
+                      <dt>Lớp</dt><dd style="font-family:var(--mono)">D23CQAT01-B</dd>
+                      <dt>Email</dt><dd style="font-family:var(--mono)">ducanhyeutoan@gmail.com</dd>
+                      <dt>Học phần</dt><dd>IoT &amp; Ứng dụng</dd>
+                      <dt>Giảng viên</dt><dd>ThS. Nguyễn Quốc Uy</dd>
+                      <dt style="border-bottom:0">Đề tài</dt><dd style="border-bottom:0">Hệ thống giám sát và điều khiển môi trường phòng dựa trên IoT</dd>
+                    </dl>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-head"><div class="card-title">Sản phẩm bàn giao</div><div class="card-sub">4 liên kết</div></div>
+                  <div class="links">
+                    <div class="link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9c0-1.1.1-1.5-.6-2.1 3-.3 5.6-1.5 5.6-6a4.7 4.7 0 0 0-1.3-3.2 4.3 4.3 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.4 5.4 2.7 5.4 2.7a4.3 4.3 0 0 0-.1 3.2A4.7 4.7 0 0 0 4 9.1c0 4.5 2.6 5.7 5.6 6-.7.6-.7 1.2-.6 2.1V21"/></svg>
+                      <div><div class="link-t">Mã nguồn</div><div class="link-s">github.com/…</div></div>
+                    </div>
+                    <div class="link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5h5"/><path d="M14 3H6v18h12V8z"/><path d="M9 13h6M9 17h4"/></svg>
+                      <div><div class="link-t">Báo cáo PDF</div><div class="link-s">BaoCao.pdf</div></div>
+                    </div>
+                    <div class="link off">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M9 3h3v6H9a3 3 0 0 1 0-6zM12 3h3a3 3 0 0 1 0 6h-3M9 9h3v6H9a3 3 0 0 1 0-6zM9 15h3v3a3 3 0 1 1-3-3z"/></svg>
+                      <div><div class="link-t">Thiết kế Figma</div><div class="link-s">Đang cập nhật</div></div>
+                    </div>
+                    <div class="link">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6"/></svg>
+                      <div><div class="link-t">Tài liệu API</div><div class="link-s">/api/schema/swagger-ui/</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="notes">
+      <li><b>Nút "Thiết kế Figma" đang ở trạng thái vô hiệu</b>, viền nét đứt kèm chữ "Đang cập nhật" — đúng luồng ngoại lệ UC-06 E1 khi biến môi trường còn trống.</li>
+      <li><b>API phân biệt <code>null</code> và chuỗi rỗng.</b> Liên kết chưa cấu hình trả về <code>null</code>, Frontend nhờ đó biết chắc phải vô hiệu hóa nút.</li>
+      <li><b>Thông tin sinh viên trên hình vẫn là giả định</b> — cần xác nhận trước khi nộp, vì nó xuất hiện ở cả trang bìa báo cáo.</li>
+    </ul>
+  </section>
+
+  <!-- ============ STATES ============ -->
+  <section class="plate">
+    <div class="plate-head">
+      <p class="eyebrow">Trạng thái phụ · không cần chèn vào báo cáo</p>
+      <h2>Bốn trạng thái phải vẽ trong Figma</h2>
+      <p>Đây là những trạng thái dễ bị bỏ quên khi dựng giao diện, nhưng đều có trong đặc tả và sẽ bị hỏi khi vấn đáp.</p>
+    </div>
+
+    <div class="states">
+      <div class="state">
+        <div class="state-h"><b>Công tắc đang chờ</b><span>BR-04</span></div>
+        <div class="state-b">
+          <div style="display:flex;align-items:center;gap:13px;width:230px">
+            <div class="dev-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z"/></svg></div>
+            <div class="dev-meta"><div class="dev-name">Đèn phòng</div><div class="dev-code">room01_lamp · D5</div></div>
+            <div class="sw-wrap"><div class="sw on busy"></div><span class="sw-state">ĐANG CHỜ…</span></div>
+          </div>
+        </div>
+        <div class="state-n">Khóa từ lúc bấm tới khi nhận <code>device.state</code>, tối đa 7 giây rồi tự mở.</div>
+      </div>
+
+      <div class="state">
+        <div class="state-h"><b>Thiết bị ngoại tuyến</b><span>BR-07</span></div>
+        <div class="state-b">
+          <div style="text-align:center">
+            <div class="badge-off"><i class="dot warn"></i>Thiết bị ngoại tuyến</div>
+            <div style="font-family:var(--mono);font-size:26px;color:var(--ink-faint);margin-top:10px">28.5 °C</div>
+          </div>
+        </div>
+        <div class="state-n">Quá 30 giây không có <code>sensor.data</code>: hiện nhãn, làm mờ số liệu cũ.</div>
+      </div>
+
+      <div class="state">
+        <div class="state-h"><b>Bảng chưa có dữ liệu</b><span>UC-03 A1</span></div>
+        <div class="state-b">
+          <div class="empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>
+            <p>Chưa có dữ liệu</p>
+          </div>
+        </div>
+        <div class="state-n">Ẩn luôn thanh phân trang. Khác với "Không tìm thấy kết quả" của UC-04 A1 — trạng thái đó có nút "Xóa bộ lọc".</div>
+      </div>
+
+      <div class="state">
+        <div class="state-h"><b>Lệnh thất bại</b><span>BR-03</span></div>
+        <div class="state-b">
+          <div class="toast">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16h.01"/></svg>
+            <div><b>Thiết bị không phản hồi</b><p>Công tắc "Đèn phòng" đã trở về trạng thái cũ.</p></div>
+          </div>
+        </div>
+        <div class="state-n">Xuất hiện sau 5–6 giây, kèm việc trả công tắc về trạng thái trước đó.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOKENS ============ -->
+  <section class="plate">
+    <div class="plate-head">
+      <p class="eyebrow">Bảng thông số · để vẽ lại trong Figma</p>
+      <h2>Màu và kích thước</h2>
+      <p>Chép các giá trị này thành Color Styles và Text Styles trong Figma trước khi vẽ, để không phải chỉnh tay từng lớp.</p>
+    </div>
+
+    <div class="swatches" style="margin-bottom:18px">
+      <div class="sw-item"><div class="sw-chip" style="background:#0F1E2B"></div><div class="sw-meta"><b>Mực</b><code>#0F1E2B</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#5B6D7C"></div><div class="sw-meta"><b>Mực nhạt</b><code>#5B6D7C</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#F1F4F7"></div><div class="sw-meta"><b>Nền trang</b><code>#F1F4F7</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#D3DBE2"></div><div class="sw-meta"><b>Đường kẻ</b><code>#D3DBE2</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#1F4B99"></div><div class="sw-meta"><b>Nhấn</b><code>#1F4B99</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#C0492F"></div><div class="sw-meta"><b>Nhiệt độ</b><code>#C0492F</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#1C7B8E"></div><div class="sw-meta"><b>Độ ẩm</b><code>#1C7B8E</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#C98A16"></div><div class="sw-meta"><b>Ánh sáng / chờ</b><code>#C98A16</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#2F7A4D"></div><div class="sw-meta"><b>Thành công</b><code>#2F7A4D</code></div></div>
+      <div class="sw-item"><div class="sw-chip" style="background:#B3261E"></div><div class="sw-meta"><b>Thất bại</b><code>#B3261E</code></div></div>
+    </div>
+
+    <div class="frame-scroll">
+      <table class="spec-table">
+        <thead><tr><th>Thành phần</th><th>Kích thước</th><th>Kiểu chữ</th><th>Ghi chú</th></tr></thead>
+        <tbody>
+          <tr><td>Khung ứng dụng</td><td class="mono">co giãn</td><td>—</td><td>Bản HTML trong <code>docs/wireframe/</code> lấp đầy cửa sổ (rộng 100%, tối đa 1680; cao 100vh). Đặt cửa sổ đúng cỡ muốn có — ví dụ 1440 × 900 — rồi mới chụp. Tối thiểu 1366 × 768 theo NFR-07</td></tr>
+          <tr><td>Sidebar</td><td class="mono">rộng 212</td><td>14 / 400</td><td>Mục đang chọn: nền <code>#E7EDF7</code>, chữ màu nhấn, đậm 600</td></tr>
+          <tr><td><b>Khối logo</b></td><td class="mono">cao 58</td><td>16 / 600</td><td><b>Bằng đúng chiều cao thanh tiêu đề</b> — hai vạch kẻ ngang phải nối liền nhau</td></tr>
+          <tr><td>Thanh tiêu đề</td><td class="mono">cao 58</td><td>18 / 600</td><td>Viền dưới 1 px</td></tr>
+          <tr><td>Mục điều hướng</td><td class="mono">cao 36</td><td>14 / 400</td><td>Khe giữa các mục 4 px</td></tr>
+          <tr><td>Đầu thẻ</td><td class="mono">cao 56</td><td>14 / 600</td><td>Cố định để các thẻ cạnh nhau có vạch kẻ trùng nhau</td></tr>
+          <tr><td>Thẻ số liệu</td><td class="mono">cao 112</td><td>32 / mono</td><td>Vạch màu 4 px bên trái; 3 thẻ cao bằng nhau</td></tr>
+          <tr><td><b>Lưới 3 cột</b></td><td class="mono">(100% − 32) ÷ 3</td><td>—</td><td>Thẻ thiết bị rộng đúng một cột, thẻ biểu đồ chiếm phần còn lại → <b>mép trái panel thiết bị luôn trùng mép trái thẻ số liệu thứ ba</b> ở mọi bề ngang cửa sổ. Ở khung 1180 thì một cột đúng 296 px</td></tr>
+          <tr><td>Biểu đồ</td><td class="mono">co giãn</td><td>13 / mono</td><td>Vùng vẽ kéo giãn tự do lấp hết chỗ trống (<code>preserveAspectRatio="none"</code>); đường dày 2,5 giữ nguyên nhờ <code>vector-effect</code>. Nhãn trục và chấm cuối nằm ngoài SVG nên không bị méo. Chấm cuối 9 px</td></tr>
+          <tr><td>Dòng thiết bị</td><td class="mono">cao 68</td><td>14 / 600</td><td>Biểu tượng 36 × 36</td></tr>
+          <tr><td>Công tắc</td><td class="mono">48 × 24</td><td>—</td><td>Núm 18 px, bo tròn hoàn toàn</td></tr>
+          <tr><td>Ô nhập</td><td class="mono">cao 36</td><td>13 / 400</td><td>Viền 1 px, bo góc 3 px</td></tr>
+          <tr><td>Đầu bảng</td><td class="mono">cao 40</td><td>11 / 600</td><td>Chữ HOA, giãn chữ 0,05em, nền <code>#F7F9FB</code></td></tr>
+          <tr><td>Dòng bảng</td><td class="mono">cao 40</td><td>13 / 400</td><td>Chiều rộng cột theo <b>phần trăm</b> để bảng lấp đầy thẻ ở mọi bề ngang. Nội dung căn <b>đỉnh</b> ô</td></tr>
+          <tr><td>Nhãn trạng thái</td><td class="mono">cao 20</td><td>11 / mono</td><td>Bo góc 2 px, chữ HOA, giãn chữ 0,04em</td></tr>
+          <tr><td>Nút phân trang</td><td class="mono">32 × 32</td><td>12 / mono</td><td>Khe 4 px</td></tr>
+          <tr><td>Khoảng cách</td><td class="mono">bội số của 4</td><td>—</td><td>Đệm trong thẻ 16 · khe giữa các khối 16 · lề vùng nội dung 24</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ul class="notes">
+      <li><b>Chữ giao diện</b> dùng Segoe UI Variable (có sẵn trên Windows 11). Trong Figma chọn <em>Segoe UI</em> nếu không thấy bản Variable.</li>
+      <li><b>Mọi con số, mốc thời gian và mã</b> dùng Consolas hoặc Cascadia Mono — cột số thẳng hàng thì mắt so sánh được theo chiều dọc.</li>
+      <li><b>Bo góc 3 px, không bo tròn nhiều.</b> Đây là bảng điều khiển thiết bị, không phải ứng dụng tiêu dùng.</li>
+      <li><b>Trang này tự đổi theo nền sáng/tối</b> của máy bạn. Chụp ảnh cho báo cáo nên để nền sáng cho dễ in.</li>
+    </ul>
+  </section>
+
+</div>
