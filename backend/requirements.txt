@@ -1,0 +1,15 @@
+# Phiên bản đã cài và chạy thử trên Python 3.14 (18/09/2026).
+# Django >= 5.1 vì models dùng CheckConstraint(condition=...) — CLAUDE.md §0.4.
+Django==5.2.17
+djangorestframework==3.18.1
+django-filter==26.1
+django-cors-headers==4.9.0
+drf-spectacular==0.30.0
+channels[daphne]==4.3.2
+channels-redis==4.3.0
+# redis-py 8 mặc định socket_timeout = 5 giây — phải kèm "socket_timeout" trong CHANNEL_LAYERS (settings.py)
+redis==8.1.0
+psycopg[binary]==3.3.5
+# paho-mqtt 2.x: Client() bắt buộc truyền CallbackAPIVersion — 05-API.md §7.4
+paho-mqtt==2.1.0
+python-decouple==3.8
