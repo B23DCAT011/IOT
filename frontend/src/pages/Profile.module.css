@@ -1,0 +1,160 @@
+/* Hai cột thông tin ⟷ liên kết (CLAUDE.md §0.2e) */
+.cols {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex: none;
+}
+.col {
+  display: flex;
+  min-width: 0;
+}
+.col > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.colA {
+  flex: 1.7;
+}
+.colB {
+  flex: 1;
+}
+.who {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  align-items: stretch;
+}
+.avatar,
+.avatarImg {
+  width: 200px;
+  height: 200px;
+  flex: none;
+  border-radius: 3px;
+}
+.avatar {
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 18px;
+}
+.avatarImg {
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+.kv {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.kvRow {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  border-bottom: 1px solid var(--line-soft);
+}
+.kvRow:last-child {
+  border-bottom: 0;
+}
+.kvK {
+  width: 136px;
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.kvV {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mono {
+  font-family: var(--mono);
+}
+.topic {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  margin-top: auto;
+  padding: 16px;
+  gap: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+.topicK {
+  width: 136px;
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.topicV {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+}
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  flex: 1;
+}
+.link {
+  width: 100%;
+  flex: 1;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 16px;
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--ink);
+}
+a.link:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.link svg {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+  flex: none;
+}
+.linkTxt {
+  min-width: 0;
+}
+.linkT {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 20px;
+}
+.linkS {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.linkOff {
+  border-style: dashed;
+  cursor: not-allowed;
+}
+.linkOff .linkT,
+.linkOff svg {
+  color: var(--ink-faint);
+}

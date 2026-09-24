@@ -1,0 +1,103 @@
+/* Màn hình đăng nhập — chưa có trong bản vẽ; dựng theo cùng bảng màu, kích thước của 4 màn hình. */
+.page {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--ground);
+}
+.panel {
+  width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.brand {
+  height: 58px;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--line);
+}
+.brandName {
+  font-family: var(--ui-display);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+.brandSub {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+.form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.title {
+  font-family: var(--ui-display);
+  font-size: 20px;
+  line-height: 28px;
+  margin: 0;
+  font-weight: 600;
+}
+.lead {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+.field input {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+.submit {
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+}
+.error,
+.notice {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-size: 13px;
+  line-height: 18px;
+}
+.error {
+  border-left: 3px solid var(--bad);
+  background: var(--bad-bg);
+}
+.notice {
+  border-left: 3px solid var(--wait);
+  background: var(--wait-bg);
+}
+.mockHint {
+  padding: 12px 24px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--surface-2);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+.mockHint code {
+  font-family: var(--mono);
+  color: var(--ink);
+}
