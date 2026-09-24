@@ -1,0 +1,1077 @@
+openapi: 3.0.3
+info:
+  title: IoT Room Monitoring API
+  version: 2.1.0
+  description: |-
+    Hệ thống giám sát và điều khiển môi trường phòng dựa trên IoT.
+
+    Bấm **Authorize** và nhập `Token <token>` — có chữ `Token` và một dấu cách (lấy token bằng `POST /api/auth/login`).
+paths:
+  /api/actions:
+    get:
+      operationId: actions_list
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+          title: Hành động
+          enum:
+          - 'OFF'
+          - 'ON'
+        description: |-
+          * `ON` - Bật
+          * `OFF` - Tắt
+      - in: query
+        name: created_at__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created_at__lte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: device
+        schema:
+          type: number
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          title: Trạng thái
+          enum:
+          - FAILED
+          - PENDING
+          - SUCCESS
+        description: |-
+          * `PENDING` - Đang chờ
+          * `SUCCESS` - Thành công
+          * `FAILED` - Thất bại
+      - in: query
+        name: user
+        schema:
+          type: string
+      tags:
+      - Actions
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActionHistoryList'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/actions/{id}:
+    get:
+      operationId: actions_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Lịch sử thao tác.
+        required: true
+      tags:
+      - Actions
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActionHistory'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/auth/login:
+    post:
+      operationId: auth_login_create
+      tags:
+      - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              TàiKhoảnAdmin:
+                value:
+                  username: admin
+                  password: doi-mat-khau-nay
+                summary: Tài khoản admin
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/auth/logout:
+    post:
+      operationId: auth_logout_create
+      description: Thu hồi token đang dùng. Thiếu/sai token thì IsAuthenticated trả
+        401 trước khi vào hàm.
+      tags:
+      - Auth
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/devices:
+    get:
+      operationId: devices_list
+      tags:
+      - Devices
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/devices/{id}:
+    get:
+      operationId: devices_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Thiết bị.
+        required: true
+      tags:
+      - Devices
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/devices/{id}/control:
+    post:
+      operationId: devices_control_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Thiết bị.
+        required: true
+      tags:
+      - Devices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlRequest'
+            examples:
+              BậtĐèn:
+                value:
+                  action: 'ON'
+                summary: Bật đèn
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControlRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControlRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlAccepted'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/profile:
+    get:
+      operationId: profile_retrieve
+      description: |-
+        Thông tin sinh viên và liên kết bàn giao — đọc từ `.env`, không có bảng CSDL.
+
+        Biến để trống ⇒ `null`, Frontend hiện nút vô hiệu "Đang cập nhật" (UC-06 E1).
+      tags:
+      - Profile
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/sensors:
+    get:
+      operationId: sensors_list
+      parameters:
+      - in: query
+        name: node
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: recorded_at__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: recorded_at__lte
+        schema:
+          type: string
+          format: date-time
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sensor
+        schema:
+          type: string
+      - in: query
+        name: value__gte
+        schema:
+          type: number
+          format: float
+      - in: query
+        name: value__lte
+        schema:
+          type: number
+          format: float
+      tags:
+      - Sensors
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSensorReadingList'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/sensors/{id}:
+    get:
+      operationId: sensors_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Số đo cảm biến.
+        required: true
+      tags:
+      - Sensors
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorReading'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/sensors/chart:
+    get:
+      operationId: sensors_chart_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: Số chu kỳ, 1 → 100, mặc định 20
+      tags:
+      - Sensors
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChartPoint'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/sensors/devices:
+    get:
+      operationId: sensors_devices_list
+      tags:
+      - Sensors
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SensorDevice'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+  /api/sensors/latest:
+    get:
+      operationId: sensors_latest_list
+      tags:
+      - Sensors
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LatestReading'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: ''
+components:
+  schemas:
+    ActionHistory:
+      type: object
+      description: Một dòng của GET /api/actions. `user` có thể null (BR-12) — Frontend
+        hiện "—".
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        device:
+          $ref: '#/components/schemas/DeviceBrief'
+        action:
+          allOf:
+          - $ref: '#/components/schemas/OnOffEnum'
+          title: Hành động
+        user:
+          allOf:
+          - $ref: '#/components/schemas/UserBrief'
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          title: Trạng thái
+        error_message:
+          type: string
+          nullable: true
+          title: Lý do thất bại
+          maxLength: 255
+        request_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Mã yêu cầu
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Thời điểm gửi lệnh
+        responded_at:
+          type: string
+          format: date-time
+          nullable: true
+          title: Thời điểm kết thúc lệnh
+        latency_ms:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - action
+      - created_at
+      - device
+      - id
+      - latency_ms
+      - request_id
+      - user
+    ChartPoint:
+      type: object
+      description: Một CHU KỲ trên biểu đồ (§4.2). Khóa là metric_type viết thường;
+        thiếu số đo → null.
+      properties:
+        recorded_at:
+          type: string
+          format: date-time
+        temperature:
+          type: number
+          format: double
+          nullable: true
+        humidity:
+          type: number
+          format: double
+          nullable: true
+        light:
+          type: number
+          format: double
+          nullable: true
+      required:
+      - humidity
+      - light
+      - recorded_at
+      - temperature
+    ControlAccepted:
+      type: object
+      description: Phản hồi 202 — lệnh đã tiếp nhận, CHƯA hoàn tất. Kết quả về qua
+        WebSocket.
+      properties:
+        request_id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Mã yêu cầu
+        device_id:
+          type: integer
+        device:
+          type: string
+        action:
+          allOf:
+          - $ref: '#/components/schemas/OnOffEnum'
+          title: Hành động
+        user:
+          $ref: '#/components/schemas/UserBrief'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          title: Trạng thái
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Thời điểm gửi lệnh
+      required:
+      - action
+      - created_at
+      - device
+      - device_id
+      - request_id
+      - user
+    ControlRequest:
+      type: object
+      description: |-
+        Thân POST /api/devices/{id}/control.
+
+        Chỉ khai `action`: `user_id` người gọi gửi kèm bị bỏ qua — người thao tác lấy từ
+        token, không giả mạo được (05-API.md §4.5, ca A-11c).
+      properties:
+        action:
+          type: string
+      required:
+      - action
+    Device:
+      type: object
+      description: GET /api/devices — không trả `is_active` vì danh sách đã lọc sẵn.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          title: Mã thiết bị
+          maxLength: 30
+        name:
+          type: string
+          title: Tên hiển thị
+          maxLength: 100
+        device_type:
+          allOf:
+          - $ref: '#/components/schemas/DeviceTypeEnum'
+          title: Loại thiết bị
+        node_id:
+          type: string
+          default: esp8266_room01
+          title: Mã bo mạch
+          maxLength: 50
+        gpio_pin:
+          type: string
+          title: Chân GPIO
+          maxLength: 10
+        current_state:
+          allOf:
+          - $ref: '#/components/schemas/OnOffEnum'
+          title: Trạng thái hiện tại
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - code
+      - gpio_pin
+      - id
+      - name
+      - updated_at
+    DeviceBrief:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          title: Mã thiết bị
+          maxLength: 30
+        name:
+          type: string
+          title: Tên hiển thị
+          maxLength: 100
+      required:
+      - code
+      - id
+      - name
+    DeviceTypeEnum:
+      enum:
+      - LIGHT
+      - FAN
+      - OTHER
+      type: string
+      description: |-
+        * `LIGHT` - Đèn
+        * `FAN` - Quạt
+        * `OTHER` - Khác
+    Error:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorBody'
+      required:
+      - error
+    ErrorBody:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Một trong 9 mã ở 05-API.md §2.7
+        message:
+          type: string
+        details:
+          nullable: true
+      required:
+      - code
+      - details
+      - message
+    LatestReading:
+      type: object
+      description: Một phần tử của GET /api/sensors/latest (§4.1).
+      properties:
+        sensor:
+          $ref: '#/components/schemas/SensorBrief'
+        value:
+          type: number
+          format: double
+          title: Giá trị đo
+        recorded_at:
+          type: string
+          format: date-time
+          title: Thời điểm ghi nhận
+      required:
+      - sensor
+      - value
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/LoginUser'
+      required:
+      - token
+      - user
+    LoginUser:
+      type: object
+      description: Người dùng trả về lúc đăng nhập — thêm `username` và `role` để
+        hiện ở sidebar (§4.8).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          title: Tên đăng nhập
+          description: Yêu cầu. 150 ký tự hoặc ít hơn. Chỉ là chữ cái, chữ số và @/./+/-/_.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        full_name:
+          type: string
+          title: Họ và tên
+          maxLength: 100
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          title: Vai trò
+      required:
+      - id
+      - username
+    MetricTypeEnum:
+      enum:
+      - TEMPERATURE
+      - HUMIDITY
+      - LIGHT
+      type: string
+      description: |-
+        * `TEMPERATURE` - Nhiệt độ
+        * `HUMIDITY` - Độ ẩm
+        * `LIGHT` - Ánh sáng
+    OnOffEnum:
+      enum:
+      - 'ON'
+      - 'OFF'
+      type: string
+      description: |-
+        * `ON` - Bật
+        * `OFF` - Tắt
+    PaginatedActionHistoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActionHistory'
+    PaginatedSensorReadingList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SensorReading'
+    Profile:
+      type: object
+      properties:
+        student:
+          $ref: '#/components/schemas/ProfileStudent'
+        project:
+          $ref: '#/components/schemas/ProfileProject'
+        links:
+          $ref: '#/components/schemas/ProfileLinks'
+      required:
+      - links
+      - project
+      - student
+    ProfileLinks:
+      type: object
+      properties:
+        github:
+          type: string
+          nullable: true
+        report_pdf:
+          type: string
+          nullable: true
+        figma:
+          type: string
+          nullable: true
+        api_docs:
+          type: string
+          nullable: true
+      required:
+      - api_docs
+      - figma
+      - github
+      - report_pdf
+    ProfileProject:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+        subject:
+          type: string
+          nullable: true
+        supervisor:
+          type: string
+          nullable: true
+      required:
+      - subject
+      - supervisor
+      - title
+    ProfileStudent:
+      type: object
+      properties:
+        full_name:
+          type: string
+          nullable: true
+        student_id:
+          type: string
+          nullable: true
+        class_name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        avatar_url:
+          type: string
+          nullable: true
+      required:
+      - avatar_url
+      - class_name
+      - email
+      - full_name
+      - student_id
+    RoleEnum:
+      enum:
+      - ADMIN
+      - OPERATOR
+      - VIEWER
+      type: string
+      description: |-
+        * `ADMIN` - Quản trị
+        * `OPERATOR` - Người vận hành
+        * `VIEWER` - Chỉ xem
+    SensorBrief:
+      type: object
+      description: Cảm biến rút gọn, lồng trong mỗi số đo.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          title: Mã cảm biến
+          maxLength: 30
+        name:
+          type: string
+          title: Tên hiển thị
+          maxLength: 100
+        unit:
+          type: string
+          title: Đơn vị
+          maxLength: 10
+      required:
+      - code
+      - id
+      - name
+      - unit
+    SensorDevice:
+      type: object
+      description: GET /api/sensors/devices — KHÔNG trả min_value/max_value (chỉ worker
+        dùng).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          title: Mã cảm biến
+          maxLength: 30
+        name:
+          type: string
+          title: Tên hiển thị
+          maxLength: 100
+        metric_type:
+          allOf:
+          - $ref: '#/components/schemas/MetricTypeEnum'
+          title: Đại lượng đo
+        unit:
+          type: string
+          title: Đơn vị
+          maxLength: 10
+        node_id:
+          type: string
+          default: esp8266_room01
+          title: Mã bo mạch
+          maxLength: 50
+      required:
+      - code
+      - id
+      - metric_type
+      - name
+      - unit
+    SensorReading:
+      type: object
+      description: Một dòng của bảng GET /api/sensors (§4.3) — thêm `id`.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sensor:
+          $ref: '#/components/schemas/SensorBrief'
+        value:
+          type: number
+          format: double
+          title: Giá trị đo
+        recorded_at:
+          type: string
+          format: date-time
+          title: Thời điểm ghi nhận
+      required:
+      - id
+      - sensor
+      - value
+    StatusEnum:
+      enum:
+      - PENDING
+      - SUCCESS
+      - FAILED
+      type: string
+      description: |-
+        * `PENDING` - Đang chờ
+        * `SUCCESS` - Thành công
+        * `FAILED` - Thất bại
+    UserBrief:
+      type: object
+      description: Người thao tác rút gọn — lồng trong lịch sử và phản hồi điều khiển
+        (05-API.md §4.5, §4.6).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        full_name:
+          type: string
+          title: Họ và tên
+          maxLength: 100
+      required:
+      - id
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

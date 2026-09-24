@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IoT Room Monitoring API — tài liệu</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F4B99'/%3E%3Cpath d='M8 21l5-6 4 3 7-8' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui.css" />
+<style>
+  body { margin: 0; background: #fafafa; font-family: 'Segoe UI', system-ui, sans-serif; }
+  .note {
+    margin: 0; padding: 12px 20px; background: #e7edf7; border-bottom: 1px solid #c7d5ea;
+    color: #1f3a63; font-size: 13px; line-height: 20px;
+  }
+  .note b { color: #17305a; }
+  .note code {
+    font-family: Consolas, ui-monospace, monospace; font-size: 12px;
+    background: #fff; border: 1px solid #c7d5ea; border-radius: 3px; padding: 1px 5px;
+  }
+  .swagger-ui .topbar { display: none; }
+</style>
+</head>
+<body>
+<p class="note">
+  Bản <b>chỉ để đọc</b>, dựng từ <code>docs/api/openapi.yaml</code> — xuất bằng
+  <code>manage.py spectacular</code> từ chính mã nguồn backend.
+  Nút <b>Try it out</b> ở đây <b>không gọi được</b> vì máy chủ chỉ chạy trong mạng nội bộ;
+  muốn gọi thật thì chạy <code>daphne -p 8000 config.asgi:application</code> rồi mở
+  <code>http://localhost:8000/api/schema/swagger-ui/</code>, bấm <b>Authorize</b> và nhập
+  <code>Token &lt;khoá&gt;</code> — nhớ gõ cả chữ <code>Token</code> và một dấu cách.
+</p>
+<div id="swagger"></div>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+<script>
+  window.ui = SwaggerUIBundle({
+    url: './openapi.yaml',
+    dom_id: '#swagger',
+    deepLinking: true,
+    docExpansion: 'list',
+    defaultModelsExpandDepth: 0,
+    tryItOutEnabled: false,
+    supportedSubmitMethods: [],
+    presets: [SwaggerUIBundle.presets.apis],
+  })
+</script>
+</body>
+</html>
