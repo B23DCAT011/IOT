@@ -1,0 +1,68 @@
+/* Bảng màu và kích thước lấy đúng từ docs/wireframe/*.html.
+   Một bảng màu sáng duy nhất, không theo nền tối của hệ điều hành. */
+:root {
+  --ground: #f1f4f7;
+  --surface: #ffffff;
+  --surface-2: #f7f9fb;
+  --ink: #0f1e2b;
+  --ink-soft: #5b6d7c;
+  --ink-faint: #8a9aa7;
+  --line: #d3dbe2;
+  --line-soft: #e6ebef;
+  --accent: #1f4b99;
+  --accent-strong: #193f82;
+  --accent-soft: #e7edf7;
+  --temp: #c0492f;
+  --hum: #1c7b8e;
+  --light: #c98a16;
+  --ok: #2f7a4d;
+  --ok-bg: #e4f1e9;
+  --bad: #b3261e;
+  --bad-bg: #fbe7e5;
+  --wait: #c98a16;
+  --wait-bg: #fbf1dc;
+  --off: #7a8894;
+  --off-bg: #ebeff2;
+  --ui: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --ui-display: 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Cascadia Mono', Consolas, 'Roboto Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html {
+  background: var(--ground);
+}
+
+body {
+  margin: 0;
+  min-width: 1100px; /* dưới mức này bố cục 2 cột không còn đủ chỗ */
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}

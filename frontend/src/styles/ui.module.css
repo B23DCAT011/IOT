@@ -1,0 +1,497 @@
+/* Thành phần dùng chung cho mọi màn hình — chép từ docs/wireframe/*.html.
+   Chiều cao cố định: đầu thẻ 56, dòng bảng 40, ô nhập 36; mọi khoảng cách là bội số của 4. */
+
+/* ---------- thẻ ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.cardGrow {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cardHead {
+  height: 56px;
+  flex: none;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.cardTitle {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+.cardSub {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+
+/* ---------- thanh tiêu đề ---------- */
+.stamp {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.conn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ok);
+  flex: none;
+}
+.dotWarn {
+  background: var(--off);
+}
+
+/* ---------- bộ lọc ---------- */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  flex: none;
+  padding: 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fieldLabel {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.input {
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+}
+.input::placeholder {
+  color: var(--ink-faint);
+}
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.input:disabled {
+  background: var(--surface-2);
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+.invalid,
+.invalid:focus {
+  border-color: var(--bad);
+  box-shadow: 0 0 0 3px var(--bad-bg);
+}
+/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Mã hoặc tên cảm biến…" và "Ánh sáng phòng"
+   bị cắt mất đuôi. Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
+.searchBox {
+  position: relative;
+  width: 232px;
+}
+.searchBox svg {
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+.searchBox .input {
+  width: 100%;
+  padding-left: 36px;
+}
+.inputNum {
+  width: 96px;
+  font-family: var(--mono);
+  text-align: right;
+}
+.select {
+  width: 164px;
+  padding-right: 4px;
+}
+/* Ô số dòng/trang chỉ chứa số nên hẹp hơn hẳn các ô chọn khác. */
+.selectNarrow {
+  width: 76px;
+}
+/* Ô thời điểm: chữ gõ tay chiếm gần hết, chừa 32px bên phải cho nút mở lịch. */
+.dtBox {
+  position: relative;
+  /* đủ chỗ cho cả chuỗi chép từ cột Thời gian: "17/08/2026 · 17:29:54" + nút lịch */
+  width: 214px;
+}
+.dtBox .input {
+  width: 100%;
+  padding: 0 34px 0 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.dtBtn {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 34px;
+  border: 0;
+  border-radius: 0 3px 3px 0;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.dtBtn:hover {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+.dtBtn svg {
+  width: 16px;
+  height: 16px;
+}
+/* Ô lịch thật của trình duyệt: phải được render (chỉ trong suốt) thì showPicker() mới chạy,
+   để display:none là Chrome ném InvalidStateError. */
+.dtPicker {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.btn {
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  padding: 0 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+.btn:disabled {
+  color: var(--ink-faint);
+  cursor: default;
+}
+.btnPrimary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+.btnPrimary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #ffffff;
+}
+.btnPrimary:disabled {
+  opacity: 0.6;
+  color: #ffffff;
+}
+
+/* Dải chú thích dưới thanh lọc */
+.fNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 36px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-2);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+.fNote svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--ink-faint);
+}
+.fNoteBad {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+.fNoteBad svg {
+  color: var(--bad);
+}
+
+/* ---------- bảng ---------- */
+.tbl {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  transition: opacity 0.15s;
+}
+.loading {
+  opacity: 0.55;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+}
+.table thead th {
+  height: 40px;
+  padding: 0 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.table tbody td {
+  padding: 10px 16px;
+  line-height: 20px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.table .num {
+  text-align: right;
+}
+.table td.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.table td.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.nil,
+.table td.nil {
+  color: var(--ink-faint);
+}
+.code {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+.sub {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ink-faint);
+  margin-top: 1px;
+}
+.act {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.sortcap,
+.sortable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.sortcap {
+  color: var(--accent);
+}
+.sortcap svg {
+  width: 12px;
+  height: 12px;
+}
+.sortable {
+  color: inherit;
+}
+.sortable svg {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  color: var(--ink-faint);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border-radius: 2px;
+}
+.pillSUCCESS {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.pillFAILED {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+.pillPENDING {
+  background: var(--wait-bg);
+  color: var(--wait);
+}
+.errline {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+  white-space: normal;
+}
+
+/* ---------- chân bảng + phân trang ---------- */
+.tfoot {
+  height: 52px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.pager {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.pg {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.pg:hover:not(:disabled):not(.pgOn) {
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+.pgOn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  cursor: default;
+}
+.pgMute,
+.pg:disabled {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ink-faint);
+  cursor: default;
+}
+
+/* ---------- thông báo + trạng thái rỗng ---------- */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 16px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--bad);
+  border-radius: 3px;
+  background: var(--bad-bg);
+  font-size: 13px;
+  color: var(--ink);
+}
+.bannerText {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+}
+.bannerBtn {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: var(--off-bg);
+  color: var(--off);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 36px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+.dim {
+  opacity: 0.45;
+}
