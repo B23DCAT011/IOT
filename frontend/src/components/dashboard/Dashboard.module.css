@@ -1,0 +1,262 @@
+/* ---------- thẻ số liệu ---------- */
+.stats {
+  display: flex;
+  gap: 16px;
+  flex: none;
+  transition: opacity 0.2s;
+}
+.stat {
+  flex: 1 1 0;
+  height: 112px; /* cố định → 3 thẻ bằng nhau */
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+.tick {
+  width: 4px;
+  height: 24px;
+  border-radius: 2px;
+  flex: none;
+  margin-top: 4px;
+}
+.statMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.statLabel {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-soft);
+}
+.statVal {
+  font-family: var(--mono);
+  font-size: 32px;
+  line-height: 36px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.statValNil {
+  color: var(--ink-faint);
+}
+.statUnit {
+  font-family: var(--ui);
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+.statFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 20px;
+}
+.statFoot svg {
+  width: 72px;
+  height: 20px;
+  flex: none;
+  display: block;
+  overflow: visible;
+}
+.statDelta {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- biểu đồ + thiết bị ---------- */
+.chartRow {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 320px;
+}
+.chartCol {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+.chartCol > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+/* Rộng đúng 1/3 vùng nội dung → mép trái trùng mép trái thẻ số liệu thứ ba. */
+.devCol {
+  width: calc((100% - 32px) / 3);
+  flex: none;
+  display: flex;
+}
+.devCol > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.legendKey {
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  flex: none;
+}
+.chartBox {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.plot {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.plotInner {
+  position: absolute;
+  inset: 0;
+}
+.units {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+.chartEmpty {
+  flex: 1;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+/* ---------- thiết bị ---------- */
+.dev {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 68px;
+  flex: none;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.dev:last-child {
+  border-bottom: 0;
+}
+.devIc {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+}
+.devIc svg {
+  width: 20px;
+  height: 20px;
+}
+.devMeta {
+  flex: 1;
+  min-width: 0;
+}
+.devName {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+}
+.devCode {
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+.swWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex: none;
+}
+.sw {
+  width: 48px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--off-bg);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  cursor: pointer;
+}
+.sw:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.swOn {
+  background: var(--accent);
+  border-color: var(--accent);
+  justify-content: flex-end;
+}
+.knob {
+  width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.swOn .knob {
+  border-color: var(--accent);
+}
+.swBusy,
+.sw:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+.swState {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+}
+.devEmpty {
+  padding: 24px 16px;
+  font-size: 13px;
+  color: var(--ink-faint);
+}
