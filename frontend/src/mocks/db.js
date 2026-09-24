@@ -372,7 +372,7 @@ export const PROFILE = {
   links: {
     github: 'https://github.com/B23DCAT011/IOT',
     report_pdf: 'https://github.com/B23DCAT011/IOT/blob/main/docs/BaoCao.pdf',
-    figma: null,
+    figma: 'https://www.figma.com/design/2oR8lFM04tyK7kjpxGrILX/Untitled?node-id=0-1',
     api_docs: 'http://localhost:8000/api/schema/swagger-ui/',
   },
 }
