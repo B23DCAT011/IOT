@@ -1,0 +1,45 @@
+LINK THAM KHẢO — LẮP RÁP PHẦN CỨNG (ESP8266 + DHT11 + LM393 + LED)
+Dùng để chuẩn bị trước khi viết bản hướng dẫn lắp ráp chi tiết (tuần 2).
+Đã kiểm tra bằng tìm kiếm ngày 27/08/2026, chưa mở từng trang để xác nhận nội dung —
+nếu link nào chết hoặc đổi nội dung khi mở, báo lại để thay link khác.
+
+============================================================
+
+--- đây là link về SƠ ĐỒ CHÂN (PINOUT) CỦA BOARD ESP8266 NODEMCU ---
+--- (chân nào là D1/D2/D5/D6/A0 ứng với GPIO số mấy, chân nào cấp 3.3V) ---
+https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/
+
+--- đây là link về CÁCH ĐẤU DÂY CẢM BIẾN NHIỆT ĐỘ + ĐỘ ẨM DHT11 VÀO ESP8266 ---
+--- (sơ đồ nối VCC, GND, chân Data, có cần điện trở kéo lên hay không) ---
+https://lastminuteengineers.com/esp8266-dht11-dht22-web-server-tutorial/
+
+--- đây là link về CÁCH ĐẤU MODULE CẢM BIẾN ÁNH SÁNG (QUANG TRỞ + LM393) VÀO ESP8266 ---
+--- (nối chân AO/DO vào chân analog A0, cách chỉnh biến trở trên module) ---
+https://newbiely.com/tutorials/esp8266/esp8266-light-sensor
+
+--- đây là link về THƯ VIỆN ĐỌC CẢM BIẾN DHT11 TRONG ARDUINO IDE (Adafruit DHT sensor library) ---
+--- (thư viện dùng để viết code đọc nhiệt độ/độ ẩm ở tuần 2) ---
+https://github.com/adafruit/DHT-sensor-library
+
+--- đây là link về CÁCH CÀI BOARD ESP8266 VÀO ARDUINO IDE ---
+--- (thêm URL vào Additional Board Manager URLs, cài gói esp8266 rồi mới nạp code được) ---
+https://randomnerdtutorials.com/how-to-install-esp8266-board-arduino-ide/
+
+--- đây là link về THƯ VIỆN MQTT ĐÃ CHỐT DÙNG CHO FIRMWARE (arduino-mqtt / lwmqtt, KHÔNG dùng PubSubClient — lý do ghi ở CLAUDE.md §5.5) ---
+--- (repo GitHub, cách publish có QoS 1, cách khai bộ đệm 256 byte) ---
+https://github.com/256dpi/arduino-mqtt
+
+--- đây là link về CÁCH CÀI ĐẶT MQTT BROKER MOSQUITTO TRÊN WINDOWS ---
+--- (tải bản cài, chạy dưới dạng Windows Service, kiểm tra bằng mosquitto_sub/mosquitto_pub) ---
+https://www.cedalo.com/blog/how-to-install-mosquitto-mqtt-broker-on-windows
+
+============================================================
+
+Ghi chú:
+- Chân cắm thực tế của dự án đã chốt sẵn ở CLAUDE.md §2.1: DHT11 → D4,
+  quang trở (LM393) → A0, đèn phòng → D5, quạt → D6. Các link trên chỉ để
+  tham khảo cách đấu chung — khi lắp thì lấy đúng số chân đã chốt, không
+  lấy chân ví dụ trong link.
+- Bước kế tiếp: viết bản hướng dẫn lắp ráp đầy đủ (sơ đồ đấu nối từng dây,
+  checklist kiểm tra trước khi cấp nguồn) — làm sau khi bạn xác nhận các
+  link trên dùng được.

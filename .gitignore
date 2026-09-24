@@ -1,6 +1,7 @@
 # ---------- Bí mật: KHÔNG BAO GIỜ commit ----------
 backend/.env
 .env.local
+firmware/esp8266_room01/secrets.h
 
 # ---------- Môi trường, thư viện ----------
 backend/.venv/
