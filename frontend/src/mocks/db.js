@@ -370,8 +370,8 @@ export const PROFILE = {
     supervisor: 'TS. Nguyễn Quốc Uy',
   },
   links: {
-    github: null,
-    report_pdf: null,
+    github: 'https://github.com/B23DCAT011/IOT',
+    report_pdf: 'https://github.com/B23DCAT011/IOT/blob/main/docs/BaoCao.pdf',
     figma: null,
     api_docs: 'http://localhost:8000/api/schema/swagger-ui/',
   },
