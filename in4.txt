@@ -1,0 +1,13 @@
+Nguyen Quoc Uy
+1987
+uynq@ptit.edu.vn
+0971479145
+
+esp8266 - 70-100k dien tu Tuyet nga
+DHT11 - 25k
+quang trở
+led,dây nối
+breadboard
+
+keyword:
+remote comtrol led esp 8266,source
