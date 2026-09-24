@@ -542,6 +542,8 @@ PostgreSQL 18 (service `postgresql-x64-18`, DB `iot_room`) · Redis = container 
 | Mật khẩu MQTT trong `docs/BTH2-huongdan-terminal-demo.md` | 21 chỗ đã thay bằng `<mat-khau>`. Chép lệnh từ tài liệu thì phải tự điền lại |
 | Không commit | `backend/.env` · `.venv` · `node_modules` · `dist` · `build/` · `.claude/settings.local.json` · `secrets.h` |
 | Đã quét trước khi push | Dò từng giá trị bí mật thật trên **toàn bộ** commit: `SECRET_KEY`, `DB_PASSWORD`, `MQTT_PASSWORD`, `WIFI_PASS`, `MQTT_PASS` — sạch. Tên WiFi `Luu Duc Anh` và tài khoản `iotuser` vẫn còn trong tài liệu (SSID vốn phát công khai, còn `iotuser` chỉ là tên đăng nhập) |
+| **Link trang Profile** | `LINK_GITHUB` = kho ở trên · `LINK_REPORT_PDF` = `.../blob/main/docs/BaoCao.pdf` (đã kiểm: HTTP 200, repo đang **public**) · `LINK_FIGMA` **vẫn trống** — giao diện hiện "Đang cập nhật". Sửa link chỉ cần đổi `backend/.env` rồi khởi động lại daphne, **không đụng code**; nhớ sửa kèm `frontend/src/mocks/db.js` cho chế độ dữ liệu giả |
+| `docs/BaoCao.pdf` | Xuất từ `BaoCao-moi .docx` bằng Word COM ở chế độ **chỉ đọc** (30 trang). Bản Word không bị đụng (`LastWriteTime` giữ nguyên 20/08). Chương 4 còn thiếu kết quả chạy thử ⇒ xuất lại đè lên file này khi xong, link không đổi |
 | Lần sau thêm bí mật | Đừng gõ thẳng vào code. Backend: thêm biến vào `.env` + `.env.example`. Firmware: thêm vào `secrets.h` + `secrets.example.h` |
 
 ### 0.5 Mở phiên mới thì bắt đầu từ đâu
