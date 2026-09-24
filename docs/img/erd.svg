@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1380" height="830" viewBox="0 0 1380 830" font-family="Segoe UI, Arial, sans-serif">
+  <!-- ERD 5 bang — nguon vector cua docs/img/erd.png.
+       Sua file nay roi render lai bang Chrome headless (CLAUDE.md §0.2i),
+       DUNG sua truc tiep file .png. -->
+  <defs>
+    <style>
+      .box   { fill:#ffffff; stroke:#334155; stroke-width:2; }
+      .hdr   { fill:#e2e8f0; stroke:#334155; stroke-width:2; }
+      .hdrT  { font-size:17px; font-weight:700; fill:#0f172a; letter-spacing:.3px; }
+      .row   { font-size:14.5px; fill:#1e293b; }
+      .key   { font-size:12px; font-weight:700; fill:#b45309; }
+      .fk    { font-size:12px; font-weight:700; fill:#1d4ed8; }
+      .note  { font-size:12.5px; fill:#64748b; font-style:italic; }
+      .line  { stroke:#334155; stroke-width:2; fill:none; }
+      .card  { font-size:15px; font-weight:700; fill:#0f172a; }
+      .rel   { font-size:12.5px; fill:#475569; }
+      .sep   { stroke:#cbd5e1; stroke-width:1; }
+    </style>
+  </defs>
+
+  <rect width="1380" height="830" fill="#ffffff"/>
+
+  <!-- ===================== SENSOR_DEVICE ===================== -->
+  <rect class="hdr" x="40" y="60" width="320" height="34" rx="4"/>
+  <rect class="box" x="40" y="94" width="320" height="278"/>
+  <text class="hdrT" x="200" y="83" text-anchor="middle">sensor_device</text>
+  <text class="note" x="200" y="112" text-anchor="middle">danh mục cảm biến</text>
+  <line class="sep" x1="40" y1="122" x2="360" y2="122"/>
+  <text class="row" x="56" y="145">id</text>                <text class="key" x="344" y="145" text-anchor="end">PK</text>
+  <text class="row" x="56" y="169">code</text>              <text class="key" x="344" y="169" text-anchor="end">UK</text>
+  <text class="row" x="56" y="193">name</text>
+  <text class="row" x="56" y="217">metric_type</text>       <text class="key" x="344" y="217" text-anchor="end">UK*</text>
+  <text class="row" x="56" y="241">unit</text>
+  <text class="row" x="56" y="265">hardware_model</text>
+  <text class="row" x="56" y="289">node_id</text>           <text class="key" x="344" y="289" text-anchor="end">UK*</text>
+  <text class="row" x="56" y="313">min_value / max_value</text>
+  <text class="row" x="56" y="337">is_active</text>
+  <text class="row" x="56" y="361">created_at / updated_at</text>
+
+  <!-- ===================== SENSOR_DATA ===================== -->
+  <rect class="hdr" x="40" y="560" width="320" height="34" rx="4"/>
+  <rect class="box" x="40" y="594" width="320" height="158"/>
+  <text class="hdrT" x="200" y="583" text-anchor="middle">sensor_data</text>
+  <text class="note" x="200" y="612" text-anchor="middle">một dòng = một số đo</text>
+  <line class="sep" x1="40" y1="622" x2="360" y2="622"/>
+  <text class="row" x="56" y="645">id</text>                <text class="key" x="344" y="645" text-anchor="end">PK</text>
+  <text class="row" x="56" y="669">sensor_id</text>         <text class="fk"  x="344" y="669" text-anchor="end">FK · UK*</text>
+  <text class="row" x="56" y="693">value</text>             <text class="note" x="344" y="693" text-anchor="end">NOT NULL</text>
+  <text class="row" x="56" y="717">recorded_at</text>       <text class="key" x="344" y="717" text-anchor="end">UK*</text>
+  <text class="note" x="200" y="741" text-anchor="middle">UK* = duy nhất theo cặp (sensor_id, recorded_at)</text>
+
+  <!-- ===================== DEVICES ===================== -->
+  <rect class="hdr" x="520" y="60" width="320" height="34" rx="4"/>
+  <rect class="box" x="520" y="94" width="320" height="230"/>
+  <text class="hdrT" x="680" y="83" text-anchor="middle">devices</text>
+  <text class="note" x="680" y="112" text-anchor="middle">thiết bị chấp hành</text>
+  <line class="sep" x1="520" y1="122" x2="840" y2="122"/>
+  <text class="row" x="536" y="145">id</text>               <text class="key" x="824" y="145" text-anchor="end">PK</text>
+  <text class="row" x="536" y="169">code</text>             <text class="key" x="824" y="169" text-anchor="end">UK</text>
+  <text class="row" x="536" y="193">name</text>
+  <text class="row" x="536" y="217">device_type</text>
+  <text class="row" x="536" y="241">node_id</text>          <text class="key" x="824" y="241" text-anchor="end">UK†</text>
+  <text class="row" x="536" y="265">gpio_pin</text>         <text class="key" x="824" y="265" text-anchor="end">UK†</text>
+  <text class="row" x="536" y="289">current_state</text>
+  <text class="row" x="536" y="313">is_active · created_at · updated_at</text>
+
+  <!-- ===================== USERS ===================== -->
+  <rect class="hdr" x="1010" y="60" width="320" height="34" rx="4"/>
+  <rect class="box" x="1010" y="94" width="320" height="206"/>
+  <text class="hdrT" x="1170" y="83" text-anchor="middle">users</text>
+  <text class="note" x="1170" y="112" text-anchor="middle">người thao tác</text>
+  <line class="sep" x1="1010" y1="122" x2="1330" y2="122"/>
+  <text class="row" x="1026" y="145">id</text>              <text class="key" x="1314" y="145" text-anchor="end">PK</text>
+  <text class="row" x="1026" y="169">username</text>        <text class="key" x="1314" y="169" text-anchor="end">UK</text>
+  <text class="row" x="1026" y="193">password</text>        <text class="note" x="1314" y="193" text-anchor="end">đã băm</text>
+  <text class="row" x="1026" y="217">full_name</text>
+  <text class="row" x="1026" y="241">role</text>
+  <text class="row" x="1026" y="265">is_active</text>
+  <text class="row" x="1026" y="289">date_joined · last_login</text>
+
+  <!-- ===================== ACTION_HISTORY ===================== -->
+  <rect class="hdr" x="520" y="560" width="360" height="34" rx="4"/>
+  <rect class="box" x="520" y="594" width="360" height="230"/>
+  <text class="hdrT" x="700" y="583" text-anchor="middle">action_history</text>
+  <text class="note" x="700" y="612" text-anchor="middle">lịch sử thao tác</text>
+  <line class="sep" x1="520" y1="622" x2="880" y2="622"/>
+  <text class="row" x="536" y="645">id</text>               <text class="key" x="864" y="645" text-anchor="end">PK</text>
+  <text class="row" x="536" y="669">device_id</text>        <text class="fk"  x="864" y="669" text-anchor="end">FK</text>
+  <text class="row" x="536" y="693">user_id</text>          <text class="fk"  x="864" y="693" text-anchor="end">FK · NULL được</text>
+  <text class="row" x="536" y="717">request_id</text>       <text class="key" x="864" y="717" text-anchor="end">UK</text>
+  <text class="row" x="536" y="741">action · status</text>
+  <text class="row" x="536" y="765">error_message</text>
+  <text class="row" x="536" y="789">created_at · responded_at</text>
+
+  <!-- ===================== QUAN HE ===================== -->
+  <!-- sensor_device 1 --- N sensor_data -->
+  <line class="line" x1="200" y1="372" x2="200" y2="560"/>
+  <text class="card" x="212" y="396">1</text>
+  <text class="card" x="212" y="550">N</text>
+  <text class="rel"  x="216" y="470">sinh ra</text>
+
+  <!-- devices 1 --- N action_history -->
+  <line class="line" x1="640" y1="324" x2="640" y2="560"/>
+  <text class="card" x="652" y="348">1</text>
+  <text class="card" x="652" y="550">N</text>
+  <text class="rel"  x="656" y="446">phát sinh</text>
+
+  <!-- users 1 --- N action_history (gap khuc) -->
+  <polyline class="line" points="1170,300 1170,440 810,440 810,560"/>
+  <text class="card" x="1182" y="324">1</text>
+  <text class="card" x="822" y="550">N</text>
+  <text class="rel"  x="900" y="430">thực hiện</text>
+
+  <!-- ===================== GHI CHU RANG BUOC ===================== -->
+  <rect x="905" y="594" width="425" height="132" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text class="row" x="925" y="622" font-weight="700">Ràng buộc duy nhất theo cặp</text>
+  <text class="note" x="925" y="648">UK*  (node_id, metric_type) — mỗi bo mạch chỉ một</text>
+  <text class="note" x="925" y="668">        cảm biến cho mỗi đại lượng</text>
+  <text class="note" x="925" y="694">UK†  (node_id, gpio_pin) — một chân GPIO chỉ duy</text>
+  <text class="note" x="925" y="714">        nhất trong phạm vi một bo mạch</text>
+
+  <text class="note" x="905" y="760">Cả ba khóa ngoại đều đặt PROTECT: không xóa được bản ghi cha</text>
+  <text class="note" x="905" y="780">khi còn bản ghi con tham chiếu tới (NFR-06).</text>
+</svg>

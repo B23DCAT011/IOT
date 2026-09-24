@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 620" width="1120" height="620" font-family="Consolas, 'DejaVu Sans Mono', monospace">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e8ecef"/>
+    </marker>
+    <marker id="al" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e8ecef"/>
+    </marker>
+  </defs>
+
+  <rect width="1120" height="620" fill="#15181c"/>
+
+  <!-- ================= KHOI TRAI: PHONG ================= -->
+  <rect x="24" y="24" width="360" height="572" rx="14" fill="#1e2228" stroke="#8d97a3" stroke-width="2"/>
+  <text x="204" y="58" fill="#f2f5f7" font-size="21" font-weight="700" text-anchor="middle">PHÒNG</text>
+
+  <!-- khung ESP8266 -->
+  <rect x="48" y="78" width="312" height="456" rx="11" fill="#232830" stroke="#6aa9e0" stroke-width="2"/>
+  <text x="204" y="114" fill="#cfe3f7" font-size="18" text-anchor="middle">ESP8266 NodeMCU</text>
+
+  <rect x="72" y="290" width="264" height="70" rx="9" fill="#2b2f38" stroke="#d9a7bd" stroke-width="2"/>
+  <text x="204" y="331" fill="#f2e6ec" font-size="16" text-anchor="middle">DHT11 (temp, hum)</text>
+
+  <rect x="72" y="372" width="264" height="70" rx="9" fill="#2b2f38" stroke="#d9a7bd" stroke-width="2"/>
+  <text x="204" y="400" fill="#f2e6ec" font-size="16" text-anchor="middle">Quang trở + LM393</text>
+  <text x="204" y="424" fill="#f2e6ec" font-size="16" text-anchor="middle">(lux)</text>
+
+  <rect x="72" y="454" width="264" height="70" rx="9" fill="#2b2f38" stroke="#d9a7bd" stroke-width="2"/>
+  <text x="204" y="482" fill="#f2e6ec" font-size="16" text-anchor="middle">LED 1 (Đèn) /</text>
+  <text x="204" y="506" fill="#f2e6ec" font-size="16" text-anchor="middle">LED 2 (Quạt)</text>
+
+  <text x="204" y="570" fill="#c3ccd6" font-size="16" text-anchor="middle">WiFi 2.4GHz</text>
+
+  <!-- ================= KHOI PHAI: LAPTOP ================= -->
+  <rect x="640" y="24" width="456" height="572" rx="14" fill="#1e2228" stroke="#7fc59b" stroke-width="2"/>
+  <text x="868" y="58" fill="#f2f5f7" font-size="21" font-weight="700" text-anchor="middle">LAPTOP</text>
+
+  <!-- Mosquitto -->
+  <rect x="664" y="112" width="408" height="120" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="868" y="163" fill="#eaf6ee" font-size="17" text-anchor="middle">MQTT Broker —</text>
+  <text x="868" y="190" fill="#eaf6ee" font-size="17" text-anchor="middle">Mosquitto :1883</text>
+
+  <!-- Backend -->
+  <rect x="664" y="340" width="216" height="92" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="772" y="375" fill="#eaf6ee" font-size="17" text-anchor="middle">Backend —</text>
+  <text x="772" y="400" fill="#eaf6ee" font-size="16" text-anchor="middle">Django + DRF + WS</text>
+
+  <!-- Database -->
+  <rect x="916" y="340" width="156" height="92" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="994" y="375" fill="#eaf6ee" font-size="16" text-anchor="middle">Database —</text>
+  <text x="994" y="400" fill="#eaf6ee" font-size="16" text-anchor="middle">PostgreSQL</text>
+
+  <!-- Frontend -->
+  <rect x="664" y="480" width="216" height="80" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="772" y="511" fill="#eaf6ee" font-size="17" text-anchor="middle">Frontend —</text>
+  <text x="772" y="536" fill="#eaf6ee" font-size="17" text-anchor="middle">Web (React)</text>
+
+  <!-- Nguoi dung -->
+  <circle cx="1000" cy="486" r="15" fill="#dfe6ec"/>
+  <path d="M973 536 a27 30 0 0 1 54 0 z" fill="#dfe6ec"/>
+  <text x="1000" y="561" fill="#dfe6ec" font-size="16" text-anchor="middle">Người dùng</text>
+
+  <!-- ====== BA MUI TEN QUA KHE GIUA ======
+       Ca ba deu noi giua mep phai khoi PHONG va khoi Mosquitto.
+       Ca ba deu nam PHIA TREN khoi DHT11 (y=290) de khong bi doc nham
+       la thuoc ve mot linh kien cu the nao. -->
+  <text x="512" y="137" fill="#e8ecef" font-size="16" text-anchor="middle">pub data_sensors</text>
+  <path d="M384 150 H664" stroke="#e8ecef" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+
+  <text x="512" y="183" fill="#e8ecef" font-size="16" text-anchor="middle">pub device_respond</text>
+  <path d="M384 196 H664" stroke="#e8ecef" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+
+  <text x="512" y="239" fill="#e8ecef" font-size="16" text-anchor="middle">sub device_control</text>
+  <path d="M664 232 V252 H384" stroke="#e8ecef" stroke-width="2" fill="none" marker-end="url(#al)"/>
+
+  <!-- ====== Mosquitto <-> Backend (hai chieu) ====== -->
+  <path d="M772 232 V340" stroke="#e8ecef" stroke-width="2" fill="none" marker-start="url(#al)" marker-end="url(#ar)"/>
+  <text x="800" y="268" fill="#e8ecef" font-size="16">sub data_sensors</text>
+  <text x="800" y="293" fill="#e8ecef" font-size="16">sub device_respond</text>
+  <text x="800" y="318" fill="#e8ecef" font-size="16">pub device_control</text>
+
+  <!-- ====== Backend <-> Database (hai chieu) ====== -->
+  <path d="M880 386 H916" stroke="#e8ecef" stroke-width="2" fill="none" marker-start="url(#al)" marker-end="url(#ar)"/>
+
+  <!-- ====== Backend <-> Frontend (hai chieu) ====== -->
+  <path d="M772 432 V480" stroke="#e8ecef" stroke-width="2" fill="none" marker-start="url(#al)" marker-end="url(#ar)"/>
+  <text x="800" y="462" fill="#e8ecef" font-size="16">HTTP / WebSocket</text>
+
+  <!-- ====== Nguoi dung -> Frontend ====== -->
+  <path d="M962 520 H880" stroke="#e8ecef" stroke-width="2" fill="none" marker-end="url(#al)"/>
+</svg>
