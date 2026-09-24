@@ -1,0 +1,171 @@
+/* Khung co giãn theo cửa sổ: rộng tối đa 1680px, cao đúng 100% (CLAUDE.md §0.2e).
+   Khối logo cao 58 = thanh tiêu đề 58 → hai vạch kẻ nối liền ngang màn hình. */
+.app {
+  display: flex;
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  height: 100%;
+  min-height: 620px;
+  background: var(--ground);
+}
+
+/* ---------- thanh điều hướng trái ---------- */
+.side {
+  width: 212px;
+  flex: none;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.brand {
+  height: 58px;
+  flex: none;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--line);
+}
+.brandName {
+  font-family: var(--ui-display);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+.brandSub {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 12px;
+}
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 3px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 14px;
+}
+.navLink:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.navLink svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.on,
+.on:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.spacer {
+  flex: 1;
+}
+
+/* Khối người dùng — thêm ở bản có đăng nhập (05-API.md v2.1), bản vẽ cũ chưa có */
+.user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 12px 20px;
+  border-top: 1px solid var(--line-soft);
+}
+.userMeta {
+  flex: 1;
+  min-width: 0;
+}
+.userName {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.userRole {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.logout {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.logout:hover {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+.logout svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- vùng nội dung ---------- */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.topbar {
+  height: 58px;
+  flex: none;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+.title {
+  font-family: var(--ui-display);
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0;
+  font-weight: 600;
+}
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto; /* cửa sổ quá thấp thì cuộn ở đây */
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
