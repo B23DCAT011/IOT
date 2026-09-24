@@ -19,3 +19,9 @@ build/
 
 # ---------- Cấu hình riêng của máy ----------
 .claude/settings.local.json
+
+# ---------- Tư liệu riêng, không đưa lên kho ----------
+# 12 ảnh chụp bảng lúc giao đề và payload mẫu để thử mosquitto_pub:
+# vẫn nằm trên máy, chỉ là bày ra ở thư mục gốc của kho thì rối mắt.
+/*.jpg
+/*.json
