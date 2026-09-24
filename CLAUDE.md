@@ -546,6 +546,25 @@ PostgreSQL 18 (service `postgresql-x64-18`, DB `iot_room`) · Redis = container 
 | `docs/BaoCao.pdf` | Xuất từ `BaoCao-moi .docx` bằng Word COM ở chế độ **chỉ đọc** (30 trang). Bản Word không bị đụng (`LastWriteTime` giữ nguyên 20/08). Chương 4 còn thiếu kết quả chạy thử ⇒ xuất lại đè lên file này khi xong, link không đổi |
 | Lần sau thêm bí mật | Đừng gõ thẳng vào code. Backend: thêm biến vào `.env` + `.env.example`. Firmware: thêm vào `secrets.h` + `secrets.example.h` |
 
+### 0.7 HTML cho Figma — `docs/figma-import/` *(phiên 10)*
+
+Ba file `01-login.html · 02-data-sensor.html · 03-action-history.html` **trích thẳng từ ứng dụng
+React đang chạy** (DOM + CSS thật, lấy qua Chrome DevTools Protocol), dùng cho plugin
+**html.to.design**. Cách nhập ghi ở `docs/figma-import/README.md`.
+
+> ⚠️ **`docs/wireframe/*.html` nay là bản lạc hậu** — vẽ tay từ phiên 5, còn 2 ô ngày, cột Thời
+> gian để giờ trước, chưa có ô Dòng/trang, không có màn Login. Muốn ảnh khớp ứng dụng thì lấy
+> từ `docs/figma-import/`.
+
+Bốn chỗ phải xử lý khi trích (đều đã gặp thật, script trong scratchpad `figma.mjs`):
+1. **Giá trị ô nhập nằm ở thuộc tính DOM, `outerHTML` chỉ chép attribute** ⇒ phải `setAttribute('value', el.value)` và gắn `selected` cho `<option>`, nếu không file tĩnh hiện ô rỗng và mọi select nhảy về lựa chọn đầu tiên (Dòng/trang hiện `8` trong khi bảng có 10 dòng).
+2. **Tắt mọi vùng cuộn** (`overflow: visible`, bỏ `position: sticky`) và để `height: auto; min-height: 900px` — ghim cứng 900px thì Action History (cao ~960) bị dòng cuối đè lên thanh phân trang.
+3. Xoá `data-vite-dev-id` — Vite nhét **đường dẫn tuyệt đối trên máy** vào từng thẻ `<style>`.
+4. Xoá ô gợi ý tài khoản MSW ở màn Login bằng `[class*=mockHint]`; tìm theo chữ thì `__byText('div', …)` trả về thẻ bọc ngoài cùng và xoá nhầm cả khối đăng nhập.
+
+> ⚠️ **Heredoc `<<'EOF'` của Bash trên máy này vẫn nuốt dấu `\`** (đã dính 2 lần: đường dẫn Chrome và `'...
+'` trong chuỗi JS). Viết script nhiều escape thì tạo file bằng Python, hoặc tránh escape (`String.fromCharCode(10)`).
+
 ### 0.5 Mở phiên mới thì bắt đầu từ đâu
 
 1. Đọc file này (§0) — nắm trạng thái và các quyết định đã chốt.
