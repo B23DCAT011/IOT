@@ -1,6 +1,10 @@
 # ---------- Bí mật: KHÔNG BAO GIỜ commit ----------
 backend/.env
 .env.local
+# Frontend: chỉ đưa file mẫu lên kho, mỗi máy tự chép thành .env
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
 firmware/esp8266_room01/secrets.h
 
 # ---------- Môi trường, thư viện ----------
