@@ -3,8 +3,6 @@
 React + Vite + React Router + Recharts + Axios. Giao diện dựng theo `docs/wireframe/*.html`,
 gọi API theo đúng hợp đồng `docs/05-API.md` **v2.1** (có đăng nhập bằng token).
 
-> 📖 **Mới đọc code?** Xem `HUONG-DAN-DOC-CODE.md` — file nào làm gì, component nào dùng ở đâu.
-
 ## Chạy
 
 ```powershell
