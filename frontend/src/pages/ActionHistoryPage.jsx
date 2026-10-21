@@ -237,9 +237,17 @@ export default function ActionHistoryPage() {
                     <td className={ui.act}>{row.action}</td>
                     {/* user = null thì hiện "—", KHÔNG ghi "Hệ thống"/"Ẩn danh" (BR-12) */}
                     <td className={row.user ? undefined : ui.nil}>{row.user ? row.user.full_name : '—'}</td>
-                    <td>
+                    <td className={ui.statusCell}>
                       <span className={`${ui.pill} ${ui[`pill${row.status}`] ?? ''}`}>{row.status}</span>
-                      {row.error_message && <div className={ui.errline}>{row.error_message}</div>}
+                      {/* Lý do FAILED hiện khi rê chuột/Tab tới — để dòng chữ dưới nhãn thì dòng này cao lệch các dòng khác */}
+                      {row.error_message && (
+                        <span className={ui.errHint} tabIndex={0} aria-label={row.error_message}>
+                          <InfoIcon />
+                          <span className={ui.errTip} role="tooltip">
+                            {row.error_message}
+                          </span>
+                        </span>
+                      )}
                     </td>
                     <td className={`${ui.num} ${row.latency_ms == null ? ui.nil : ''}`}>
                       {row.latency_ms == null ? '—' : `${fmtCount(row.latency_ms)} ms`}
