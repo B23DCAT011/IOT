@@ -1,5 +1,5 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
-export const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/realtime/'
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api'
+export const WS_URL = import.meta.env.VITE_WS_URL || 'ws://127.0.0.1:8000/ws/realtime/'
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'
 
 export const CHART_POINTS = 20 // BR-10

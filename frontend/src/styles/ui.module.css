@@ -74,6 +74,14 @@
   flex-direction: column;
   gap: 4px;
 }
+/* Ô "Giá trị tìm kiếm" chiếm hết chỗ còn lại của thanh lọc */
+.fieldGrow {
+  flex: 1;
+  min-width: 240px;
+}
+.fieldGrow .input {
+  width: 100%;
+}
 .fieldLabel {
   font-size: 11px;
   line-height: 16px;
@@ -107,30 +115,8 @@
   border-color: var(--bad);
   box-shadow: 0 0 0 3px var(--bad-bg);
 }
-/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Mã hoặc tên cảm biến…" và "Ánh sáng phòng"
-   bị cắt mất đuôi. Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
-.searchBox {
-  position: relative;
-  width: 232px;
-}
-.searchBox svg {
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  width: 16px;
-  height: 16px;
-  color: var(--ink-faint);
-  pointer-events: none;
-}
-.searchBox .input {
-  width: 100%;
-  padding-left: 36px;
-}
-.inputNum {
-  width: 96px;
-  font-family: var(--mono);
-  text-align: right;
-}
+/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Ánh sáng phòng" bị cắt mất đuôi.
+   Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
 .select {
   width: 164px;
   padding-right: 4px;
@@ -200,6 +186,10 @@
   gap: 8px;
   white-space: nowrap;
   cursor: pointer;
+}
+.btn svg {
+  width: 16px;
+  height: 16px;
 }
 .btn:hover:not(:disabled) {
   border-color: var(--ink-faint);
@@ -293,6 +283,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Ô trạng thái phải cho khung lý do FAILED (.errTip) tràn ra ngoài */
+.table tbody td.statusCell {
+  overflow: visible;
+}
 .table tbody tr:last-child td {
   border-bottom: 0;
 }
@@ -362,6 +356,8 @@
   align-items: center;
   height: 20px;
   padding: 0 8px;
+  min-width: 72px;
+  justify-content: center;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -379,15 +375,61 @@
   background: var(--wait-bg);
   color: var(--wait);
 }
-.errline {
-  font-size: 11px;
+/* Biểu tượng ⓘ cạnh nhãn FAILED; khung lý do bật sang phải, căn giữa theo dòng
+   (bật lên trên/xuống dưới thì dòng đầu/cuối bị vùng cuộn .tbl cắt mất). */
+.errHint {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 6px;
+  color: var(--bad);
+  cursor: help;
+  outline: none;
+}
+.errHint svg {
+  width: 14px;
+  height: 14px;
+}
+.errTip {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: max-content;
+  max-width: 260px;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 12px;
   line-height: 16px;
-  color: var(--ink-faint);
-  margin-top: 2px;
   white-space: normal;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+.errHint:hover .errTip,
+.errHint:focus-visible .errTip {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ---------- chân bảng + phân trang ---------- */
+/* Chân bảng: Dòng/trang đứng cạnh phân trang, không nằm trong vùng bộ lọc */
+.tfootRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.pageSize {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
 .tfoot {
   height: 52px;
   flex: none;

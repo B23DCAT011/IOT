@@ -3,19 +3,19 @@
 React + Vite + React Router + Recharts + Axios. Giao diện dựng theo `docs/wireframe/*.html`,
 gọi API theo đúng hợp đồng `docs/05-API.md` **v2.1** (có đăng nhập bằng token).
 
-> 📖 **Mới đọc code?** Xem `HUONG-DAN-DOC-CODE.md` — file nào làm gì, component nào dùng ở đâu.
-
 ## Chạy
 
 ```powershell
 cd frontend
-npm install        # lần đầu
-npm run dev        # http://localhost:5173
+npm install              # lần đầu
+copy .env.example .env   # lần đầu — .env không có trên kho, mỗi máy tự tạo
+npm run dev              # http://localhost:5173
 ```
 
-Mặc định `npm run dev` gọi **backend Django thật** (`.env.development` đặt `VITE_USE_MOCK=false`) —
+Mặc định (`VITE_USE_MOCK=false` trong `.env`) `npm run dev` gọi **backend Django thật** —
 bật daphne + `mqtt_worker` trước, xem `backend/README.md`. Muốn làm giao diện khi không bật backend thì
-đặt `VITE_USE_MOCK=true`: **MSW** giả lập toàn bộ API và WebSocket bằng bộ dữ liệu mẫu bên dưới.
+đặt `VITE_USE_MOCK=true` rồi khởi động lại `npm run dev`: **MSW** giả lập toàn bộ API và WebSocket
+bằng bộ dữ liệu mẫu bên dưới.
 
 | Tài khoản | Mật khẩu | Vai trò |
 |---|---|---|
@@ -41,8 +41,8 @@ Lệnh `id 88` trong dữ liệu mẫu đang `PENDING`, nên **5–6 giây đầ
 
 ## Nối với backend thật
 
-1. Đổi `VITE_USE_MOCK=false` trong `.env.development` (hoặc xoá dòng đó).
-2. Kiểm tra `VITE_API_BASE_URL`, `VITE_WS_URL` trong `.env`. Demo trong LAN thì thay `localhost` bằng IP laptop
+1. Đặt `VITE_USE_MOCK=false` trong `.env`.
+2. Kiểm tra `VITE_API_BASE_URL`, `VITE_WS_URL` trong `.env`. Demo trong LAN thì thay `127.0.0.1` bằng IP laptop
    và thêm `http://<IP>:5173` vào `CORS_ALLOWED_ORIGINS` của Django (`05-API.md` §2.9).
 
 Không phải sửa dòng code gọi API nào.

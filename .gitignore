@@ -1,6 +1,10 @@
 # ---------- Bí mật: KHÔNG BAO GIỜ commit ----------
 backend/.env
 .env.local
+# Frontend: chỉ đưa file mẫu lên kho, mỗi máy tự chép thành .env
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
 firmware/esp8266_room01/secrets.h
 
 # ---------- Môi trường, thư viện ----------
@@ -25,3 +29,8 @@ build/
 # vẫn nằm trên máy, chỉ là bày ra ở thư mục gốc của kho thì rối mắt.
 /*.jpg
 /*.json
+# Bản báo cáo cuối kỳ đang chỉnh trong Word — chỉ để trên máy
+docs/BaoCao-cuoiky.docx
+# Ảnh đại diện trang Profile — ảnh cá nhân, kho để công khai nên chỉ để trên máy.
+# Thiếu file thì trang Profile hiện khung trống, không báo lỗi.
+backend/apps/core/static/img/avatar.jpg

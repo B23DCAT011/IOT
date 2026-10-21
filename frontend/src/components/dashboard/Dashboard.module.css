@@ -186,10 +186,35 @@
   align-items: center;
   justify-content: center;
   color: var(--ink-soft);
+  transition: background 0.25s, border-color 0.25s, color 0.25s, box-shadow 0.25s;
 }
 .devIc svg {
   width: 20px;
   height: 20px;
+}
+/* Thiết bị đang bật: đèn sáng vàng, quạt xoay */
+.devIcOn {
+  background: var(--wait-bg);
+  border-color: var(--light);
+  color: var(--light);
+  box-shadow: 0 0 0 3px rgba(201, 138, 22, 0.14);
+}
+.devIcOn svg {
+  filter: drop-shadow(0 0 3px rgba(201, 138, 22, 0.55));
+}
+.devIcFanOn {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.devIcFanOn svg {
+  transform-origin: 50% 50%;
+  animation: devSpin 5s linear infinite;
+}
+@keyframes devSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .devMeta {
   flex: 1;

@@ -104,7 +104,10 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
         const shown = wait ? wait.target : device.current_state
         return (
           <div key={device.id} className={s.dev}>
-            <div className={s.devIc}>
+            <div
+              className={`${s.devIc} ${shown === 'ON' ? (device.device_type === 'FAN' ? s.devIcFanOn : s.devIcOn) : ''
+                }`}
+            >
               <DeviceIcon type={device.device_type} />
             </div>
             <div className={s.devMeta}>
