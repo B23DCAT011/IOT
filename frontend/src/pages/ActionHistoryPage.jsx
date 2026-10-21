@@ -3,7 +3,7 @@ import { isAbort } from '../api/client'
 import { actionApi, deviceApi } from '../api/endpoints'
 import { useAuth } from '../auth/AuthContext'
 import Banner from '../components/Banner'
-import { DateTimeInput, EmptyState, Field, SearchInput } from '../components/Filters'
+import { DateTimeInput, EmptyState, Field } from '../components/Filters'
 import { InfoIcon } from '../components/Icons'
 import Layout from '../components/Layout'
 import Pagination from '../components/Pagination'
@@ -19,7 +19,6 @@ import { fmtCount, fmtDateTime, parseApproxVN } from '../utils/format'
 export default function ActionHistoryPage() {
   const { auth } = useAuth()
   const [devices, setDevices] = useState([])
-  const [search, setSearch] = useState('')
   const [device, setDevice] = useState('')
   const [status, setStatus] = useState('')
   const [action, setAction] = useState('')
@@ -34,7 +33,6 @@ export default function ActionHistoryPage() {
   const [error, setError] = useState(null)
   const [reloadKey, setReloadKey] = useState(0)
 
-  const debouncedSearch = useDebouncedValue(search.trim(), 400)
   // Gõ dần "29/10/2026 17:29:24" thì các bước giữa chừng cũng hợp lệ, phải chờ người dùng gõ xong.
   const debouncedWhen = useDebouncedValue(when.trim(), 400)
   const moment = useMemo(() => parseApproxVN(debouncedWhen), [debouncedWhen])
@@ -42,7 +40,7 @@ export default function ActionHistoryPage() {
     debouncedWhen && !moment
       ? 'Thời điểm chưa đúng định dạng. Ví dụ: 29/10/2026 17:29:24 — gõ thiếu giây, phút hay cả giờ đều được.'
       : null
-  const hasFilter = Boolean(debouncedSearch || device || status || action || user || debouncedWhen)
+  const hasFilter = Boolean(device || status || action || user || debouncedWhen)
   const userId = auth?.user?.id
 
   useEffect(() => {
@@ -58,7 +56,6 @@ export default function ActionHistoryPage() {
     if (whenError) return undefined
 
     const params = { page, page_size: pageSize, ordering }
-    if (debouncedSearch) params.search = debouncedSearch
     if (device) params.device = device
     if (status) params.status = status
     if (action) params.action = action
@@ -93,7 +90,7 @@ export default function ActionHistoryPage() {
       })
 
     return () => controller.abort()
-  }, [page, pageSize, ordering, debouncedSearch, device, status, action, user, userId, moment, whenError, reloadKey])
+  }, [page, pageSize, ordering, device, status, action, user, userId, moment, whenError, reloadKey])
 
   // Bảng lịch sử không tự chèn dòng mới; chỉ cập nhật khi một dòng PENDING đang hiện kết thúc (UC-05 A2).
   useRealtimeEvent((event) => {
@@ -108,7 +105,6 @@ export default function ActionHistoryPage() {
   }
 
   const clearFilters = () => {
-    setSearch('')
     setDevice('')
     setStatus('')
     setAction('')
@@ -146,8 +142,13 @@ export default function ActionHistoryPage() {
 
       <section className={`${ui.card} ${ui.cardGrow}`}>
         <div className={ui.filters}>
-          <Field label="Tìm kiếm">
-            <SearchInput value={search} onChange={withPageReset(setSearch)} placeholder="Tên hoặc mã thiết bị…" />
+          <Field label="Tìm kiếm theo thời gian">
+            <DateTimeInput
+              value={when}
+              onChange={withPageReset(setWhen)}
+              invalid={Boolean(whenError)}
+              placeholder="dd/mm/yyyy hh/mm/ss"
+            />
           </Field>
           <Field label="Thiết bị">
             {select(
@@ -176,15 +177,7 @@ export default function ActionHistoryPage() {
               { value: 'none', label: 'Không rõ (—)' },
             ])}
           </Field>
-          <Field label="Thời điểm">
-            <DateTimeInput
-              value={when}
-              onChange={withPageReset(setWhen)}
-              invalid={Boolean(whenError)}
-              placeholder="dd/mm/yyyy hh/mm/ss"
-            />
-          </Field>
-          <button type="button" className={ui.btn} onClick={clearFilters} disabled={!hasFilter && !search}>
+          <button type="button" className={ui.btn} onClick={clearFilters} disabled={!hasFilter}>
             Xóa bộ lọc
           </button>
         </div>
