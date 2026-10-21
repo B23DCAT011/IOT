@@ -184,22 +184,6 @@ export default function ActionHistoryPage() {
               placeholder="dd/mm/yyyy hh/mm/ss"
             />
           </Field>
-          <Field label="Dòng/trang">
-            <select
-              className={`${ui.input} ${ui.select} ${ui.selectNarrow}`}
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value))
-                setPage(1) // đổi cỡ trang thì số trang cũ có thể vượt quá số trang mới
-              }}
-            >
-              {PAGE_SIZE_OPTIONS.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          </Field>
           <button type="button" className={ui.btn} onClick={clearFilters} disabled={!hasFilter && !search}>
             Xóa bộ lọc
           </button>
@@ -282,7 +266,26 @@ export default function ActionHistoryPage() {
               Hiển thị {fmtCount(firstRow)}–{fmtCount(lastRow)} trong {fmtCount(count)} bản ghi
               {hasFilter ? ' khớp bộ lọc' : ''}
             </span>
-            <Pagination page={page} pageSize={pageSize} count={count} onChange={setPage} />
+            <div className={ui.tfootRight}>
+              <label className={ui.pageSize}>
+                Dòng/trang
+                <select
+                  className={`${ui.input} ${ui.select} ${ui.selectNarrow}`}
+                  value={pageSize}
+                  onChange={(e) => {
+                    setPageSize(Number(e.target.value))
+                    setPage(1) // đổi cỡ trang thì số trang cũ có thể vượt quá số trang mới
+                  }}
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Pagination page={page} pageSize={pageSize} count={count} onChange={setPage} />
+            </div>
           </div>
         )}
       </section>

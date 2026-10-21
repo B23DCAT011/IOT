@@ -388,6 +388,18 @@
 }
 
 /* ---------- chân bảng + phân trang ---------- */
+/* Chân bảng: Dòng/trang đứng cạnh phân trang, không nằm trong vùng bộ lọc */
+.tfootRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.pageSize {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
 .tfoot {
   height: 52px;
   flex: none;
