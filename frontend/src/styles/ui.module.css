@@ -74,6 +74,14 @@
   flex-direction: column;
   gap: 4px;
 }
+/* Ô "Giá trị tìm kiếm" chiếm hết chỗ còn lại của thanh lọc */
+.fieldGrow {
+  flex: 1;
+  min-width: 240px;
+}
+.fieldGrow .input {
+  width: 100%;
+}
 .fieldLabel {
   font-size: 11px;
   line-height: 16px;
@@ -200,6 +208,10 @@
   gap: 8px;
   white-space: nowrap;
   cursor: pointer;
+}
+.btn svg {
+  width: 16px;
+  height: 16px;
 }
 .btn:hover:not(:disabled) {
   border-color: var(--ink-faint);

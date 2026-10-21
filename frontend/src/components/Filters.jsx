@@ -3,9 +3,9 @@ import ui from '../styles/ui.module.css'
 import { fromPickerValue, toPickerValue } from '../utils/format'
 import { CalendarIcon, SearchIcon } from './Icons'
 
-export function Field({ label, children }) {
+export function Field({ label, children, grow }) {
   return (
-    <label className={ui.field}>
+    <label className={`${ui.field} ${grow ? ui.fieldGrow : ''}`}>
       <span className={ui.fieldLabel}>{label}</span>
       {children}
     </label>
