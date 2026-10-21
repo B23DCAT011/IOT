@@ -115,30 +115,8 @@
   border-color: var(--bad);
   box-shadow: 0 0 0 3px var(--bad-bg);
 }
-/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Mã hoặc tên cảm biến…" và "Ánh sáng phòng"
-   bị cắt mất đuôi. Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
-.searchBox {
-  position: relative;
-  width: 232px;
-}
-.searchBox svg {
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  width: 16px;
-  height: 16px;
-  color: var(--ink-faint);
-  pointer-events: none;
-}
-.searchBox .input {
-  width: 100%;
-  padding-left: 36px;
-}
-.inputNum {
-  width: 96px;
-  font-family: var(--mono);
-  text-align: right;
-}
+/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Ánh sáng phòng" bị cắt mất đuôi.
+   Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
 .select {
   width: 164px;
   padding-right: 4px;

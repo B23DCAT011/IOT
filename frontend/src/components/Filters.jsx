@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import ui from '../styles/ui.module.css'
 import { fromPickerValue, toPickerValue } from '../utils/format'
-import { CalendarIcon, SearchIcon } from './Icons'
+import { CalendarIcon } from './Icons'
 
 export function Field({ label, children, grow }) {
   return (
@@ -12,25 +12,6 @@ export function Field({ label, children, grow }) {
   )
 }
 
-export function SearchInput({ value, onChange, placeholder }) {
-  return (
-    <div className={ui.searchBox}>
-      <SearchIcon />
-      <input
-        type="search"
-        className={ui.input}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-      />
-    </div>
-  )
-}
-
-// Ô "Thời điểm": gõ tay theo dd/mm/yyyy hh:mm:ss (thiếu đuôi vẫn chạy — xem parseApproxVN)
-// hoặc bấm nút lịch để chọn bằng ô datetime-local sẵn có của trình duyệt.
-// Không dùng thẳng datetime-local làm ô hiển thị vì nó bắt điền đủ mọi ô mới cho ra giá trị,
-// tức là không nhập gần đúng được.
 export function DateTimeInput({ value, onChange, invalid, placeholder }) {
   const picker = useRef(null)
 
@@ -70,8 +51,6 @@ export function DateTimeInput({ value, onChange, invalid, placeholder }) {
   )
 }
 
-// Bảng rỗng: đang lọc thì kèm nút Xóa bộ lọc, không lọc thì chỉ báo không có dữ liệu
-// (05-trang-thai.html, khung 4). Cả hai trường hợp đều ẩn phân trang.
 export function EmptyState({ filtered, onClear }) {
   return (
     <div className={ui.empty}>
