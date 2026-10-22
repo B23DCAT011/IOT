@@ -39,7 +39,7 @@ const int   MQTT_PORT = 1884;
 
 const char* NODE_ID = "esp8266_room01";
 // In ra ngay đầu Serial Monitor để biết chắc mạch đang chạy bản nào — đổi mỗi lần sửa firmware.
-const char* FW_VERSION = "2026-09-24 lenh-gop";
+const char* FW_VERSION = "2026-10-22 dao-anh-sang";
 const unsigned long SEND_INTERVAL = 2000;   // 2 giây/lần
 unsigned long lastSend = 0;
 
@@ -93,7 +93,7 @@ void onMqttMessage(String &topic, String &payload) {
   Serial.println("Nhan tren " + topic + ": " + payload);
 
   JsonDocument doc;
-  DeserializationError err = deserializeJson(doc,  -fpayload);
+  DeserializationError err = deserializeJson(doc, payload);
   if (err) {
     Serial.print("Loi doc JSON, bo qua message: ");
     Serial.println(err.c_str());
@@ -268,7 +268,11 @@ void publishStateReport() {
 void publishSensorData() {
   float t = dht.readTemperature();
   float h = dht.readHumidity();
-  int   l = analogRead(LIGHTPIN);   // Module chỉ có DO -> tạm thời ra ~0 hoặc ~1023
+  // Quang trở trên module LM393 nối kiểu chia áp: càng sáng điện trở càng nhỏ -> điện áp ra
+  // càng THẤP, nên analogRead() ra số nhỏ khi sáng và ~1024 khi bị che. Đảo lại để giá trị
+  // gửi lên tăng theo độ sáng. ADC của ESP8266 trả 0..1024 nên lấy 1024 trừ đi.
+  // Module chỉ có DO -> tạm thời chỉ ra ~0 (tối) hoặc ~1024 (sáng).
+  int   l = 1024 - analogRead(LIGHTPIN);
 
   JsonDocument doc;
   doc["device_id"] = NODE_ID;
