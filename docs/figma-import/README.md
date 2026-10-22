@@ -6,15 +6,18 @@ nay đã lạc hậu (còn 2 ô ngày, cột Thời gian để giờ trước, c
 
 | File | Màn hình | Khung |
 |---|---|---|
-| `01-login.html` | Đăng nhập — đã điền sẵn để nút hiện trạng thái bật | 1440 × 900 |
-| `02-dashboard.html` | Dashboard — 3 thẻ số, biểu đồ 20 mẫu, panel 2 thiết bị | 1440 × 900 |
-| `03-data-sensor.html` | Data Sensor — 10 dòng, đủ 7 ô lọc | 1440 × 900 |
-| `04-action-history.html` | Action History — 10 thao tác, có `FAILED` và người thao tác `—` | 1440 × ~960 |
-| `05-profile.html` | Profile — thông tin sinh viên + 4 liên kết bàn giao | 1440 × 900 |
+| `01-login.html` | Đăng nhập — đã điền sẵn để nút hiện trạng thái bật (mật khẩu là chuỗi giả) | 1440 × 900 |
+| `02-dashboard.html` | Dashboard — 3 thẻ số, biểu đồ 20 mẫu, panel 2 thiết bị (quạt đang bật: biểu tượng tô màu) | 1440 × 900 |
+| `03-data-sensor.html` | Data Sensor — 10 dòng, thanh tìm "Tìm theo" + ô giá trị + nút Tìm, Dòng/trang ở chân bảng | 1440 × 900 |
+| `04-action-history.html` | Action History — 10 thao tác, ô tìm theo thời gian, `FAILED` kèm biểu tượng ⓘ, người thao tác `—` | 1440 × 900 |
+| `05-profile.html` | Profile — thông tin sinh viên + 4 liên kết bàn giao (ảnh đại diện để khung trống) | 1440 × 900 |
 
 Mọi con số lấy từ bộ dữ liệu mẫu chuẩn (`CLAUDE.md` §0.2f): Dashboard là chu kỳ `17:30:02`
 (28.5 °C · 72.0 % · 350 lux, biến thiên −0.1 / −14.4 / +262), đường độ ẩm **đứt một đoạn** ở
-`17:29:54` đúng như UC-07 A2; Action History có lệnh 88 `FAILED` và lệnh 79 không rõ người bấm.
+`17:29:54` đúng như UC-07 A2; Action History có lệnh 86 `FAILED`, lệnh 88 `PENDING` và lệnh 79
+không rõ người bấm.
+
+Trích lại lần cuối: **21/10/2026**, sau khi đổi bộ lọc Data Sensor / Action History (PR #1).
 
 ## Cách nhập
 
@@ -29,5 +32,7 @@ Mọi con số lấy từ bộ dữ liệu mẫu chuẩn (`CLAUDE.md` §0.2f): D
   (đã dính một lần, xem `CLAUDE.md` §0.1 mục 13).
 - Font khai là `Segoe UI` và `Consolas`; máy Windows có sẵn nên Figma không phải thay font.
 - Mọi vùng cuộn đã bị tắt và nội dung trải hết, để plugin không cắt mất phần dưới bảng.
+- Mọi animation đã bị tắt (`animation: none`) — quạt đang xoay mà chụp giữa chừng thì biểu tượng
+  bị nghiêng. Khung lý do FAILED chỉ hiện khi rê chuột nên trong file tĩnh nó ẩn.
 - Sinh lại khi giao diện đổi: chạy `npm run dev` ở `frontend/` rồi chạy lại script trích
   (không nằm trong repo, cách làm và 6 cái bẫy ghi ở `CLAUDE.md` §0.7).

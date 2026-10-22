@@ -7,23 +7,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F4B99'/%3E%3Cpath d='M8 21l5-6 4 3 7-8' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-    <title>Room01 Monitor — Dashboard</title>
+    <title>Room01 Monitor</title>
   <style type="text/css">/* Thành phần dùng chung cho mọi màn hình — chép từ docs/wireframe/*.html.
    Chiều cao cố định: đầu thẻ 56, dòng bảng 40, ô nhập 36; mọi khoảng cách là bội số của 4. */
 
 /* ---------- thẻ ---------- */
-._card_1md8o_5 {
+._card_179wh_9 {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 3px;
 }
-._cardGrow_1md8o_10 {
+._cardGrow_179wh_19 {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-._cardHead_1md8o_16 {
+._cardHead_179wh_31 {
   height: 56px;
   flex: none;
   padding: 0 16px;
@@ -33,12 +33,12 @@
   justify-content: space-between;
   gap: 16px;
 }
-._cardTitle_1md8o_26 {
+._cardTitle_179wh_51 {
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 }
-._cardSub_1md8o_31 {
+._cardSub_179wh_61 {
   font-family: var(--mono);
   font-size: 11px;
   line-height: 16px;
@@ -46,31 +46,31 @@
 }
 
 /* ---------- thanh tiêu đề ---------- */
-._stamp_1md8o_39 {
+._stamp_179wh_77 {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--ink-faint);
 }
-._conn_1md8o_44 {
+._conn_179wh_87 {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 12px;
   color: var(--ink-soft);
 }
-._dot_1md8o_51 {
+._dot_179wh_101 {
   width: 8px;
   height: 8px;
   border-radius: 4px;
   background: var(--ok);
   flex: none;
 }
-._dotWarn_1md8o_58 {
+._dotWarn_179wh_115 {
   background: var(--off);
 }
 
 /* ---------- bộ lọc ---------- */
-._filters_1md8o_63 {
+._filters_179wh_125 {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -79,18 +79,26 @@
   padding: 16px;
   border-bottom: 1px solid var(--line-soft);
 }
-._field_1md8o_72 {
+._field_179wh_143 {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-._fieldLabel_1md8o_77 {
+/* Ô "Giá trị tìm kiếm" chiếm hết chỗ còn lại của thanh lọc */
+._fieldGrow_179wh_155 {
+  flex: 1;
+  min-width: 240px;
+}
+._fieldGrow_179wh_155 ._input_179wh_163 {
+  width: 100%;
+}
+._fieldLabel_179wh_169 {
   font-size: 11px;
   line-height: 16px;
   color: var(--ink-soft);
   white-space: nowrap;
 }
-._input_1md8o_83 {
+._input_179wh_163 {
   height: 36px;
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -100,68 +108,46 @@
   color: var(--ink);
   outline: none;
 }
-._input_1md8o_83::placeholder {
+._input_179wh_163::placeholder {
   color: var(--ink-faint);
 }
-._input_1md8o_83:focus {
+._input_179wh_163:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
-._input_1md8o_83:disabled {
+._input_179wh_163:disabled {
   background: var(--surface-2);
   color: var(--ink-faint);
   cursor: not-allowed;
 }
-._invalid_1md8o_105,
-._invalid_1md8o_105:focus {
+._invalid_179wh_225,
+._invalid_179wh_225:focus {
   border-color: var(--bad);
   box-shadow: 0 0 0 3px var(--bad-bg);
 }
-/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Mã hoặc tên cảm biến…" và "Ánh sáng phòng"
-   bị cắt mất đuôi. Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
-._searchBox_1md8o_112 {
-  position: relative;
-  width: 232px;
-}
-._searchBox_1md8o_112 svg {
-  position: absolute;
-  left: 12px;
-  top: 10px;
-  width: 16px;
-  height: 16px;
-  color: var(--ink-faint);
-  pointer-events: none;
-}
-._searchBox_1md8o_112 ._input_1md8o_83 {
-  width: 100%;
-  padding-left: 36px;
-}
-._inputNum_1md8o_129 {
-  width: 96px;
-  font-family: var(--mono);
-  text-align: right;
-}
-._select_1md8o_134 {
+/* Rộng hơn bản vẽ một nhịp: ở 1440px chữ "Ánh sáng phòng" bị cắt mất đuôi.
+   Hàng lọc có flex-wrap nên thừa chỗ thì tự xuống dòng, không vỡ bố cục. */
+._select_179wh_239 {
   width: 164px;
   padding-right: 4px;
 }
 /* Ô số dòng/trang chỉ chứa số nên hẹp hơn hẳn các ô chọn khác. */
-._selectNarrow_1md8o_139 {
+._selectNarrow_179wh_249 {
   width: 76px;
 }
 /* Ô thời điểm: chữ gõ tay chiếm gần hết, chừa 32px bên phải cho nút mở lịch. */
-._dtBox_1md8o_143 {
+._dtBox_179wh_257 {
   position: relative;
   /* đủ chỗ cho cả chuỗi chép từ cột Thời gian: "17/08/2026 · 17:29:54" + nút lịch */
   width: 214px;
 }
-._dtBox_1md8o_143 ._input_1md8o_83 {
+._dtBox_179wh_257 ._input_179wh_163 {
   width: 100%;
   padding: 0 34px 0 10px;
   font-family: var(--mono);
   font-size: 12px;
 }
-._dtBtn_1md8o_154 {
+._dtBtn_179wh_279 {
   position: absolute;
   top: 1px;
   right: 1px;
@@ -175,17 +161,17 @@
   color: var(--ink-soft);
   cursor: pointer;
 }
-._dtBtn_1md8o_154:hover {
+._dtBtn_179wh_279:hover {
   background: var(--surface-2);
   color: var(--accent);
 }
-._dtBtn_1md8o_154 svg {
+._dtBtn_179wh_279 svg {
   width: 16px;
   height: 16px;
 }
 /* Ô lịch thật của trình duyệt: phải được render (chỉ trong suốt) thì showPicker() mới chạy,
    để display:none là Chrome ném InvalidStateError. */
-._dtPicker_1md8o_178 {
+._dtPicker_179wh_327 {
   position: absolute;
   right: 10px;
   bottom: 0;
@@ -196,7 +182,7 @@
   opacity: 0;
   pointer-events: none;
 }
-._btn_1md8o_189 {
+._btn_179wh_349 {
   height: 36px;
   border: 1px solid var(--line);
   border-radius: 3px;
@@ -211,32 +197,36 @@
   white-space: nowrap;
   cursor: pointer;
 }
-._btn_1md8o_189:hover:not(:disabled) {
+._btn_179wh_349 svg {
+  width: 16px;
+  height: 16px;
+}
+._btn_179wh_349:hover:not(:disabled) {
   border-color: var(--ink-faint);
   color: var(--ink);
 }
-._btn_1md8o_189:disabled {
+._btn_179wh_349:disabled {
   color: var(--ink-faint);
   cursor: default;
 }
-._btnPrimary_1md8o_212 {
+._btnPrimary_179wh_403 {
   background: var(--accent);
   border-color: var(--accent);
   color: #ffffff;
   font-weight: 600;
 }
-._btnPrimary_1md8o_212:hover:not(:disabled) {
+._btnPrimary_179wh_403:hover:not(:disabled) {
   background: var(--accent-strong);
   border-color: var(--accent-strong);
   color: #ffffff;
 }
-._btnPrimary_1md8o_212:disabled {
+._btnPrimary_179wh_403:disabled {
   opacity: 0.6;
   color: #ffffff;
 }
 
 /* Dải chú thích dưới thanh lọc */
-._fNote_1md8o_229 {
+._fNote_179wh_437 {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -249,37 +239,37 @@
   line-height: 16px;
   color: var(--ink-soft);
 }
-._fNote_1md8o_229 svg {
+._fNote_179wh_437 svg {
   width: 14px;
   height: 14px;
   flex: none;
   color: var(--ink-faint);
 }
-._fNoteBad_1md8o_248 {
+._fNoteBad_179wh_475 {
   background: var(--bad-bg);
   color: var(--bad);
 }
-._fNoteBad_1md8o_248 svg {
+._fNoteBad_179wh_475 svg {
   color: var(--bad);
 }
 
 /* ---------- bảng ---------- */
-._tbl_1md8o_257 {
+._tbl_179wh_493 {
   flex: 1;
   min-height: 0;
   overflow: auto;
   transition: opacity 0.15s;
 }
-._loading_1md8o_263 {
+._loading_179wh_505 {
   opacity: 0.55;
 }
-._table_1md8o_266 {
+._table_179wh_511 {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
   font-size: 13px;
 }
-._table_1md8o_266 thead th {
+._table_179wh_511 thead th {
   height: 40px;
   padding: 0 16px;
   text-align: left;
@@ -295,7 +285,7 @@
   top: 0;
   z-index: 1;
 }
-._table_1md8o_266 tbody td {
+._table_179wh_511 tbody td {
   padding: 10px 16px;
   line-height: 20px;
   border-bottom: 1px solid var(--line-soft);
@@ -303,43 +293,47 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-._table_1md8o_266 tbody tr:last-child td {
+/* Ô trạng thái phải cho khung lý do FAILED (.errTip) tràn ra ngoài */
+._table_179wh_511 tbody td._statusCell_179wh_573 {
+  overflow: visible;
+}
+._table_179wh_511 tbody tr:last-child td {
   border-bottom: 0;
 }
-._table_1md8o_266 ._num_1md8o_299 {
+._table_179wh_511 ._num_179wh_585 {
   text-align: right;
 }
-._table_1md8o_266 td._num_1md8o_299 {
+._table_179wh_511 td._num_179wh_585 {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
 }
-._table_1md8o_266 td._mono_1md8o_306 {
+._table_179wh_511 td._mono_179wh_599 {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--ink-soft);
   white-space: nowrap;
 }
-._nil_1md8o_312,
-._table_1md8o_266 td._nil_1md8o_312 {
+._nil_179wh_611,
+._table_179wh_511 td._nil_179wh_611 {
   color: var(--ink-faint);
 }
-._code_1md8o_316 {
+._code_179wh_619 {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--ink);
 }
-._sub_1md8o_321 {
+._sub_179wh_629 {
   font-size: 11px;
   line-height: 15px;
   color: var(--ink-faint);
   margin-top: 1px;
 }
-._act_1md8o_327 {
+._act_179wh_641 {
   font-family: var(--mono);
   font-size: 12px;
 }
-._sortcap_1md8o_331,
-._sortable_1md8o_332 {
+._sortcap_179wh_649,
+._sortable_179wh_651 {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -351,54 +345,102 @@
   letter-spacing: inherit;
   cursor: pointer;
 }
-._sortcap_1md8o_331 {
+._sortcap_179wh_649 {
   color: var(--accent);
 }
-._sortcap_1md8o_331 svg {
+._sortcap_179wh_649 svg {
   width: 12px;
   height: 12px;
 }
-._sortable_1md8o_332 {
+._sortable_179wh_651 {
   color: inherit;
 }
-._sortable_1md8o_332 svg {
+._sortable_179wh_651 svg {
   width: 10px;
   height: 10px;
   flex: none;
   color: var(--ink-faint);
 }
-._pill_1md8o_360 {
+._pill_179wh_707 {
   display: inline-flex;
   align-items: center;
   height: 20px;
   padding: 0 8px;
+  min-width: 72px;
+  justify-content: center;
   font-family: var(--mono);
   font-size: 11px;
   letter-spacing: 0.04em;
   border-radius: 2px;
 }
-._pillSUCCESS_1md8o_370 {
+._pillSUCCESS_179wh_731 {
   background: var(--ok-bg);
   color: var(--ok);
 }
-._pillFAILED_1md8o_374 {
+._pillFAILED_179wh_739 {
   background: var(--bad-bg);
   color: var(--bad);
 }
-._pillPENDING_1md8o_378 {
+._pillPENDING_179wh_747 {
   background: var(--wait-bg);
   color: var(--wait);
 }
-._errline_1md8o_382 {
-  font-size: 11px;
+/* Biểu tượng ⓘ cạnh nhãn FAILED; khung lý do bật sang phải, căn giữa theo dòng
+   (bật lên trên/xuống dưới thì dòng đầu/cuối bị vùng cuộn .tbl cắt mất). */
+._errHint_179wh_759 {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 6px;
+  color: var(--bad);
+  cursor: help;
+  outline: none;
+}
+._errHint_179wh_759 svg {
+  width: 14px;
+  height: 14px;
+}
+._errTip_179wh_571 {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: max-content;
+  max-width: 260px;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 12px;
   line-height: 16px;
-  color: var(--ink-faint);
-  margin-top: 2px;
   white-space: normal;
+  border-radius: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s;
+  pointer-events: none;
+}
+._errHint_179wh_759:hover ._errTip_179wh_571,
+._errHint_179wh_759:focus-visible ._errTip_179wh_571 {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* ---------- chân bảng + phân trang ---------- */
-._tfoot_1md8o_391 {
+/* Chân bảng: Dòng/trang đứng cạnh phân trang, không nằm trong vùng bộ lọc */
+._tfootRight_179wh_843 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+._pageSize_179wh_853 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+._tfoot_179wh_843 {
   height: 52px;
   flex: none;
   display: flex;
@@ -409,12 +451,12 @@
   font-size: 12px;
   color: var(--ink-soft);
 }
-._pager_1md8o_402 {
+._pager_179wh_887 {
   display: flex;
   gap: 4px;
   align-items: center;
 }
-._pg_1md8o_407 {
+._pg_179wh_897 {
   min-width: 32px;
   height: 32px;
   padding: 0 8px;
@@ -429,18 +471,18 @@
   color: var(--ink-soft);
   cursor: pointer;
 }
-._pg_1md8o_407:hover:not(:disabled):not(._pgOn_1md8o_422) {
+._pg_179wh_897:hover:not(:disabled):not(._pgOn_179wh_927) {
   border-color: var(--ink-faint);
   color: var(--ink);
 }
-._pgOn_1md8o_422 {
+._pgOn_179wh_927 {
   background: var(--accent);
   border-color: var(--accent);
   color: #ffffff;
   cursor: default;
 }
-._pgMute_1md8o_432,
-._pg_1md8o_407:disabled {
+._pgMute_179wh_947,
+._pg_179wh_897:disabled {
   border-color: transparent;
   background: transparent;
   color: var(--ink-faint);
@@ -448,7 +490,7 @@
 }
 
 /* ---------- thông báo + trạng thái rỗng ---------- */
-._banner_1md8o_441 {
+._banner_179wh_965 {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -462,12 +504,12 @@
   font-size: 13px;
   color: var(--ink);
 }
-._bannerText_1md8o_455 {
+._bannerText_179wh_993 {
   flex: 1;
   min-width: 0;
   padding: 10px 0;
 }
-._bannerBtn_1md8o_460 {
+._bannerBtn_179wh_1003 {
   height: 28px;
   padding: 0 12px;
   border: 1px solid var(--line);
@@ -478,7 +520,7 @@
   cursor: pointer;
   white-space: nowrap;
 }
-._chip_1md8o_471 {
+._chip_179wh_1025 {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -491,7 +533,7 @@
   line-height: 16px;
   white-space: nowrap;
 }
-._empty_1md8o_484 {
+._empty_179wh_1051 {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -502,7 +544,7 @@
   font-size: 13px;
   color: var(--ink-faint);
 }
-._dim_1md8o_495 {
+._dim_179wh_1073 {
   opacity: 0.45;
 }
 </style><style type="text/css">/* Khung co giãn theo cửa sổ: rộng tối đa 1680px, cao đúng 100% (CLAUDE.md §0.2e).
@@ -677,13 +719,13 @@
   gap: 16px;
 }
 </style><style type="text/css">/* ---------- thẻ số liệu ---------- */
-._stats_19q5y_2 {
+._stats_wfcnf_3 {
   display: flex;
   gap: 16px;
   flex: none;
   transition: opacity 0.2s;
 }
-._stat_19q5y_2 {
+._stat_wfcnf_3 {
   flex: 1 1 0;
   height: 112px; /* cố định → 3 thẻ bằng nhau */
   background: var(--surface);
@@ -694,57 +736,57 @@
   gap: 12px;
   min-width: 0;
 }
-._tick_19q5y_19 {
+._tick_wfcnf_37 {
   width: 4px;
   height: 24px;
   border-radius: 2px;
   flex: none;
   margin-top: 4px;
 }
-._statMain_19q5y_26 {
+._statMain_wfcnf_51 {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
-._statLabel_19q5y_33 {
+._statLabel_wfcnf_65 {
   font-size: 12px;
   line-height: 16px;
   color: var(--ink-soft);
 }
-._statVal_19q5y_38 {
+._statVal_wfcnf_75 {
   font-family: var(--mono);
   font-size: 32px;
   line-height: 36px;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
-._statValNil_19q5y_45 {
+._statValNil_wfcnf_89 {
   color: var(--ink-faint);
 }
-._statUnit_19q5y_48 {
+._statUnit_wfcnf_95 {
   font-family: var(--ui);
   font-size: 16px;
   color: var(--ink-soft);
   margin-left: 4px;
   letter-spacing: 0;
 }
-._statFoot_19q5y_55 {
+._statFoot_wfcnf_109 {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   height: 20px;
 }
-._statFoot_19q5y_55 svg {
+._statFoot_wfcnf_109 svg {
   width: 72px;
   height: 20px;
   flex: none;
   display: block;
   overflow: visible;
 }
-._statDelta_19q5y_69 {
+._statDelta_wfcnf_137 {
   font-family: var(--mono);
   font-size: 11px;
   line-height: 16px;
@@ -755,19 +797,19 @@
 }
 
 /* ---------- biểu đồ + thiết bị ---------- */
-._chartRow_19q5y_80 {
+._chartRow_wfcnf_159 {
   display: flex;
   gap: 16px;
   align-items: stretch;
   flex: 1;
   min-height: 320px;
 }
-._chartCol_19q5y_87 {
+._chartCol_wfcnf_173 {
   flex: 1;
   min-width: 0;
   display: flex;
 }
-._chartCol_19q5y_87 > * {
+._chartCol_wfcnf_173 > * {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -775,23 +817,23 @@
   min-height: 0;
 }
 /* Rộng đúng 1/3 vùng nội dung → mép trái trùng mép trái thẻ số liệu thứ ba. */
-._devCol_19q5y_100 {
+._devCol_wfcnf_199 {
   width: calc((100% - 32px) / 3);
   flex: none;
   display: flex;
 }
-._devCol_19q5y_100 > * {
+._devCol_wfcnf_199 > * {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
-._legend_19q5y_111 {
+._legend_wfcnf_221 {
   display: flex;
   gap: 16px;
   align-items: center;
 }
-._legendItem_19q5y_116 {
+._legendItem_wfcnf_231 {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -799,13 +841,13 @@
   color: var(--ink-soft);
   white-space: nowrap;
 }
-._legendKey_19q5y_124 {
+._legendKey_wfcnf_247 {
   width: 12px;
   height: 3px;
   border-radius: 2px;
   flex: none;
 }
-._chartBox_19q5y_130 {
+._chartBox_wfcnf_259 {
   flex: 1;
   min-height: 0;
   padding: 16px 16px 12px;
@@ -813,16 +855,16 @@
   flex-direction: column;
   gap: 8px;
 }
-._plot_19q5y_138 {
+._plot_wfcnf_275 {
   flex: 1;
   min-height: 0;
   position: relative;
 }
-._plotInner_19q5y_143 {
+._plotInner_wfcnf_285 {
   position: absolute;
   inset: 0;
 }
-._units_19q5y_147 {
+._units_wfcnf_293 {
   display: flex;
   justify-content: space-between;
   font-family: var(--mono);
@@ -830,7 +872,7 @@
   line-height: 16px;
   color: var(--ink-faint);
 }
-._chartEmpty_19q5y_155 {
+._chartEmpty_wfcnf_309 {
   flex: 1;
   min-height: 160px;
   display: flex;
@@ -841,7 +883,7 @@
 }
 
 /* ---------- thiết bị ---------- */
-._dev_19q5y_100 {
+._dev_wfcnf_199 {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -850,10 +892,10 @@
   padding: 0 16px;
   border-bottom: 1px solid var(--line-soft);
 }
-._dev_19q5y_100:last-child {
+._dev_wfcnf_199:last-child {
   border-bottom: 0;
 }
-._devIc_19q5y_178 {
+._devIc_wfcnf_355 {
   width: 36px;
   height: 36px;
   flex: none;
@@ -864,34 +906,59 @@
   align-items: center;
   justify-content: center;
   color: var(--ink-soft);
+  transition: background 0.25s, border-color 0.25s, color 0.25s, box-shadow 0.25s;
 }
-._devIc_19q5y_178 svg {
+._devIc_wfcnf_355 svg {
   width: 20px;
   height: 20px;
 }
-._devMeta_19q5y_194 {
+/* Thiết bị đang bật: đèn sáng vàng, quạt xoay */
+._devIcOn_wfcnf_391 {
+  background: var(--wait-bg);
+  border-color: var(--light);
+  color: var(--light);
+  box-shadow: 0 0 0 3px rgba(201, 138, 22, 0.14);
+}
+._devIcOn_wfcnf_391 svg {
+  filter: drop-shadow(0 0 3px rgba(201, 138, 22, 0.55));
+}
+._devIcFanOn_wfcnf_409 {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+._devIcFanOn_wfcnf_409 svg {
+  transform-origin: 50% 50%;
+  animation: _devSpin_wfcnf_1 5s linear infinite;
+}
+@keyframes _devSpin_wfcnf_1 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+._devMeta_wfcnf_437 {
   flex: 1;
   min-width: 0;
 }
-._devName_19q5y_198 {
+._devName_wfcnf_445 {
   font-weight: 600;
   font-size: 14px;
   line-height: 20px;
 }
-._devCode_19q5y_203 {
+._devCode_wfcnf_455 {
   font-family: var(--mono);
   font-size: 11px;
   line-height: 16px;
   color: var(--ink-faint);
 }
-._swWrap_19q5y_209 {
+._swWrap_wfcnf_467 {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
   flex: none;
 }
-._sw_19q5y_209 {
+._sw_wfcnf_467 {
   width: 48px;
   height: 24px;
   border-radius: 12px;
@@ -902,38 +969,38 @@
   padding: 2px;
   cursor: pointer;
 }
-._sw_19q5y_209:focus-visible {
+._sw_wfcnf_467:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-._swOn_19q5y_231 {
+._swOn_wfcnf_511 {
   background: var(--accent);
   border-color: var(--accent);
   justify-content: flex-end;
 }
-._knob_19q5y_236 {
+._knob_wfcnf_521 {
   width: 18px;
   height: 18px;
   border-radius: 9px;
   background: var(--surface);
   border: 1px solid var(--line);
 }
-._swOn_19q5y_231 ._knob_19q5y_236 {
+._swOn_wfcnf_511 ._knob_wfcnf_521 {
   border-color: var(--accent);
 }
-._swBusy_19q5y_246,
-._sw_19q5y_209:disabled {
+._swBusy_wfcnf_541,
+._sw_wfcnf_467:disabled {
   opacity: 0.5;
   cursor: progress;
 }
-._swState_19q5y_251 {
+._swState_wfcnf_551 {
   font-family: var(--mono);
   font-size: 10px;
   line-height: 14px;
   color: var(--ink-faint);
   letter-spacing: 0.05em;
 }
-._devEmpty_19q5y_258 {
+._devEmpty_wfcnf_565 {
   padding: 24px 16px;
   font-size: 13px;
   color: var(--ink-faint);
@@ -1269,9 +1336,9 @@ select {
 a {
   color: inherit;
 }
-</style><style>:root{--ui:"Segoe UI",sans-serif;--ui-display:"Segoe UI",sans-serif;--mono:Consolas,monospace}html,body,#root{height:auto;min-width:0;background:#f1f4f7}body{margin:0}</style><style>:root{--ui:"Segoe UI",sans-serif;--ui-display:"Segoe UI",sans-serif;--mono:Consolas,monospace}html,body,#root{height:auto;min-width:0;background:#f1f4f7}body{margin:0}</style></head>
+</style><style>*,*::before,*::after{animation:none!important;transition:none!important}</style><style>:root{--ui:"Segoe UI",sans-serif;--ui-display:"Segoe UI",sans-serif;--mono:Consolas,monospace}html,body,#root{height:auto;min-width:0;background:#f1f4f7}body{margin:0}</style></head>
   <body>
-    <div id="root"><div class="_app_lsfxq_3" style="height: auto; min-height: 900px; width: 1440px; max-width: 1440px; margin: 0px;"><aside class="_side_lsfxq_14"><div class="_brand_lsfxq_23"><div class="_brandName_lsfxq_32">Room01 Monitor</div><div class="_brandSub_lsfxq_39">ESP8266 · PHÒNG 01</div></div><nav class="_nav_lsfxq_46"><a aria-current="page" class="_navLink_lsfxq_52 _on_lsfxq_72" href="/" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>Dashboard</a><a class="_navLink_lsfxq_52 " href="/data-sensor" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg>Data Sensor</a><a class="_navLink_lsfxq_52 " href="/action-history" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M12 8v4l3 2"></path><circle cx="12" cy="12" r="9"></circle></svg>Action History</a><a class="_navLink_lsfxq_52 " href="/profile" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Profile</a></nav><div class="_spacer_lsfxq_78"></div><div class="_user_lsfxq_83"><div class="_userMeta_lsfxq_90"><div class="_userName_lsfxq_94">Lưu Đức Anh</div><div class="_userRole_lsfxq_102">admin · Quản trị</div></div><button type="button" class="_logout_lsfxq_111" title="Đăng xuất" aria-label="Đăng xuất"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l-5-5 5-5"></path><path d="M5 12h11"></path></svg></button></div></aside><div class="_main_lsfxq_134"><header class="_topbar_lsfxq_141"><h1 class="_title_lsfxq_151">Dashboard</h1><div class="_topbarRight_lsfxq_158"><div class="_conn_1md8o_44"><span class="_dot_1md8o_51 "></span>Đang nhận dữ liệu</div><div class="_stamp_1md8o_39">Cập nhật 17:30:02</div></div></header><main class="_body_lsfxq_163" style="overflow: visible;"><div class="_stats_19q5y_2 "><div class="_stat_19q5y_2"><div class="_tick_19q5y_19" style="background: rgb(192, 73, 47);"></div><div class="_statMain_19q5y_26"><div class="_statLabel_19q5y_33">Nhiệt độ phòng</div><div class="_statVal_19q5y_38 ">28.5<span class="_statUnit_19q5y_48">°C</span></div><div class="_statFoot_19q5y_55"><span class="_statDelta_19q5y_69">−0.1 trong 20 giây</span><svg viewBox="0 0 72 20" fill="none" aria-hidden="true"><polyline points="0,6 7.2,14 14.4,18 21.6,10 28.8,2 36,6 43.2,14 50.4,10 57.6,6 64.8,10 72,10" stroke="#C0492F" stroke-width="1.5"></polyline><circle cx="72" cy="10" r="2.2" fill="#C0492F"></circle></svg></div></div></div><div class="_stat_19q5y_2"><div class="_tick_19q5y_19" style="background: rgb(28, 123, 142);"></div><div class="_statMain_19q5y_26"><div class="_statLabel_19q5y_33">Độ ẩm phòng</div><div class="_statVal_19q5y_38 ">72.0<span class="_statUnit_19q5y_48">%</span></div><div class="_statFoot_19q5y_55"><span class="_statDelta_19q5y_69">−14.4 trong 20 giây</span><svg viewBox="0 0 72 20" fill="none" aria-hidden="true"><polyline points="0,2 8,6.8 16,10.9 24,13.9 32,15.8 40,17 48,17.8 56,18 64,17.7 72,17.6" stroke="#1C7B8E" stroke-width="1.5"></polyline><circle cx="72" cy="17.6" r="2.2" fill="#1C7B8E"></circle></svg></div></div></div><div class="_stat_19q5y_2"><div class="_tick_19q5y_19" style="background: rgb(201, 138, 22);"></div><div class="_statMain_19q5y_26"><div class="_statLabel_19q5y_33">Ánh sáng phòng</div><div class="_statVal_19q5y_38 ">350<span class="_statUnit_19q5y_48">lux</span></div><div class="_statFoot_19q5y_55"><span class="_statDelta_19q5y_69">+262 trong 20 giây</span><svg viewBox="0 0 72 20" fill="none" aria-hidden="true"><polyline points="0,18 7.2,17.6 14.4,12.4 21.6,5.2 28.8,2.7 36,2.2 43.2,2 50.4,2.1 57.6,2.2 64.8,2.1 72,2.1" stroke="#C98A16" stroke-width="1.5"></polyline><circle cx="72" cy="2.1" r="2.2" fill="#C98A16"></circle></svg></div></div></div></div><div class="_chartRow_19q5y_80"><div class="_chartCol_19q5y_87"><section class="_card_1md8o_5"><div class="_cardHead_1md8o_16"><div><div class="_cardTitle_1md8o_26">Diễn biến 20 mẫu gần nhất</div><div class="_cardSub_1md8o_31">17:29:24 → 17:30:02 · chu kỳ 2 giây · 1 mẫu thiếu độ ẩm phòng</div></div><div class="_legend_19q5y_111"><span class="_legendItem_19q5y_116"><span class="_legendKey_19q5y_124" style="background: rgb(192, 73, 47);"></span>Nhiệt độ phòng</span><span class="_legendItem_19q5y_116"><span class="_legendKey_19q5y_124" style="background: rgb(28, 123, 142);"></span>Độ ẩm phòng</span><span class="_legendItem_19q5y_116"><span class="_legendKey_19q5y_124" style="background: rgb(201, 138, 22);"></span>Ánh sáng phòng</span></div></div><div class="_chartBox_19q5y_130"><div class="_plot_19q5y_138"><div class="_plotInner_19q5y_143"><div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;"><div style="width: 0px; height: 0px; overflow: visible;"><div width="735" height="556" class="recharts-wrapper" style="position: relative; cursor: default; width: 735px; height: 556px;"><div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"><div class="recharts-default-tooltip" role="status" aria-live="assertive" style="margin: 0px; padding: 8px 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(211, 219, 226); white-space: nowrap; border-radius: 3px; font-size: 12px; box-shadow: none;"><p class="recharts-tooltip-label" style="margin: 0px;"></p></div></div><svg role="application" tabindex="0" class="recharts-surface" width="735" height="556" viewBox="0 0 735 556" style="width: 100%; height: 100%; display: block;"><title></title><desc></desc><g tabindex="-1" class="recharts-zIndex-layer_-100"><g class="recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal"><line stroke="#E6EBEF" x="44" y="8" width="647" height="518" x1="44" y1="8" x2="691" y2="8" fill="none"></line><line stroke="#E6EBEF" x="44" y="8" width="647" height="518" x1="44" y1="526" x2="691" y2="526" fill="none"></line></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_-50"></g><defs><clipPath id="recharts1-clip"><rect x="44" y="8" height="518" width="647"></rect></clipPath></defs><g tabindex="-1" class="recharts-zIndex-layer_100"></g><g tabindex="-1" class="recharts-zIndex-layer_200"></g><g tabindex="-1" class="recharts-zIndex-layer_300"></g><g tabindex="-1" class="recharts-zIndex-layer_400"><g class="recharts-layer recharts-line"><g class="recharts-layer recharts-shape"><path name="Nhiệt độ phòng" stroke="#C0492F" stroke-width="2.5" fill="none" id="recharts-line-_r_0_" height="518" width="647" class="recharts-curve recharts-line-curve" d="M44,476.79L78.053,475.495L112.105,474.848L146.158,473.552L180.211,474.2L214.263,472.905L248.316,471.61L282.368,472.258L316.421,470.963L350.474,470.315L384.526,471.61L418.579,472.258L452.632,470.963L486.684,469.668L520.737,470.315L554.789,471.61L588.842,470.963L622.895,470.315L656.947,470.963L691,470.963"></path></g></g><g class="recharts-layer recharts-line"><g class="recharts-layer recharts-shape"><path name="Độ ẩm phòng" stroke="#1C7B8E" stroke-width="2.5" fill="none" id="recharts-line-_r_1_" height="518" width="647" class="recharts-curve recharts-line-curve" d="M44,200.955L78.053,199.013L112.105,197.07L146.158,195.775L180.211,193.185L214.263,175.055L248.316,140.09L282.368,104.478L316.421,83.758L350.474,96.06L384.526,124.55L418.579,149.155L452.632,167.285L486.684,178.94L520.737,186.063M588.842,190.595L622.895,191.89L656.947,189.947L691,189.3"></path></g></g><g class="recharts-layer recharts-line"><g class="recharts-layer recharts-shape"><path name="Ánh sáng phòng" stroke="#C98A16" stroke-width="2.5" fill="none" id="recharts-line-_r_2_" height="518" width="647" class="recharts-curve recharts-line-curve" d="M44,161.328L78.053,164.436L112.105,162.364L146.158,165.472L180.211,163.4L214.263,166.508L248.316,169.616L282.368,401.68L316.421,430.688L350.474,434.832L384.526,427.58L418.579,339.52L452.632,215.2L486.684,172.724L520.737,164.436L554.789,161.328L588.842,163.4L622.895,165.472L656.947,162.364L691,163.4"></path></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_500"><g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks recharts-xAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-xAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g></g></g></g><g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><g class="recharts-cartesian-axis-ticks recharts-yAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-yAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g></g></g></g><g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><g class="recharts-cartesian-axis-ticks recharts-yAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-yAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_600"></g><g tabindex="-1" class="recharts-zIndex-layer_1000"></g><g tabindex="-1" class="recharts-zIndex-layer_1100"></g><g tabindex="-1" class="recharts-zIndex-layer_1200"></g><g tabindex="-1" class="recharts-zIndex-layer_2000"><g class="recharts-cartesian-axis-tick-labels recharts-xAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="44" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="44" dy="0.71em">17:29:24</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="146.1578947368421" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="146.1578947368421" dy="0.71em">17:29:30</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="248.31578947368422" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="248.31578947368422" dy="0.71em">17:29:36</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="350.47368421052636" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="350.47368421052636" dy="0.71em">17:29:42</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="452.63157894736844" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="452.63157894736844" dy="0.71em">17:29:48</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="554.7894736842105" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="554.7894736842105" dy="0.71em">17:29:54</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="647" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="691" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="691" dy="0.71em">17:30:02</tspan></text></g></g><g class="recharts-cartesian-axis-tick-labels recharts-yAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="526" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">20</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="396.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">40</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="267" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">60</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="137.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">80</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="10" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">100</tspan></text></g></g><g class="recharts-cartesian-axis-tick-labels recharts-yAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="699" y="526" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="699" dy="0.355em">0</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="699" y="396.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="699" dy="0.355em">125</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="699" y="267" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="699" dy="0.355em">250</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="699" y="137.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="699" dy="0.355em">375</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="699" y="10" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="699" dy="0.355em">500</tspan></text></g></g></g></svg></div></div></div></div></div><div class="_units_19q5y_147"><span>°C / %</span><span>lux</span></div></div></section></div><div class="_devCol_19q5y_100"><section class="_card_1md8o_5"><div class="_cardHead_1md8o_16"><div class="_cardTitle_1md8o_26">Thiết bị</div><div class="_cardSub_1md8o_31">2 thiết bị</div></div><div class="_dev_19q5y_100"><div class="_devIc_19q5y_178"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.7"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z"></path></svg></div><div class="_devMeta_19q5y_194"><div class="_devName_19q5y_198">Đèn phòng</div><div class="_devCode_19q5y_203">room01_lamp · D5</div></div><div class="_swWrap_19q5y_209"><button type="button" role="switch" aria-checked="false" aria-busy="false" aria-label="Đèn phòng" class="_sw_19q5y_209  "><span class="_knob_19q5y_236"></span></button><span class="_swState_19q5y_251">OFF</span></div></div><div class="_dev_19q5y_100"><div class="_devIc_19q5y_178"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.7"><circle cx="12" cy="12" r="2"></circle><path d="M12 10c0-4 1-7 3-7s2 4-1 6M14 12c4 0 7 1 7 3s-4 2-6-1M12 14c0 4-1 7-3 7s-2-4 1-6M10 12c-4 0-7-1-7-3s4-2 6 1"></path></svg></div><div class="_devMeta_19q5y_194"><div class="_devName_19q5y_198">Quạt trần</div><div class="_devCode_19q5y_203">room01_fan · D6</div></div><div class="_swWrap_19q5y_209"><button type="button" role="switch" aria-checked="true" aria-busy="false" aria-label="Quạt trần" class="_sw_19q5y_209 _swOn_19q5y_231 "><span class="_knob_19q5y_236"></span></button><span class="_swState_19q5y_251">ON</span></div></div></section></div></div></main></div></div></div>
+    <div id="root"><div class="_app_lsfxq_3" style="height: auto; min-height: 900px;"><aside class="_side_lsfxq_14"><div class="_brand_lsfxq_23"><div class="_brandName_lsfxq_32">Room01 Monitor</div><div class="_brandSub_lsfxq_39">ESP8266 · PHÒNG 01</div></div><nav class="_nav_lsfxq_46"><a aria-current="page" class="_navLink_lsfxq_52 _on_lsfxq_72" href="/" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>Dashboard</a><a class="_navLink_lsfxq_52 " href="/data-sensor" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M3 3v18h18"></path><path d="M7 15l4-5 3 3 5-7"></path></svg>Data Sensor</a><a class="_navLink_lsfxq_52 " href="/action-history" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M12 8v4l3 2"></path><circle cx="12" cy="12" r="9"></circle></svg>Action History</a><a class="_navLink_lsfxq_52 " href="/profile" data-discover="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>Profile</a></nav><div class="_spacer_lsfxq_78"></div><div class="_user_lsfxq_83"><div class="_userMeta_lsfxq_90"><div class="_userName_lsfxq_94">Lưu Đức Anh</div><div class="_userRole_lsfxq_102">admin · Quản trị</div></div><button type="button" class="_logout_lsfxq_111" title="Đăng xuất" aria-label="Đăng xuất"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.8"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l-5-5 5-5"></path><path d="M5 12h11"></path></svg></button></div></aside><div class="_main_lsfxq_134"><header class="_topbar_lsfxq_141"><h1 class="_title_lsfxq_151">Dashboard</h1><div class="_topbarRight_lsfxq_158"><div class="_conn_179wh_87"><span class="_dot_179wh_101 "></span>Đang nhận dữ liệu</div><div class="_stamp_179wh_77">Cập nhật 17:30:02</div></div></header><main class="_body_lsfxq_163" style="overflow: visible;"><div class="_stats_wfcnf_3 "><div class="_stat_wfcnf_3"><div class="_tick_wfcnf_37" style="background: rgb(192, 73, 47);"></div><div class="_statMain_wfcnf_51"><div class="_statLabel_wfcnf_65">Nhiệt độ phòng</div><div class="_statVal_wfcnf_75 ">28.5<span class="_statUnit_wfcnf_95">°C</span></div><div class="_statFoot_wfcnf_109"><span class="_statDelta_wfcnf_137">−0.1 trong 20 giây</span><svg viewBox="0 0 72 20" fill="none" aria-hidden="true"><polyline points="0,6 7.2,14 14.4,18 21.6,10 28.8,2 36,6 43.2,14 50.4,10 57.6,6 64.8,10 72,10" stroke="#C0492F" stroke-width="1.5"></polyline><circle cx="72" cy="10" r="2.2" fill="#C0492F"></circle></svg></div></div></div><div class="_stat_wfcnf_3"><div class="_tick_wfcnf_37" style="background: rgb(28, 123, 142);"></div><div class="_statMain_wfcnf_51"><div class="_statLabel_wfcnf_65">Độ ẩm phòng</div><div class="_statVal_wfcnf_75 ">72.0<span class="_statUnit_wfcnf_95">%</span></div><div class="_statFoot_wfcnf_109"><span class="_statDelta_wfcnf_137">−14.4 trong 20 giây</span><svg viewBox="0 0 72 20" fill="none" aria-hidden="true"><polyline points="0,2 8,6.8 16,10.9 24,13.9 32,15.8 40,17 48,17.8 56,18 64,17.7 72,17.6" stroke="#1C7B8E" stroke-width="1.5"></polyline><circle cx="72" cy="17.6" r="2.2" fill="#1C7B8E"></circle></svg></div></div></div><div class="_stat_wfcnf_3"><div class="_tick_wfcnf_37" style="background: rgb(201, 138, 22);"></div><div class="_statMain_wfcnf_51"><div class="_statLabel_wfcnf_65">Ánh sáng phòng</div><div class="_statVal_wfcnf_75 ">350<span class="_statUnit_wfcnf_95">lux</span></div><div class="_statFoot_wfcnf_109"><span class="_statDelta_wfcnf_137">+262 trong 20 giây</span><svg viewBox="0 0 72 20" fill="none" aria-hidden="true"><polyline points="0,18 7.2,17.6 14.4,12.4 21.6,5.2 28.8,2.7 36,2.2 43.2,2 50.4,2.1 57.6,2.2 64.8,2.1 72,2.1" stroke="#C98A16" stroke-width="1.5"></polyline><circle cx="72" cy="2.1" r="2.2" fill="#C98A16"></circle></svg></div></div></div></div><div class="_chartRow_wfcnf_159"><div class="_chartCol_wfcnf_173"><section class="_card_179wh_9"><div class="_cardHead_179wh_31"><div><div class="_cardTitle_179wh_51">Diễn biến 20 mẫu gần nhất</div><div class="_cardSub_179wh_61">17:29:24 → 17:30:02 · chu kỳ 2 giây · 1 mẫu thiếu độ ẩm phòng</div></div><div class="_legend_wfcnf_221"><span class="_legendItem_wfcnf_231"><span class="_legendKey_wfcnf_247" style="background: rgb(192, 73, 47);"></span>Nhiệt độ phòng</span><span class="_legendItem_wfcnf_231"><span class="_legendKey_wfcnf_247" style="background: rgb(28, 123, 142);"></span>Độ ẩm phòng</span><span class="_legendItem_wfcnf_231"><span class="_legendKey_wfcnf_247" style="background: rgb(201, 138, 22);"></span>Ánh sáng phòng</span></div></div><div class="_chartBox_wfcnf_259"><div class="_plot_wfcnf_275"><div class="_plotInner_wfcnf_285"><div class="recharts-responsive-container" style="width: 100%; height: 100%; min-width: 0px;"><div style="width: 0px; height: 0px; overflow: visible;"><div width="747" height="556" class="recharts-wrapper" style="position: relative; cursor: default; width: 747px; height: 556px;"><div xmlns="http://www.w3.org/1999/xhtml" tabindex="-1" class="recharts-tooltip-wrapper" style="visibility: hidden; pointer-events: none; position: absolute; top: 0px; left: 0px;"><div class="recharts-default-tooltip" role="status" aria-live="assertive" style="margin: 0px; padding: 8px 12px; background-color: rgb(255, 255, 255); border: 1px solid rgb(211, 219, 226); white-space: nowrap; border-radius: 3px; font-size: 12px; box-shadow: none;"><p class="recharts-tooltip-label" style="margin: 0px;"></p></div></div><svg role="application" tabindex="0" class="recharts-surface" width="747" height="556" viewBox="0 0 747 556" style="width: 100%; height: 100%; display: block;"><title></title><desc></desc><g tabindex="-1" class="recharts-zIndex-layer_-100"><g class="recharts-cartesian-grid"><g class="recharts-cartesian-grid-horizontal"><line stroke="#E6EBEF" x="44" y="8" width="659" height="518" x1="44" y1="8" x2="703" y2="8" fill="none"></line><line stroke="#E6EBEF" x="44" y="8" width="659" height="518" x1="44" y1="526" x2="703" y2="526" fill="none"></line></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_-50"></g><defs><clipPath id="recharts1-clip"><rect x="44" y="8" height="518" width="659"></rect></clipPath></defs><g tabindex="-1" class="recharts-zIndex-layer_100"></g><g tabindex="-1" class="recharts-zIndex-layer_200"></g><g tabindex="-1" class="recharts-zIndex-layer_300"></g><g tabindex="-1" class="recharts-zIndex-layer_400"><g class="recharts-layer recharts-line"><g class="recharts-layer recharts-shape"><path name="Nhiệt độ phòng" stroke="#C0492F" stroke-width="2.5" fill="none" id="recharts-line-_r_0_" height="518" width="659" class="recharts-curve recharts-line-curve" d="M44,476.79L78.684,475.495L113.368,474.848L148.053,473.552L182.737,474.2L217.421,472.905L252.105,471.61L286.789,472.258L321.474,470.963L356.158,470.315L390.842,471.61L425.526,472.258L460.211,470.963L494.895,469.668L529.579,470.315L564.263,471.61L598.947,470.963L633.632,470.315L668.316,470.963L703,470.963"></path></g></g><g class="recharts-layer recharts-line"><g class="recharts-layer recharts-shape"><path name="Độ ẩm phòng" stroke="#1C7B8E" stroke-width="2.5" fill="none" id="recharts-line-_r_1_" height="518" width="659" class="recharts-curve recharts-line-curve" d="M44,200.955L78.684,199.013L113.368,197.07L148.053,195.775L182.737,193.185L217.421,175.055L252.105,140.09L286.789,104.478L321.474,83.758L356.158,96.06L390.842,124.55L425.526,149.155L460.211,167.285L494.895,178.94L529.579,186.063M598.947,190.595L633.632,191.89L668.316,189.947L703,189.3"></path></g></g><g class="recharts-layer recharts-line"><g class="recharts-layer recharts-shape"><path name="Ánh sáng phòng" stroke="#C98A16" stroke-width="2.5" fill="none" id="recharts-line-_r_2_" height="518" width="659" class="recharts-curve recharts-line-curve" d="M44,161.328L78.684,164.436L113.368,162.364L148.053,165.472L182.737,163.4L217.421,166.508L252.105,169.616L286.789,401.68L321.474,430.688L356.158,434.832L390.842,427.58L425.526,339.52L460.211,215.2L494.895,172.724L529.579,164.436L564.263,161.328L598.947,163.4L633.632,165.472L668.316,162.364L703,163.4"></path></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_500"><g class="recharts-layer recharts-cartesian-axis recharts-xAxis xAxis"><g class="recharts-cartesian-axis-ticks recharts-xAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-xAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g></g></g></g><g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><g class="recharts-cartesian-axis-ticks recharts-yAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-yAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g></g></g></g><g class="recharts-layer recharts-cartesian-axis recharts-yAxis yAxis"><g class="recharts-cartesian-axis-ticks recharts-yAxis-ticks"><g class="recharts-cartesian-axis-tick-lines recharts-yAxis-tick-lines"><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g><g class="recharts-layer recharts-cartesian-axis-tick"></g></g></g></g></g><g tabindex="-1" class="recharts-zIndex-layer_600"></g><g tabindex="-1" class="recharts-zIndex-layer_1000"></g><g tabindex="-1" class="recharts-zIndex-layer_1100"></g><g tabindex="-1" class="recharts-zIndex-layer_1200"></g><g tabindex="-1" class="recharts-zIndex-layer_2000"><g class="recharts-cartesian-axis-tick-labels recharts-xAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="44" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="44" dy="0.71em">17:29:24</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="148.05263157894737" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="148.05263157894737" dy="0.71em">17:29:30</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="252.10526315789474" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="252.10526315789474" dy="0.71em">17:29:36</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="356.1578947368421" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="356.1578947368421" dy="0.71em">17:29:42</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="460.2105263157895" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="460.2105263157895" dy="0.71em">17:29:48</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="564.2631578947368" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="564.2631578947368" dy="0.71em">17:29:54</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text height="30" orientation="bottom" width="659" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="703" y="534" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="middle" fill="#8A9AA7"><tspan x="703" dy="0.71em">17:30:02</tspan></text></g></g><g class="recharts-cartesian-axis-tick-labels recharts-yAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="526" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">20</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="396.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">40</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="267" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">60</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="137.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">80</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text width="40" orientation="left" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="36" y="10" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="end" fill="#8A9AA7"><tspan x="36" dy="0.355em">100</tspan></text></g></g><g class="recharts-cartesian-axis-tick-labels recharts-yAxis-tick-labels"><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="711" y="526" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="711" dy="0.355em">0</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="711" y="396.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="711" dy="0.355em">125</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="711" y="267" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="711" dy="0.355em">250</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="711" y="137.5" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="711" dy="0.355em">375</tspan></text></g><g class="recharts-layer recharts-cartesian-axis-tick-label"><text orientation="right" width="40" height="518" stroke="none" font-size="12" font-family="'Cascadia Mono', Consolas, monospace" x="711" y="10" class="recharts-text recharts-cartesian-axis-tick-value" text-anchor="start" fill="#8A9AA7"><tspan x="711" dy="0.355em">500</tspan></text></g></g></g></svg></div></div></div></div></div><div class="_units_wfcnf_293"><span>°C / %</span><span>lux</span></div></div></section></div><div class="_devCol_wfcnf_199"><section class="_card_179wh_9"><div class="_cardHead_179wh_31"><div class="_cardTitle_179wh_51">Thiết bị</div><div class="_cardSub_179wh_61">2 thiết bị</div></div><div class="_dev_wfcnf_199"><div class="_devIc_wfcnf_355 "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.7"><path d="M9 18h6M10 21h4"></path><path d="M12 3a6 6 0 0 0-3.5 10.9V15h7v-1.1A6 6 0 0 0 12 3z"></path></svg></div><div class="_devMeta_wfcnf_437"><div class="_devName_wfcnf_445">Đèn phòng</div><div class="_devCode_wfcnf_455">room01_lamp · D5</div></div><div class="_swWrap_wfcnf_467"><button type="button" role="switch" aria-checked="false" aria-busy="false" aria-label="Đèn phòng" class="_sw_wfcnf_467  "><span class="_knob_wfcnf_521"></span></button><span class="_swState_wfcnf_551">OFF</span></div></div><div class="_dev_wfcnf_199"><div class="_devIc_wfcnf_355 _devIcFanOn_wfcnf_409"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" stroke-width="1.7"><circle cx="12" cy="12" r="2"></circle><path d="M12 10c0-4 1-7 3-7s2 4-1 6M14 12c4 0 7 1 7 3s-4 2-6-1M12 14c0 4-1 7-3 7s-2-4 1-6M10 12c-4 0-7-1-7-3s4-2 6 1"></path></svg></div><div class="_devMeta_wfcnf_437"><div class="_devName_wfcnf_445">Quạt trần</div><div class="_devCode_wfcnf_455">room01_fan · D6</div></div><div class="_swWrap_wfcnf_467"><button type="button" role="switch" aria-checked="true" aria-busy="false" aria-label="Quạt trần" class="_sw_wfcnf_467 _swOn_wfcnf_511 "><span class="_knob_wfcnf_521"></span></button><span class="_swState_wfcnf_551">ON</span></div></div></section></div></div></main></div></div></div>
     
   
 
