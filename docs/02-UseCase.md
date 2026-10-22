@@ -59,6 +59,11 @@ left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome
 skinparam shadowing false
+' Ảnh dựng bằng bộ dàn trang Smetana có sẵn của PlantUML (máy không cài Graphviz). Smetana tính khung ảnh
+' thiếu phần đường cong phía trên, làm hai đường tới UC-03, UC-05 bị cắt → tiêu đề trắng để chừa lề trên.
+!pragma layout smetana
+skinparam titleFontColor white
+title .
 
 actor "Người dùng" as User
 actor "Thiết bị IoT\n(ESP8266)" as IoT
@@ -69,10 +74,11 @@ rectangle "Hệ thống giám sát và điều khiển phòng IoT" {
   usecase "UC-01\nXem Dashboard giám sát" as UC01
   usecase "UC-02\nĐiều khiển bật/tắt thiết bị" as UC02
   usecase "UC-03\nXem lịch sử số liệu cảm biến" as UC03
-  usecase "UC-04\nTìm kiếm, lọc, sắp xếp" as UC04
+  usecase "UC-04\nTìm kiếm, lọc,\nsắp xếp, phân trang" as UC04
   usecase "UC-05\nXem lịch sử thao tác thiết bị" as UC05
   usecase "UC-06\nXem trang Profile" as UC06
   usecase "UC-07\nThu thập và truyền\nsố liệu cảm biến" as UC07
+  usecase "UC-08\nĐăng nhập / Đăng xuất" as UC08
 
   UC04 ..> UC03 : <<extend>>
   UC04 ..> UC05 : <<extend>>
@@ -85,6 +91,7 @@ User --> UC03
 User --> UC04
 User --> UC05
 User --> UC06
+User --> UC08
 
 IoT --> UC07
 UC07 --> Broker
@@ -111,10 +118,11 @@ flowchart LR
         UC01["UC-01<br/>Xem Dashboard"]
         UC02["UC-02<br/>Điều khiển thiết bị"]
         UC03["UC-03<br/>Lịch sử số liệu"]
-        UC04["UC-04<br/>Tìm kiếm, lọc, sắp xếp"]
+        UC04["UC-04<br/>Tìm kiếm, lọc, sắp xếp, phân trang"]
         UC05["UC-05<br/>Lịch sử thao tác"]
         UC06["UC-06<br/>Trang Profile"]
         UC07["UC-07<br/>Thu thập số liệu"]
+        UC08["UC-08<br/>Đăng nhập / Đăng xuất"]
     end
 
     User --- UC01
@@ -123,6 +131,7 @@ flowchart LR
     User --- UC04
     User --- UC05
     User --- UC06
+    User --- UC08
     IoT --- UC07
     UC07 --- Broker
     UC02 --- Broker

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 620" width="1120" height="620" font-family="Consolas, 'DejaVu Sans Mono', monospace">
+  <!-- Hình 3 — Phân rã tiến trình phía Backend. Cùng phong cách với architecture.svg (Hình 1).
+       Ý chính: P1 và P2 là hai tiến trình riêng, P2 chỉ tới được trình duyệt qua Redis (channel layer). -->
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e8ecef"/>
+    </marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#e5c07b"/>
+    </marker>
+  </defs>
+  <rect width="1120" height="620" fill="#15181c"/>
+
+  <!-- ================= MOSQUITTO + ESP8266 ================= -->
+  <rect x="420" y="28" width="280" height="92" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="560" y="67" fill="#eaf6ee" font-size="17" text-anchor="middle">MQTT Broker</text>
+  <text x="560" y="93" fill="#eaf6ee" font-size="17" text-anchor="middle">Mosquitto :1884</text>
+
+  <rect x="30" y="28" width="210" height="92" rx="10" fill="#1e2228" stroke="#6aa9e0" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="135" y="67" fill="#cfe3f7" font-size="17" text-anchor="middle">ESP8266</text>
+  <text x="135" y="93" fill="#8d97a3" font-size="14" text-anchor="middle">thiết bị trong phòng</text>
+  <line x1="240" y1="50" x2="418" y2="50" stroke="#8d97a3" stroke-width="2" stroke-dasharray="7 5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="300" y="40" fill="#8d97a3" font-size="13" text-anchor="middle">WiFi · MQTT</text>
+
+  <!-- ================= KHUNG BACKEND ================= -->
+  <rect x="232" y="186" width="826" height="226" rx="14" fill="#1a1e22" stroke="#7fc59b" stroke-width="2" stroke-dasharray="9 6"/>
+  <text x="645" y="212" fill="#7fc59b" font-size="14" font-weight="700" text-anchor="middle">BACKEND DJANGO: HAI TIẾN TRÌNH</text>
+
+  <!-- P1 -->
+  <rect x="250" y="226" width="250" height="172" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="375" y="258" fill="#f2f5f7" font-size="17" font-weight="700" text-anchor="middle">P1: ASGI server</text>
+  <text x="375" y="284" fill="#7fc59b" font-size="14" text-anchor="middle">daphne :8000</text>
+  <g fill="#dfe6ec" font-size="14" text-anchor="middle">
+    <text x="375" y="320">REST API</text>
+    <text x="375" y="344">WebSocket</text>
+    <text x="375" y="368">gửi lệnh điều khiển</text>
+  </g>
+
+  <!-- P2 -->
+  <rect x="790" y="226" width="250" height="172" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="915" y="258" fill="#f2f5f7" font-size="17" font-weight="700" text-anchor="middle">P2: MQTT worker</text>
+  <text x="915" y="284" fill="#7fc59b" font-size="14" text-anchor="middle">manage.py mqtt_worker</text>
+  <g fill="#dfe6ec" font-size="14" text-anchor="middle">
+    <text x="915" y="320">nhận số đo, phản hồi</text>
+    <text x="915" y="344">ghi CSDL</text>
+    <text x="915" y="368">quét lệnh hết giờ mỗi 1 s</text>
+  </g>
+
+  <!-- Redis: cầu nối duy nhất P2 → P1 -->
+  <rect x="575" y="272" width="140" height="80" rx="10" fill="#2b2a22" stroke="#e5c07b" stroke-width="2.5"/>
+  <text x="645" y="305" fill="#f5e6c4" font-size="17" font-weight="700" text-anchor="middle">Redis</text>
+  <text x="645" y="329" fill="#e5c07b" font-size="13" text-anchor="middle">channel layer</text>
+  <line x1="790" y1="312" x2="717" y2="312" stroke="#e5c07b" stroke-width="2.5" marker-end="url(#am)"/>
+  <line x1="575" y1="312" x2="502" y2="312" stroke="#e5c07b" stroke-width="2.5" marker-end="url(#am)"/>
+  <g fill="#e5c07b" font-size="13" text-anchor="middle">
+    <text x="645" y="376">sensor.data</text>
+    <text x="645" y="394">device.state</text>
+  </g>
+
+  <!-- ================= TRÌNH DUYỆT ================= -->
+  <rect x="20" y="266" width="150" height="92" rx="10" fill="#2b2f38" stroke="#d9a7bd" stroke-width="2"/>
+  <text x="95" y="305" fill="#f2e6ec" font-size="16" text-anchor="middle">Trình duyệt</text>
+  <text x="95" y="329" fill="#c3ccd6" font-size="14" text-anchor="middle">React</text>
+  <line x1="172" y1="292" x2="248" y2="292" stroke="#e8ecef" stroke-width="2" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="210" y="283" fill="#c3ccd6" font-size="13" text-anchor="middle">HTTP</text>
+  <line x1="248" y1="334" x2="172" y2="334" stroke="#e5c07b" stroke-width="2.5" marker-end="url(#am)"/>
+  <text x="210" y="354" fill="#e5c07b" font-size="13" text-anchor="middle">WS</text>
+
+  <!-- ================= POSTGRESQL ================= -->
+  <rect x="420" y="500" width="280" height="92" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
+  <text x="560" y="539" fill="#eaf6ee" font-size="17" text-anchor="middle">PostgreSQL</text>
+  <text x="560" y="565" fill="#8d97a3" font-size="14" text-anchor="middle">CSDL iot_room</text>
+
+  <!-- ================= MŨI TÊN ================= -->
+  <!-- P1 → Mosquitto: publish device_control -->
+  <path d="M375,226 V74 H418" fill="none" stroke="#e8ecef" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="363" y="138" fill="#dfe6ec" font-size="14" text-anchor="end">pub</text>
+  <text x="363" y="158" fill="#dfe6ec" font-size="14" text-anchor="end">device_control</text>
+
+  <!-- Mosquitto → P2: subscribe 2 topic -->
+  <path d="M700,100 H915 V224" fill="none" stroke="#e8ecef" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="927" y="148" fill="#dfe6ec" font-size="14">sub data_sensors</text>
+  <text x="927" y="168" fill="#dfe6ec" font-size="14">sub device_respond</text>
+
+  <!-- P1 ↔ PostgreSQL -->
+  <path d="M375,400 V546 H418" fill="none" stroke="#e8ecef" stroke-width="2" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="363" y="470" fill="#dfe6ec" font-size="14" text-anchor="end">ghi lệnh PENDING,</text>
+  <text x="363" y="490" fill="#dfe6ec" font-size="14" text-anchor="end">truy vấn các bảng</text>
+
+  <!-- P2 ↔ PostgreSQL -->
+  <path d="M915,400 V546 H702" fill="none" stroke="#e8ecef" stroke-width="2" marker-start="url(#ar)" marker-end="url(#ar)"/>
+  <text x="927" y="470" fill="#dfe6ec" font-size="14">ghi số đo,</text>
+  <text x="927" y="490" fill="#dfe6ec" font-size="14">chốt kết quả lệnh</text>
+</svg>

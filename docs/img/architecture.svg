@@ -37,22 +37,22 @@
 
   <!-- Mosquitto -->
   <rect x="664" y="112" width="408" height="120" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
-  <text x="868" y="163" fill="#eaf6ee" font-size="17" text-anchor="middle">MQTT Broker —</text>
-  <text x="868" y="190" fill="#eaf6ee" font-size="17" text-anchor="middle">Mosquitto :1883</text>
+  <text x="868" y="163" fill="#eaf6ee" font-size="17" text-anchor="middle">MQTT Broker</text>
+  <text x="868" y="190" fill="#eaf6ee" font-size="17" text-anchor="middle">Mosquitto :1884</text>
 
   <!-- Backend -->
   <rect x="664" y="340" width="216" height="92" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
-  <text x="772" y="375" fill="#eaf6ee" font-size="17" text-anchor="middle">Backend —</text>
+  <text x="772" y="375" fill="#eaf6ee" font-size="17" text-anchor="middle">Backend</text>
   <text x="772" y="400" fill="#eaf6ee" font-size="16" text-anchor="middle">Django + DRF + WS</text>
 
   <!-- Database -->
   <rect x="916" y="340" width="156" height="92" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
-  <text x="994" y="375" fill="#eaf6ee" font-size="16" text-anchor="middle">Database —</text>
+  <text x="994" y="375" fill="#eaf6ee" font-size="16" text-anchor="middle">Database</text>
   <text x="994" y="400" fill="#eaf6ee" font-size="16" text-anchor="middle">PostgreSQL</text>
 
   <!-- Frontend -->
   <rect x="664" y="480" width="216" height="80" rx="10" fill="#232a2b" stroke="#7fc59b" stroke-width="2"/>
-  <text x="772" y="511" fill="#eaf6ee" font-size="17" text-anchor="middle">Frontend —</text>
+  <text x="772" y="511" fill="#eaf6ee" font-size="17" text-anchor="middle">Frontend</text>
   <text x="772" y="536" fill="#eaf6ee" font-size="17" text-anchor="middle">Web (React)</text>
 
   <!-- Nguoi dung -->

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 620" width="1120" height="620" font-family="Consolas, 'DejaVu Sans Mono', monospace">
+  <!-- Hình 2 — Sơ đồ đấu nối phần cứng. Cùng phong cách với architecture.svg (Hình 1).
+       Chân theo firmware/esp8266_room01.ino: DHT11→D4, LM393 DO→A0, Đèn→D5, Quạt→D6, nguồn 3V3. -->
+  <rect width="1120" height="620" fill="#15181c"/>
+
+  <!-- ================= ESP8266 ================= -->
+  <rect x="32" y="32" width="300" height="556" rx="14" fill="#1e2228" stroke="#6aa9e0" stroke-width="2"/>
+  <text x="182" y="72" fill="#cfe3f7" font-size="20" font-weight="700" text-anchor="middle">ESP8266</text>
+  <text x="182" y="98" fill="#cfe3f7" font-size="16" text-anchor="middle">NodeMCU</text>
+  <text x="182" y="560" fill="#8d97a3" font-size="14" text-anchor="middle">cấp nguồn qua micro-USB</text>
+
+  <!-- chân của bo: nhãn trong bo, chấm ở mép phải -->
+  <g font-size="17" fill="#e8ecef" text-anchor="end">
+    <text x="300" y="146">3V3</text>
+    <text x="300" y="206">GND</text>
+    <text x="300" y="266">D4</text>
+    <text x="300" y="386">A0</text>
+    <text x="300" y="466">D5</text>
+    <text x="300" y="526">D6</text>
+  </g>
+  <g font-size="13" fill="#8d97a3" text-anchor="end">
+    <text x="252" y="266">GPIO2</text>
+    <text x="252" y="386">ADC0</text>
+    <text x="252" y="466">GPIO14</text>
+    <text x="252" y="526">GPIO12</text>
+  </g>
+
+  <!-- ================= ĐƯỜNG NGUỒN CHUNG ================= -->
+  <!-- 3V3: đỏ -->
+  <line x1="332" y1="140" x2="430" y2="140" stroke="#e06c75" stroke-width="3"/>
+  <line x1="430" y1="140" x2="430" y2="350" stroke="#e06c75" stroke-width="3"/>
+  <text x="430" y="126" fill="#e06c75" font-size="15" text-anchor="middle">3V3</text>
+  <!-- GND: xám, chạy xuống thành thanh GND dưới đáy cho 2 LED -->
+  <line x1="332" y1="200" x2="470" y2="200" stroke="#8d97a3" stroke-width="3"/>
+  <line x1="470" y1="200" x2="470" y2="580" stroke="#8d97a3" stroke-width="3"/>
+  <line x1="470" y1="580" x2="960" y2="580" stroke="#8d97a3" stroke-width="3"/>
+  <text x="470" y="186" fill="#8d97a3" font-size="15" text-anchor="middle">GND</text>
+
+  <!-- ================= DHT11 ================= -->
+  <rect x="580" y="214" width="250" height="94" rx="10" fill="#2b2f38" stroke="#d9a7bd" stroke-width="2"/>
+  <text x="760" y="252" fill="#f2e6ec" font-size="18" font-weight="700" text-anchor="middle">DHT11</text>
+  <text x="760" y="278" fill="#c3ccd6" font-size="14" text-anchor="middle">nhiệt độ, độ ẩm</text>
+  <g font-size="13" fill="#c3ccd6">
+    <text x="592" y="234">VCC</text><text x="592" y="265">DATA</text><text x="592" y="296">GND</text>
+  </g>
+  <!-- VCC → 3V3, DATA ← D4, GND → GND -->
+  <line x1="430" y1="230" x2="580" y2="230" stroke="#e06c75" stroke-width="2.5"/>
+  <line x1="332" y1="260" x2="580" y2="260" stroke="#6aa9e0" stroke-width="2.5"/>
+  <line x1="470" y1="290" x2="580" y2="290" stroke="#8d97a3" stroke-width="2.5"/>
+  <text x="525" y="254" fill="#6aa9e0" font-size="13" text-anchor="middle">dữ liệu số</text>
+
+  <!-- ================= LM393 ================= -->
+  <rect x="580" y="334" width="250" height="90" rx="10" fill="#2b2f38" stroke="#d9a7bd" stroke-width="2"/>
+  <text x="760" y="372" fill="#f2e6ec" font-size="18" font-weight="700" text-anchor="middle">LM393</text>
+  <text x="760" y="394" fill="#c3ccd6" font-size="14" text-anchor="middle">+ quang trở</text>
+  <g font-size="13" fill="#c3ccd6">
+    <text x="592" y="354">VCC</text><text x="592" y="385">DO</text><text x="592" y="416">GND</text>
+  </g>
+  <line x1="430" y1="350" x2="580" y2="350" stroke="#e06c75" stroke-width="2.5"/>
+  <line x1="332" y1="380" x2="580" y2="380" stroke="#e5c07b" stroke-width="2.5"/>
+  <line x1="470" y1="410" x2="580" y2="410" stroke="#8d97a3" stroke-width="2.5"/>
+  <text x="525" y="374" fill="#e5c07b" font-size="13" text-anchor="middle">tín hiệu</text>
+
+  <!-- ================= LED 1 — Đèn phòng (D5) ================= -->
+  <line x1="332" y1="460" x2="600" y2="460" stroke="#7fc59b" stroke-width="2.5"/>
+  <rect x="600" y="448" width="80" height="24" rx="3" fill="#2b2f38" stroke="#e8ecef" stroke-width="2"/>
+  <text x="640" y="440" fill="#c3ccd6" font-size="13" text-anchor="middle">220 Ω</text>
+  <line x1="680" y1="460" x2="780" y2="460" stroke="#7fc59b" stroke-width="2.5"/>
+  <polygon points="780,444 780,476 808,460" fill="#7fc59b"/>
+  <line x1="810" y1="444" x2="810" y2="476" stroke="#7fc59b" stroke-width="3"/>
+  <path d="M792,444 l10,-12 M802,448 l10,-12" stroke="#e5c07b" stroke-width="2" fill="none"/>
+  <path d="M798,432 l4,0 l0,4 M808,436 l4,0 l0,4" stroke="#e5c07b" stroke-width="2" fill="none"/>
+  <line x1="810" y1="460" x2="960" y2="460" stroke="#8d97a3" stroke-width="2.5"/>
+  <line x1="960" y1="460" x2="960" y2="580" stroke="#8d97a3" stroke-width="2.5"/>
+  <text x="978" y="456" fill="#f2e6ec" font-size="15">LED 1</text>
+  <text x="978" y="476" fill="#c3ccd6" font-size="14">Đèn phòng</text>
+
+  <!-- ================= LED 2 — Quạt trần (D6) ================= -->
+  <line x1="332" y1="520" x2="600" y2="520" stroke="#7fc59b" stroke-width="2.5"/>
+  <rect x="600" y="508" width="80" height="24" rx="3" fill="#2b2f38" stroke="#e8ecef" stroke-width="2"/>
+  <text x="640" y="500" fill="#c3ccd6" font-size="13" text-anchor="middle">220 Ω</text>
+  <line x1="680" y1="520" x2="780" y2="520" stroke="#7fc59b" stroke-width="2.5"/>
+  <polygon points="780,504 780,536 808,520" fill="#7fc59b"/>
+  <line x1="810" y1="504" x2="810" y2="536" stroke="#7fc59b" stroke-width="3"/>
+  <path d="M792,498 l10,-12 M802,502 l10,-12" stroke="#e5c07b" stroke-width="2" fill="none"/>
+  <path d="M798,486 l4,0 l0,4 M808,490 l4,0 l0,4" stroke="#e5c07b" stroke-width="2" fill="none"/>
+  <line x1="810" y1="520" x2="880" y2="520" stroke="#8d97a3" stroke-width="2.5"/>
+  <line x1="880" y1="520" x2="880" y2="580" stroke="#8d97a3" stroke-width="2.5"/>
+  <text x="978" y="516" fill="#f2e6ec" font-size="15">LED 2</text>
+  <text x="978" y="536" fill="#c3ccd6" font-size="14">Quạt trần</text>
+
+  <!-- chấm nối: chỉ ở chỗ hai dây thật sự nối với nhau (chỗ cắt ngang không có chấm) -->
+  <g fill="#e8ecef">
+    <circle cx="332" cy="140" r="5"/><circle cx="332" cy="200" r="5"/><circle cx="332" cy="260" r="5"/>
+    <circle cx="332" cy="380" r="5"/><circle cx="332" cy="460" r="5"/><circle cx="332" cy="520" r="5"/>
+  </g>
+  <g fill="#e06c75"><circle cx="430" cy="230" r="5"/><circle cx="430" cy="350" r="5"/></g>
+  <g fill="#8d97a3">
+    <circle cx="470" cy="290" r="5"/><circle cx="470" cy="410" r="5"/>
+    <circle cx="960" cy="580" r="5"/><circle cx="880" cy="580" r="5"/>
+  </g>
+
+  <!-- chú giải màu dây -->
+  <g font-size="13" fill="#c3ccd6">
+    <line x1="880" y1="60" x2="910" y2="60" stroke="#e06c75" stroke-width="3"/><text x="920" y="65">nguồn 3,3 V</text>
+    <line x1="880" y1="86" x2="910" y2="86" stroke="#8d97a3" stroke-width="3"/><text x="920" y="91">GND chung</text>
+    <line x1="880" y1="112" x2="910" y2="112" stroke="#6aa9e0" stroke-width="3"/><text x="920" y="117">vào số (INPUT)</text>
+    <line x1="880" y1="138" x2="910" y2="138" stroke="#e5c07b" stroke-width="3"/><text x="920" y="143">vào ADC</text>
+    <line x1="880" y1="164" x2="910" y2="164" stroke="#7fc59b" stroke-width="3"/><text x="920" y="169">ra (OUTPUT)</text>
+  </g>
+</svg>

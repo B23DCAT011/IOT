@@ -300,11 +300,13 @@ erDiagram
 
 ```plantuml
 @startuml ERD
+' Dựng bằng bộ dàn trang Smetana có sẵn của PlantUML (máy không cài Graphviz)
+!pragma layout smetana
 hide circle
 skinparam linetype ortho
 skinparam shadowing false
 
-entity "sensor_device" as SDV {
+entity "sensors_sensordevice" as SDV {
   * id : bigserial <<PK>>
   --
   * code : varchar(30) <<unique>>
@@ -320,7 +322,7 @@ entity "sensor_device" as SDV {
   * updated_at : timestamptz
 }
 
-entity "sensor_data" as SD {
+entity "sensors_sensordata" as SD {
   * id : bigserial <<PK>>
   --
   * sensor_id : bigint <<FK>>
@@ -328,7 +330,7 @@ entity "sensor_data" as SD {
   * recorded_at : timestamptz <<index>>
 }
 
-entity "users" as US {
+entity "users_user" as US {
   * id : bigserial <<PK>>
   --
   * username : varchar(150) <<unique>>
@@ -340,7 +342,7 @@ entity "users" as US {
     last_login : timestamptz
 }
 
-entity "devices" as DV {
+entity "devices_device" as DV {
   * id : bigserial <<PK>>
   --
   * code : varchar(30) <<unique>>
@@ -354,7 +356,7 @@ entity "devices" as DV {
   * updated_at : timestamptz
 }
 
-entity "action_history" as AH {
+entity "devices_actionhistory" as AH {
   * id : bigserial <<PK>>
   --
   * device_id : bigint <<FK>>

@@ -119,13 +119,13 @@ User -> FE : M-01 bấm công tắc "Đèn" → ON
 activate FE
 note right of FE : BR-04 — khóa công tắc\nchặn bấm trùng
 
-FE -> BE : M-02 POST /api/devices/1/control\n{ "action": "ON", "user_id": 1 }
+FE -> BE : M-02 POST /api/devices/1/control\n{ "action": "ON" } + header Authorization: Token
 activate BE
 
 BE -> BE : M-03 kiểm tra thiết bị tồn tại\nvà action ∈ {ON, OFF}
 BE -> BE : M-04 sinh request_id (uuid4) — BR-06
 
-BE -> DB : M-05 INSERT action_history\n(status = PENDING, user_id) — «include» UC-05
+BE -> DB : M-05 INSERT action_history + COMMIT\n(status = PENDING, user_id lấy từ token) — «include» UC-05
 activate DB
 DB --> BE : ok
 deactivate DB
@@ -171,11 +171,11 @@ sequenceDiagram
     User->>FE: M-01 bấm công tắc "Đèn" → ON
     activate FE
     Note right of FE: BR-04 — khóa công tắc
-    FE->>BE: M-02 POST /api/devices/1/control {action:"ON", user_id:1}
+    FE->>BE: M-02 POST /api/devices/1/control {action:"ON"} (kèm token)
     activate BE
     BE->>BE: M-03 kiểm tra device + action hợp lệ
     BE->>BE: M-04 sinh request_id (uuid4) — BR-06
-    BE->>DB: M-05 INSERT action_history (PENDING, user_id)
+    BE->>DB: M-05 INSERT + COMMIT action_history (PENDING, user_id từ token)
     DB-->>BE: ok
     BE->>MQ: M-06 publish device_control (QoS 1)
     BE-->>FE: M-07 HTTP 202 {request_id, status:"PENDING"}
@@ -200,10 +200,10 @@ sequenceDiagram
 | Mã | Từ → Đến | Giao thức | Nội dung | Nguồn |
 |---|---|---|---|---|
 | M-01 | User → FE | Thao tác UI | Bấm công tắc | UC-02 bước 1 |
-| M-02 | FE → BE | HTTP POST | `/api/devices/{id}/control`, body `{"action":"ON","user_id":1}` — `user_id` **tùy chọn** (BR-12) | UC-02 bước 2, FR-04, FR-18 |
-| M-03 | BE → BE | — | Kiểm tra `devices_device` tồn tại, `is_active = true`, `action ∈ {ON,OFF}`, `user_id` hợp lệ nếu có | UC-02 bước 3, E3, E4 |
+| M-02 | FE → BE | HTTP POST | `/api/devices/{id}/control`, body `{"action":"ON"}`, header `Authorization: Token <key>`; người thao tác lấy từ token (BR-12) | UC-02 bước 2, FR-04, FR-18 |
+| M-03 | BE → BE | — | Kiểm tra `devices_device` tồn tại, `is_active = true`, `action ∈ {ON,OFF}`, token hợp lệ (thiếu hoặc sai → 401) | UC-02 bước 3, E3, E4 |
 | M-04 | BE → BE | — | `uuid4()` | BR-06 |
-| M-05 | BE → DB | SQL INSERT | `devices_actionhistory(device_id, user_id, request_id, action, status='PENDING', created_at)` — `user_id` có thể rỗng (BR-12) | UC-02 bước 5, BR-05 |
+| M-05 | BE → DB | SQL INSERT | `devices_actionhistory(device_id, user_id, request_id, action, status='PENDING', created_at)` — `user_id` lấy từ token, chỉ rỗng với lệnh không đi qua API (BR-12); **commit ngay, trước M-06** | UC-02 bước 5, BR-05 |
 | M-06 | BE → Broker | MQTT pub | Topic `device_control`, QoS 1 | UC-02 bước 6 |
 | M-07 | BE → FE | HTTP 202 | `{request_id, device_id, action, user, status:"PENDING"}` — `user` có thể `null` | §10 điểm ①|
 | M-08 | Broker → HW | MQTT | Chuyển tiếp tới client đang subscribe | UC-02 bước 7 |
@@ -237,13 +237,13 @@ sequenceDiagram
         DB-->>BE: có
         BE-->>FE: HTTP 409 DEVICE_BUSY
     else E2 — không kết nối được Broker
-        BE->>DB: INSERT action_history (PENDING, user_id)
+        BE->>DB: INSERT action_history (PENDING, user_id) + COMMIT
         BE->>MQ: publish device_control
-        MQ--xBE: ConnectionRefusedError
-        BE->>DB: ROLLBACK — huỷ bản ghi vừa ghi
-        BE-->>FE: HTTP 503 Service Unavailable
+        MQ--xBE: ConnectionRefusedError / không có PUBACK
+        BE->>DB: DELETE bản ghi vừa tạo
+        BE-->>FE: HTTP 503 BROKER_UNAVAILABLE
     else Luồng chuẩn
-        BE->>DB: INSERT action_history (PENDING, user_id)
+        BE->>DB: INSERT action_history (PENDING, user_id) + COMMIT
         BE->>MQ: publish device_control (QoS 1)
         BE-->>FE: HTTP 202 Accepted
     end
@@ -252,7 +252,7 @@ sequenceDiagram
 
 > **Nhánh E6 phải đứng trước nhánh chuẩn.** Truy vấn `EXISTS` kiểm tra lệnh đang chờ nằm **bên trong** `transaction.atomic()` và chạy **trước** lệnh `INSERT`, nếu không hai yêu cầu tới gần nhau vẫn kịp ghi hai bản ghi `PENDING`. Đây là phần máy chủ của BR-04 (`02-UseCase.md` UC-02 E6), bù cho việc khóa công tắc ở Frontend chỉ có hiệu lực trong một tab.
 >
-> **Chú ý thứ tự ở nhánh E2.** UC-02 quy định "không kết nối được broker thì **không** ghi bản ghi `action_history`". Nhưng luồng chính lại ghi `PENDING` **trước** khi publish (bước 5 trước bước 6). Hai điều này chỉ dung hòa được nếu toàn bộ view nằm trong `transaction.atomic()`: khi `publish()` ném ngoại lệ, giao dịch cuộn ngược và bản ghi `PENDING` biến mất. Đây là ràng buộc bắt buộc khi lập trình view ở tuần 3, không phải chi tiết tùy chọn.
+> **Chú ý thứ tự ở nhánh E2** *(sửa ở bản 2.1 theo lỗi bắt được khi chạy thật)*. Bản ghi `PENDING` phải **commit xong trước khi publish**. Nếu publish bên trong `transaction.atomic()`, thiết bị có thể trả lời (ESP giả lập: khoảng 20 ms) trước lúc giao dịch commit; worker không thấy bản ghi `PENDING`, bỏ qua phản hồi, rồi 5 giây sau đánh `FAILED` trong khi đèn đã bật. Vì vậy khi broker lỗi, view **xoá** bản ghi vừa commit thay vì cuộn ngược giao dịch: người dùng vẫn nhận `503` và không có lịch sử nào được để lại, đúng UC-02 E2. Hệ quả nhỏ: dãy `id` của bảng lịch sử có lỗ hổng, hành vi bình thường của PostgreSQL.
 
 ### 2.5 Ghi chú thiết kế
 
@@ -293,12 +293,13 @@ participant "ESP8266" as HW
 
 User -> FE : bấm công tắc
 activate FE
-FE -> P1 : POST /api/devices/1/control\n{ action, user_id }
+FE -> P1 : POST /api/devices/1/control\n{ action } + header Authorization: Token
 activate P1
-P1 -> DB : INSERT action_history\n(PENDING, user_id) — BR-12
+P1 -> DB : INSERT action_history\n(PENDING, user_id từ token) + COMMIT
 note right of P1
-  Toàn bộ khối này nằm trong
-  transaction.atomic()
+  COMMIT xong mới publish: thiết bị
+  trả lời nhanh hơn lúc commit thì
+  P2 sẽ không thấy bản ghi PENDING
 end note
 P1 -> MQ : publish "device_control" QoS 1
 note left of P1
@@ -357,9 +358,9 @@ sequenceDiagram
     rect rgb(245,245,245)
     Note over User,HW: Giai đoạn 1 — gửi lệnh
     User->>FE: bấm công tắc
-    FE->>P1: POST /api/devices/1/control {action, user_id}
+    FE->>P1: POST /api/devices/1/control {action} (kèm token)
     activate P1
-    P1->>DB: INSERT action_history (PENDING, user_id)
+    P1->>DB: INSERT action_history (PENDING, user_id từ token) + COMMIT
     P1->>MQ: publish device_control (client paho ngắn hạn)
     P1-->>FE: HTTP 202 {request_id}
     deactivate P1
@@ -427,9 +428,9 @@ loop mỗi 2 giây (BR-01)
   HW -> SEN : analogRead(A0)
   SEN --> HW : 350 (ADC → lux)
 
-  alt A1 — DHT11 trả về NaN
-    HW -> HW : bỏ qua chu kỳ này,\nghi log Serial Monitor
-  else Đọc được (toàn bộ hoặc một phần)
+  opt A1 — DHT11 trả về NaN
+    HW -> HW : bỏ riêng trường NaN khỏi gói,\ncác số đo còn lại vẫn gửi
+  end
     HW -> MQ : publish "data_sensors" QoS 0\n{ device_id, temperature, humidity, light }
     deactivate HW
 
@@ -454,7 +455,6 @@ loop mỗi 2 giây (BR-01)
       FE -> User : cập nhật 3 thẻ số liệu\n+ thêm điểm vào biểu đồ (BR-10)
     end
     deactivate P2
-  end
 end
 
 @enduml
@@ -479,9 +479,9 @@ sequenceDiagram
         SEN-->>HW: 28.5 °C, 72.0 %
         HW->>SEN: analogRead(A0)
         SEN-->>HW: 350 (ADC → lux)
-        alt A1 — DHT11 trả về NaN
-            HW->>HW: bỏ qua chu kỳ, log Serial
-        else Đọc được
+        opt A1 — DHT11 trả về NaN
+            HW->>HW: bỏ riêng trường NaN, số đo khác vẫn gửi
+        end
             HW->>MQ: publish data_sensors (QoS 0)
             MQ->>P2: on_message(data_sensors)
             activate P2
@@ -498,7 +498,6 @@ sequenceDiagram
                 P1->>FE: WebSocket sensor.data
             end
             deactivate P2
-        end
     end
 ```
 
@@ -569,7 +568,7 @@ else Có dữ liệu
 end
 
 group Thiết lập kênh realtime (WebSocket)
-  FE -> P1 : WS CONNECT /ws/realtime/
+  FE -> P1 : WS CONNECT /ws/realtime/?token=<token>
   activate P1
   P1 -> RD : group_add("realtime", channel_name)
   P1 --> FE : accept
@@ -631,7 +630,7 @@ sequenceDiagram
     else Có dữ liệu
         FE->>User: 3 thẻ + biểu đồ 20 điểm + công tắc
     end
-    FE->>P1: WS CONNECT /ws/realtime/
+    FE->>P1: WS CONNECT /ws/realtime/?token=<token>
     P1->>RD: group_add("realtime", channel_name)
     P1-->>FE: accept
     loop suốt phiên làm việc
@@ -825,8 +824,8 @@ note over User, DB
 end note
 
 opt Người dùng lọc / tìm kiếm / sắp xếp
-  User -> FE : chọn cảm biến, nhập khoảng giá trị\nvà khoảng thời gian
-  FE -> P1 : GET /api/sensors\n?sensor=room01_temp&value__gte=30\n&recorded_at__gte=...&ordering=-value&page=1
+  User -> FE : chọn "Tìm theo" = Nhiệt độ phòng,\nnhập 31.8 rồi bấm Tìm
+  FE -> P1 : GET /api/sensors\n?sensor=room01_temp&value__gte=31.8\n&value__lte=31.8&page=1
   activate P1
   P1 -> DB : SELECT với WHERE + ORDER BY tương ứng
   activate DB
@@ -887,8 +886,8 @@ sequenceDiagram
     Note over User,DB: Điểm mở rộng «extend» UC-04
 
     opt Người dùng lọc / tìm kiếm / sắp xếp
-        User->>FE: nhập khoảng thời gian, đổi cột sắp xếp
-        FE->>P1: GET /api/sensors?sensor=room01_temp&value__gte=30&recorded_at__gte=...&ordering=-value&page=1
+        User->>FE: chọn "Tìm theo" = Nhiệt độ phòng, nhập 31.8, bấm Tìm
+        FE->>P1: GET /api/sensors?sensor=room01_temp&value__gte=31.8&value__lte=31.8&page=1
         activate P1
         P1->>DB: SELECT với WHERE + ORDER BY tương ứng
         DB-->>P1: count + kết quả trang 1
@@ -1020,6 +1019,7 @@ Toàn hệ thống chỉ dùng **đúng hai** sự kiện, giữ nguyên như `0
 |---|---|---|---|
 | **2.0** | **20/08/2026** | Nhóm thực hiện | **Đồng bộ theo `04-Database.md` v2.0.** ① **SD-03**: khối `alt` xử lý message viết lại — thêm bước tra danh mục cảm biến, tính `recorded_at` **một lần**, `bulk_create` nhiều dòng cùng mốc thời gian; nhánh E3 nay loại **riêng số đo** vượt ngưỡng thay vì cả bản ghi. §4.3 thêm cảnh báo về `auto_now_add`, ngưỡng theo từng cảm biến, và tần suất ghi 43.200 → **129.600 dòng/ngày**. ② **SD-04**: `/api/sensors/latest` đổi thành `DISTINCT ON (sensor_id)` trả mảng 3 phần tử; thêm `/api/sensors/devices` vào §8.1. ③ **SD-01**: M-02 và M-05 mang thêm `user_id` (BR-12); M-07 trả thêm `user`. ④ **SD-06**: truy vấn thêm `JOIN` và `ORDER BY` hai cột; ví dụ bộ lọc đổi sang `sensor` + `value__gte`; §7.3 viết lại 4 điểm cài đặt, gỡ cảnh báo về `NULL`. ⑤ Đổi tên mã `led1` → `room01_lamp`. **Mã PlantUML/Mermaid của 6 sơ đồ chỉ đổi nhãn thông điệp, cấu trúc lifeline và thứ tự trao đổi giữ nguyên — 6 ảnh `SD-0x` chỉ cần xuất lại nếu muốn nhãn khớp tuyệt đối** |
 | **2.0.1** | **20/08/2026** | Nhóm thực hiện | **Vá chỗ sót của bản 2.0.** Bản 2.0 mới thêm `user_id` vào **một** chỗ (M-05 của SD-01, bản PlantUML) nên ba sơ đồ mô tả cùng một thao tác ghi CSDL lại nói ba kiểu khác nhau. Nay đồng bộ toàn bộ: SD-01 (M-02 thêm `user_id` ở cả PlantUML lẫn Mermaid, M-05 bản Mermaid), khối `alt` §2.4, **SD-02 §3.1 và §3.2**, SD-05 §6.1 và §6.2. ⚠️ **Phải xuất lại ảnh SD-01, SD-02, SD-05** — ba ảnh này có nhãn thay đổi; SD-03, SD-04, SD-06 không đổi |
+| **2.1** | **21/10/2026** | Nhóm thực hiện | **Khớp với hệ thống đã chạy thật.** SD-01, SD-02: bỏ `user_id` khỏi body (API v2.1 lấy người thao tác từ token), bản ghi `PENDING` **commit trước rồi mới publish**; §2.4 nhánh E2 đổi từ ROLLBACK sang xoá bản ghi. SD-03: NaN chỉ bỏ riêng trường đó, gói vẫn gửi. SD-04: WebSocket kèm `?token=`. SD-06: ví dụ theo giao diện "Tìm theo" + nút Tìm. Đã xuất lại ảnh SD-01, SD-02, SD-03, SD-04, SD-06 |
 | 1.0 | 14/08/2026 | Nhóm thực hiện | Bản đầu tiên: 6 sequence diagram (SD-01 → SD-06), bảng thông điệp, ma trận truy vết SD ↔ UC/BR |
 | 1.1 | 17/08/2026 | Nhóm thực hiện | Bổ sung ghi chú về bộ lọc theo khoảng giá trị số đo ở SD-06 (§7.3) và §8.1. **Mã PlantUML/Mermaid của cả 6 sơ đồ giữ nguyên — không phải xuất lại ảnh** |
 | 1.2 | 18/08/2026 | Nhóm thực hiện | Thêm nhánh **E6 — `409 DEVICE_BUSY`** vào khối `alt` luồng ngoại lệ ở §2.4 kèm ghi chú về thứ tự kiểm tra; cập nhật ma trận truy vết §9. Sửa ví dụ sự kiện `sensor.data` ở §8.2 cho khớp mốc thời gian chuẩn `2026-08-17T10:30:02.451231Z`. **Mã PlantUML của cả 6 sơ đồ chính giữ nguyên — khối `alt` §2.4 chỉ có bản Mermaid, không xuất ảnh** |
