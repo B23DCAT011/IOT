@@ -398,6 +398,7 @@ Nguyên tắc rút ra: **mỗi khi một tài liệu sau chốt thêm một quy 
 
 | File | Nội dung | Vai trò |
 |---|---|---|
+| **`docs/BaoCao-cuoiky.docx`** *(22/10/2026)* | Báo cáo cuối kỳ 5 chương. Đã chèn **§4.4 Kiểm thử API bằng Postman** (Hình 24–29, ảnh gốc ở `docs/img/postman/`) bằng Word COM, mục lục và danh mục hình đã cập nhật. ⚠️ Hình 28 chụp lệnh bật đèn **FAILED do timeout** (lúc chụp không có mạch/`fake_esp`), caption ghi đúng như vậy | ✅ **BẢN ĐANG DÙNG** — sửa thẳng trong file, không dựng lại từ `.md` |
 | **`docs/BaoCao-moi - Copy.docx`** | Bản người dùng chỉnh tay **+ đã đồng bộ hoàn toàn sang mô hình v2.0** *(mục 2.4, chương 1, chương 3, bảng endpoint)* **+ chương 3 đã sắp xếp lại: sequence và ảnh Figma nằm trong từng use case** | ✅ **BẢN ĐANG DÙNG** |
 | `docs/BaoCao-moi.docx` | Bản người dùng chỉnh tay, mục 2.4 **còn là mô hình 3 bảng cũ** | Bản lùi, giữ nguyên làm dự phòng |
 | `docs/BaoCao.docx` | *(người dùng đã xoá/chuyển đi trong phiên 7)* | — |
