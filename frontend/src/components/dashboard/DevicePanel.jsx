@@ -9,7 +9,8 @@ import s from './Dashboard.module.css'
 
 /**
  * Điều khiển thiết bị — UC-02, 05-API.md §4.5 "Điều gì xảy ra sau khi nhận 202".
- * pending[deviceId] = { target, requestId } trong lúc chờ device.state.
+ * pending[deviceId] = { requestId } trong lúc chờ device.state.
+ * Đang chờ thì công tắc GIỮ NGUYÊN trạng thái cũ — chỉ đổi khi phần cứng xác nhận (device.state).
  */
 export default function DevicePanel({ devices, setDevices, loading, onNotice, onFallback }) {
   const [pending, setPending] = useState({})
@@ -58,7 +59,7 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
     if (event.status === 'FAILED') {
       onNotice({
         chip: 'Timeout',
-        text: 'Thiết bị không phản hồi — công tắc đã trả về trạng thái cũ, thao tác được ghi lại với trạng thái FAILED.',
+        text: 'Thiết bị không phản hồi — công tắc giữ nguyên trạng thái cũ, thao tác được ghi lại với trạng thái FAILED.',
       })
     }
   })
@@ -67,7 +68,7 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
     if (pendingRef.current[device.id]) return // BR-04: đang chờ thì không nhận lệnh mới
 
     const target = device.current_state === 'ON' ? 'OFF' : 'ON'
-    updatePending((current) => ({ ...current, [device.id]: { target, requestId: null } }))
+    updatePending((current) => ({ ...current, [device.id]: { requestId: null } }))
 
     // Bộ đếm dự phòng: WebSocket đứt đúng lúc lệnh đang chạy thì device.state không bao giờ tới.
     timers.current[device.id] = setTimeout(() => {
@@ -101,7 +102,7 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
 
       {devices.map((device) => {
         const wait = pending[device.id]
-        const shown = wait ? wait.target : device.current_state
+        const shown = device.current_state
         return (
           <div key={device.id} className={s.dev}>
             <div
