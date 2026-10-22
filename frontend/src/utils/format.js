@@ -17,9 +17,15 @@ const dateFormat = new Intl.DateTimeFormat('vi-VN', {
 
 export const fmtTime = (iso) => (iso ? timeFormat.format(new Date(iso)) : '—')
 
-// Ngày trước, giờ sau — cùng chiều với ô lọc "Thời điểm" để chép thẳng từ bảng vào ô lọc được.
+// yyyy/mm/dd — vi-VN mặc định in ngày trước, nên tự ghép lại theo từng phần.
+function fmtDate(date) {
+  const part = Object.fromEntries(dateFormat.formatToParts(date).map((p) => [p.type, p.value]))
+  return `${part.year}/${part.month}/${part.day}`
+}
+
+// Năm/tháng/ngày rồi giờ — cùng chiều với ô lọc thời gian để chép thẳng từ bảng vào ô lọc được.
 export const fmtDateTime = (iso) =>
-  iso ? `${dateFormat.format(new Date(iso))} · ${timeFormat.format(new Date(iso))}` : '—'
+  iso ? `${fmtDate(new Date(iso))} · ${timeFormat.format(new Date(iso))}` : '—'
 
 export const fmtCount = (n) => Number(n).toLocaleString('vi-VN')
 
@@ -39,17 +45,24 @@ export function fmtDelta(delta, metricType) {
 
 // ── Ô lọc "Thời điểm" ────────────────────────────────────────────────────────
 // Nhận nhập GẦN ĐÚNG: gõ tới đâu thì lọc trọn đơn vị tới đó.
-//   29/10/2026           → cả ngày hôm đó
-//   29/10/2026 17        → trọn giờ 17
-//   29/10/2026 17:29     → trọn phút đó
-//   29/10/2026 17:29:24  → đúng giây đó (một chu kỳ = 3 dòng)
-// Dấu ngăn cách nào cũng được (/ - . : dấu cách), nên "29/10/2026-17/29/24" cũng hợp lệ.
-// Thứ tự nào cũng nhận — năm-trước (ô lịch trả về 2026-10-29T17:29:24) lẫn giờ-trước
+//   2026/10/29           → cả ngày hôm đó
+//   2026/10/29 17        → trọn giờ 17
+//   2026/10/29 17:29     → trọn phút đó
+//   2026/10/29 17:29:24  → đúng giây đó (một chu kỳ = 3 dòng)
+// Dấu ngăn cách nào cũng được (/ - . : dấu cách), nên "2026-10-29T17:29:24" (ô lịch) cũng hợp lệ.
+// Dạng chuẩn là năm-trước; vẫn nhận ngày-trước (29/10/2026 17:29:24) và giờ-trước
 // (17:29:24 · 29/10/2026, dạng bảng từng hiển thị) — nhận diện qua vị trí nhóm 4 chữ số.
 const DATETIME_CHARS = /^[\d\s/\-.:,·tT]+$/
 const PRECISIONS = ['day', 'hour', 'minute', 'second']
 const pad = (n, width = 2) => String(n).padStart(width, '0')
 const daysInMonth = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate()
+
+// Chuỗi có dáng một mốc thời gian (chỉ gồm số và dấu ngăn cách, ít nhất 2 nhóm số) — dùng để
+// ô tìm "Tất cả" biết nên lọc theo thời gian hay tìm theo mã/tên. "01" hay "room01" thì không.
+export const looksLikeDateTime = (input) => {
+  const text = String(input ?? '').trim()
+  return DATETIME_CHARS.test(text) && (text.match(/\d+/g) ?? []).length >= 2
+}
 
 export function parseApproxVN(input) {
   const text = String(input ?? '').trim()
@@ -65,13 +78,13 @@ export function parseApproxVN(input) {
   let day
   let time
   if (yearAt === 0) {
-    ;[year, month, day] = n // 2026-10-29T17:29:24 — ô lịch
+    ;[year, month, day] = n // 2026/10/29 17:29:24 — dạng chuẩn, ô lịch, chép từ bảng
     time = n.slice(3)
   } else if (yearAt === 2) {
-    ;[day, month, year] = n // 29/10/2026 17:29:24 — gõ tay
+    ;[day, month, year] = n // 29/10/2026 17:29:24 — ngày trước, kiểu cũ
     time = n.slice(3)
   } else if (yearAt === groups.length - 1) {
-    ;[day, month, year] = n.slice(-3) // 17:29:24 · 29/10/2026 — chép từ bảng
+    ;[day, month, year] = n.slice(-3) // 17:29:24 · 29/10/2026 — giờ trước, kiểu cũ
     time = n.slice(0, -3)
   } else return null
 
@@ -87,7 +100,7 @@ export function parseApproxVN(input) {
 
   return {
     precision: PRECISIONS[groups.length - 3],
-    date: `${pad(day)}/${pad(month)}/${pad(year, 4)}`,
+    date: `${pad(year, 4)}/${pad(month)}/${pad(day)}`,
     hms: [hour, minute, second],
     start: at(hour ?? 0, minute ?? 0, second ?? 0),
     end: at(hour ?? 23, minute ?? 59, second ?? 59, '.999999'),
@@ -101,7 +114,7 @@ export function fromPickerValue(value) {
   if (!value) return ''
   const [date, time = ''] = value.split('T')
   const [y, m, d] = date.split('-')
-  return `${d}/${m}/${y}${time ? ` ${time}` : ''}`
+  return `${y}/${m}/${d}${time ? ` ${time}` : ''}`
 }
 
 export function shortUrl(url) {

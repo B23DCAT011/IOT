@@ -10,7 +10,7 @@ import SortHeader from '../components/SortHeader'
 import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '../config'
 import ui from '../styles/ui.module.css'
 import { errorChip } from '../utils/errors'
-import { fmtCount, fmtDateTime, fmtValue, parseApproxVN } from '../utils/format'
+import { fmtCount, fmtDateTime, fmtValue, looksLikeDateTime, parseApproxVN } from '../utils/format'
 
 const FIELD_ALL = ''
 const FIELD_TIME = 'time'
@@ -28,22 +28,27 @@ function firstMessage(details, ...keys) {
  * Trả về { params } hoặc { error } — sai định dạng thì chặn ngay ở giao diện,
  * không gọi API (UC-04 E2).
  */
-function buildQuery({ field, term }) {
-  if (field === FIELD_TIME) {
-    if (!term) return { params: {} }
-    // Gõ tới đâu lọc trọn đơn vị tới đó: cả ngày / trọn giờ / trọn phút / đúng giây.
-    const moment = parseApproxVN(term)
-    if (!moment) {
-      return {
-        error:
-          'Thời gian chưa đúng định dạng. Ví dụ: 17/08/2026 10:55:00 — gõ thiếu giây, phút hay cả giờ đều được.',
-      }
+function timeQuery(term) {
+  // Gõ tới đâu lọc trọn đơn vị tới đó: cả ngày / trọn giờ / trọn phút / đúng giây.
+  const moment = parseApproxVN(term)
+  if (!moment) {
+    return {
+      error:
+        'Thời gian chưa đúng định dạng. Ví dụ: 2026/08/17 10:55:00 — gõ thiếu giây, phút hay cả giờ đều được.',
     }
-    return { params: { recorded_at__gte: moment.start, recorded_at__lte: moment.end } }
   }
+  return { params: { recorded_at__gte: moment.start, recorded_at__lte: moment.end } }
+}
 
-  // "Tất cả": SearchFilter của DRF chỉ khớp cột chuỗi — mã và tên cảm biến.
-  if (field === FIELD_ALL) return { params: term ? { search: term } : {} }
+function buildQuery({ field, term }) {
+  if (field === FIELD_TIME) return term ? timeQuery(term) : { params: {} }
+
+  // "Tất cả": gõ một mốc thời gian thì lọc theo thời gian (mọi cảm biến); còn lại tìm theo
+  // mã/tên cảm biến — SearchFilter của DRF chỉ khớp cột chuỗi.
+  if (field === FIELD_ALL) {
+    if (!term) return { params: {} }
+    return looksLikeDateTime(term) ? timeQuery(term) : { params: { search: term } }
+  }
 
   // Còn lại là mã một cảm biến; ô giá trị để trống thì chỉ lọc theo cảm biến đó.
   if (!term) return { params: { sensor: field } }
@@ -89,8 +94,8 @@ export default function DataSensorPage() {
   const hasFilter = Object.keys(built.params ?? {}).length > 0
 
   // Gợi ý trong ô giá trị đổi theo cột đang chọn — khỏi phải đoán gõ gì.
-  let placeholder = 'Nhập mã hoặc tên cảm biến'
-  if (field === FIELD_TIME) placeholder = 'dd/mm/yyyy hh:mm:ss'
+  let placeholder = 'Mã, tên cảm biến hoặc thời gian yyyy/mm/dd hh:mm:ss'
+  if (field === FIELD_TIME) placeholder = 'yyyy/mm/dd hh:mm:ss'
   else if (field !== FIELD_ALL) placeholder = `Nhập giá trị${selected ? ` (${selected.unit})` : ''}`
 
   useEffect(() => {

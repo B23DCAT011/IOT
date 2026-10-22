@@ -33,12 +33,12 @@ export default function ActionHistoryPage() {
   const [error, setError] = useState(null)
   const [reloadKey, setReloadKey] = useState(0)
 
-  // Gõ dần "29/10/2026 17:29:24" thì các bước giữa chừng cũng hợp lệ, phải chờ người dùng gõ xong.
+  // Gõ dần "2026/10/29 17:29:24" thì các bước giữa chừng cũng hợp lệ, phải chờ người dùng gõ xong.
   const debouncedWhen = useDebouncedValue(when.trim(), 400)
   const moment = useMemo(() => parseApproxVN(debouncedWhen), [debouncedWhen])
   const whenError =
     debouncedWhen && !moment
-      ? 'Thời điểm chưa đúng định dạng. Ví dụ: 29/10/2026 17:29:24 — gõ thiếu giây, phút hay cả giờ đều được.'
+      ? 'Thời điểm chưa đúng định dạng. Ví dụ: 2026/10/29 17:29:24 — gõ thiếu giây, phút hay cả giờ đều được.'
       : null
   const hasFilter = Boolean(device || status || action || user || debouncedWhen)
   const userId = auth?.user?.id
@@ -147,7 +147,7 @@ export default function ActionHistoryPage() {
               value={when}
               onChange={withPageReset(setWhen)}
               invalid={Boolean(whenError)}
-              placeholder="dd/mm/yyyy hh/mm/ss"
+              placeholder="yyyy/mm/dd hh:mm:ss"
             />
           </Field>
           <Field label="Thiết bị">
