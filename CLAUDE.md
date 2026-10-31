@@ -228,6 +228,29 @@ Các chi tiết tôi tự chốt trong `05-API.md` v2.1 (lý do đầy đủ ở
 
 **⚠️ Tài liệu chưa sửa theo:** `01-SRS.md` §4.1 (sơ đồ màn Data Sensor / Action History còn vẽ 2 ô ngày, chưa có ô Dòng/trang) · `02-UseCase.md` UC-04 · `05-API.md` §4.3/§4.6 ví dụ lọc theo khoảng thời gian và §12 điểm 2c (đã xử) · `docs/wireframe/02-data-sensor.html`, `03-action-history.html`, `wireframe.html` (cả thứ tự cột Thời gian) · `BaoCao.md` và bản Word.
 
+### 0.2q PHIÊN 11 (29/10/2026) — LED cảnh báo vượt ngưỡng + chỉnh ngưỡng trên Dashboard
+
+> **Giao diện đã đổi lần 2 (cùng phiên):** 3 thẻ số liệu **trở về y bản cũ, không nháy**. Thay vào đó có **3 box "đèn cảnh báo" (D1/D2/D7) ở cuối panel Thiết bị** (`components/dashboard/AlertLeds.jsx`), box nháy đỏ đúng lúc LED thật nháy, nút ⚙ trên box mở khung chỉnh ngưỡng (mở sang trái, đè lên biểu đồ). **Đã bỏ dải cảnh báo đỏ đầu trang.** Giữ: số đỏ ở sidebar, đường ngưỡng nét đứt trên biểu đồ. Gõ ngưỡng khi công tắc đang tắt thì công tắc tự bật. Mọi chỗ nói "thẻ nháy / nút chuông" ở dưới là bản cũ.
+
+> **Đổi lần 3 (cùng phiên) — đèn cảnh báo là THIẾT BỊ thật, có trong Action History.** `devices_device` thêm loại `ALERT` + 3 dòng `room01_alert_temp/humi/lux` (D1/D2/D7, migration `devices/0004`); `sensors_sensordevice.alert_device` (OneToOne, `sensors/0005`). Worker ra lệnh qua `devices.services.start_auto_command()` → dòng lịch sử PENDING, **`user` NULL** → publish `{"request_id","device":"room01_alert_temp","action":"ON"}` (ON = nháy) → firmware trả `device_respond` SUCCESS → `confirm_command()` như đèn/quạt; không trả lời thì FAILED sau 5–6 s. **Bỏ hẳn dạng lệnh `{"alert":…,"state":"BLINK"}`.** Mạch khởi động lại: firmware gửi REPORT cả 3 đèn, worker thấy lệch với `led_action()` thì ra lệnh ON lại. `POST .../control` vào đèn cảnh báo → **400 VALIDATION_ERROR** (`AutoControlledDevice`). Frontend: panel Thiết bị lọc bỏ `ALERT` khỏi danh sách công tắc; trang Action History không sửa gì (tự có 3 thiết bị mới trong bộ lọc). Kiểm chứng: **78/78 test**, end-to-end thật **8/8**. ⚠️ Firmware mới (`FW_VERSION "2026-10-29 den-canh-bao-thiet-bi"`) **chưa biên dịch, chưa nạp** — mạch đang chạy bản cũ sẽ làm mọi lệnh đèn cảnh báo thành FAILED.
+
+**Người dùng chốt:** chỉnh ngưỡng ngay trên thẻ Dashboard (nút chuông → khung thả xuống), **ai đăng nhập cũng sửa được**, **không lưu lịch sử** (chỉ dòng "Sửa lần cuối: ai, lúc nào"), không làm nút "tắt nháy tạm thời". ⚠️ **Người dùng yêu cầu code trước, tài liệu để khi được bảo** — chưa sửa dòng nào trong `docs/`.
+
+| Quyết định | Chi tiết |
+|---|---|
+| **Ngưỡng cảnh báo ≠ ngưỡng hợp lệ BR-02** | Cột mới `alert_enabled/alert_low/alert_high` ở `sensors_sensordevice` (migration `0003`). Vượt ngưỡng cảnh báo vẫn LƯU số đo; `CHECK` ép ngưỡng cảnh báo nằm trong `[min_value, max_value]` và dưới < trên |
+| **Backend quyết định cảnh báo, frontend không tự so** | Worker tính trong `sensors.services.update_alert_states()` sau mỗi chu kỳ, ghi `alert_state` (HIGH/LOW/null) **chỉ khi đổi**, đọc lại ngưỡng từ CSDL mỗi chu kỳ ⇒ sửa ngưỡng không phải khởi động lại worker. Vùng đệm `ALERT_HYSTERESIS` 0,5 °C / 2 % / 20 lux |
+| API `PUT /api/sensors/devices/{id}/alert` | Thân đủ 3 trường; lỗi 400 `VALIDATION_ERROR` theo trường. **Không đụng `alert_state`** — xoá ở đây thì worker không bao giờ gửi lệnh tắt LED. `GET /api/sensors/devices` nay trả thêm `min_value/max_value` + cấu hình cảnh báo |
+| WebSocket | `sensor.data` thêm `alerts: {temperature, humidity, light}`; sự kiện mới **`sensor.alert`** khi có người sửa ngưỡng (phát từ tiến trình API) |
+| MQTT — vẫn 3 topic | Lệnh LED đi `device_control` dạng `{"alert":"room01_temp","state":"BLINK"\|"OFF"}`, **không** `request_id`, firmware **không** trả lời. Worker gửi khi trạng thái đổi, và **gửi lại khi nhận REPORT** (mạch vừa khởi động, LED đã tắt) |
+| Firmware | LED cảnh báo **D1 (nhiệt) · D2 (ẩm) · D7 (sáng)**, nháy 0,4 s bằng `millis()`; `ALERT_BRIGHTNESS = 64` (PWM ~25 %) vì người dùng **cắm LED không điện trở** — có điện trở 220–330 Ω thì đổi 255. Lệnh Serial `led test` / `led off` để thử dây. ⚠️ **Chưa biên dịch được** (máy không có `arduino-cli`) và **chưa nạp mạch** |
+| ⚠️ Thẻ nháy **bất chấp `prefers-reduced-motion`** | Máy người dùng **tắt Animation effects của Windows** ⇒ Chrome báo `reduce`. Để nhánh dự phòng thì thẻ đứng yên trong khi LED vẫn nháy |
+| `fake_esp --hot` | Nhiệt độ leo tới 36 °C để thử cảnh báo. `fake_esp` nay gửi REPORT **trước** số đo đầu (như mạch thật) — trước đây số đo tới trước làm hỏng ca "gửi lại BLINK" |
+
+**Kiểm chứng:** 74/74 test backend · end-to-end thật (daphne + worker + Mosquitto + Redis + `fake_esp --hot`) **12/12** · giao diện Chrome headless trên backend thật **17/17**, không lỗi JS. Script ở scratchpad (`e2e_alert.py`, `ui_alert.mjs`, `ui_driver.py`), không nằm trong repo.
+
+**Tài liệu phải đồng bộ khi người dùng bảo:** `05-API.md` (endpoint thứ 11, §4.0 bỏ câu "không trả min/max", §5 thêm `alerts` + sự kiện thứ 3, §6.3 dạng lệnh `alert`, §10 ca kiểm thử) · `04-Database.md` (6 cột + 3 `CHECK` mới) · `01-SRS.md` + `02-UseCase.md` — mã mới đang mồ côi: **UC-09** Cấu hình ngưỡng cảnh báo, **FR-20**, **BR-14** (ngưỡng cảnh báo tách khỏi BR-02 + vùng đệm) · `03-Sequence.md` (luồng cảnh báo) · `docs/api/openapi.yaml` xuất lại · `firmware/HuongDanLapRap.md` thêm 3 LED · báo cáo Word.
+
 ### 0.2 Các quyết định thiết kế đã chốt trong phiên 1
 
 | Quyết định | Lý do |
