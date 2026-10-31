@@ -7,6 +7,11 @@
     LM393 (DO)   -> A0   (module chỉ có DO, chưa có AO — xem CLAUDE.md §0.3)
     LED "Đèn"    -> D5   (mã nghiệp vụ: room01_lamp)
     LED "Quạt"   -> D6   (mã nghiệp vụ: room01_fan)
+    LED cảnh báo nhiệt độ  -> D1   (nháy khi room01_temp vượt ngưỡng)
+    LED cảnh báo độ ẩm     -> D2   (nháy khi room01_humi vượt ngưỡng)
+    LED cảnh báo ánh sáng  -> D7   (nháy khi room01_lux  vượt ngưỡng)
+    Mỗi LED: chân dài (+) vào chân GPIO, chân ngắn (−) vào GND. Không dùng D3/D4/D8 — chúng
+    quyết định chế độ khởi động của ESP8266 (D4 lại đang nối DHT11).
 
   Thư viện cần cài qua Library Manager (Sketch > Include Library > Manage Libraries):
     - "DHT sensor library" by Adafruit          (kèm theo "Adafruit Unified Sensor")
@@ -36,10 +41,13 @@ const int   MQTT_PORT = 1884;
 #define LIGHTPIN  A0
 #define PIN_LAMP  D5
 #define PIN_FAN   D6
+#define PIN_ALERT_TEMP  D1
+#define PIN_ALERT_HUMI  D2
+#define PIN_ALERT_LUX   D7
 
 const char* NODE_ID = "esp8266_room01";
 // In ra ngay đầu Serial Monitor để biết chắc mạch đang chạy bản nào — đổi mỗi lần sửa firmware.
-const char* FW_VERSION = "2026-10-22 dao-anh-sang";
+const char* FW_VERSION = "2026-10-29 den-canh-bao-thiet-bi";
 const unsigned long SEND_INTERVAL = 2000;   // 2 giây/lần
 unsigned long lastSend = 0;
 
@@ -54,6 +62,25 @@ DeviceMap DEVICES[] = {
   { "room01_fan",  PIN_FAN  },
 };
 const int DEVICE_COUNT = sizeof(DEVICES) / sizeof(DEVICES[0]);
+
+// LED cảnh báo vượt ngưỡng — cũng là THIẾT BỊ trong bảng devices_device (loại ALERT).
+// Backend tự ra lệnh khi cảm biến vượt/hết vượt ngưỡng, cùng dạng với đèn/quạt:
+//   {"request_id":"…","device":"room01_alert_temp","action":"ON"}   ON = nháy, OFF = tắt
+// Firmware trả device_respond SUCCESS như mọi lệnh khác ⇒ lệnh vào Action History.
+// Tách khỏi DEVICES vì LED này NHÁY (PWM theo millis) chứ không sáng đứng bằng digitalWrite.
+struct AlertLed { const char* code; uint8_t pin; bool blinking; };
+AlertLed ALERT_LEDS[] = {
+  { "room01_alert_temp", PIN_ALERT_TEMP, false },
+  { "room01_alert_humi", PIN_ALERT_HUMI, false },
+  { "room01_alert_lux",  PIN_ALERT_LUX,  false },
+};
+const int ALERT_COUNT = sizeof(ALERT_LEDS) / sizeof(ALERT_LEDS[0]);
+const unsigned long BLINK_HALF_PERIOD = 400;   // sáng 0,4 s rồi tắt 0,4 s
+// Độ sáng LED cảnh báo, 0..255. ⚠️ Đang cắm LED THẲNG vào chân, KHÔNG có điện trở hạn dòng:
+// để thấp (~25 %) cho chân GPIO bớt bị tải. Lắp điện trở 220–330 Ω rồi thì đổi thành 255.
+const int ALERT_BRIGHTNESS = 64;
+bool blinkPhaseOn = false;
+unsigned long lastBlink = 0;
 
 // ⚠️ Hàng đợi phản hồi — KHÔNG gọi client.publish() bên trong onMqttMessage().
 // Thư viện arduino-mqtt dùng CHUNG một bộ đệm 256 byte cho cả nhận lẫn gửi, nên publish
@@ -126,6 +153,14 @@ void onMqttMessage(String &topic, String &payload) {
     if (strcmp(device, DEVICES[i].code) == 0) { index = i; break; }
   }
   if (index == -1) {
+    // Không phải đèn/quạt — thử bảng đèn cảnh báo. ON = bắt đầu nháy, OFF = tắt hẳn.
+    int led = findAlertLed(device);
+    if (led != -1) {
+      bool blink = (strcmp(action, "ON") == 0);
+      setAlertLed(device, blink);
+      queueCommandResult(requestId, ALERT_LEDS[led].code, blink ? "ON" : "OFF", "SUCCESS");
+      return;
+    }
     Serial.printf("Bo qua: khong co thiet bi ma \"%s\" trong bang anh xa\n", device);
     return;   // Firmware phải bỏ qua thiết bị lạ, không tự bật chân đầu tiên (05-API.md §6.3)
   }
@@ -133,6 +168,37 @@ void onMqttMessage(String &topic, String &payload) {
   bool turnOn = (strcmp(action, "ON") == 0);
   digitalWrite(DEVICES[index].pin, turnOn ? HIGH : LOW);
   queueCommandResult(requestId, DEVICES[index].code, turnOn ? "ON" : "OFF", "SUCCESS");
+}
+
+int findAlertLed(const char* code) {
+  for (int i = 0; i < ALERT_COUNT; i++) {
+    if (strcmp(code, ALERT_LEDS[i].code) == 0) return i;
+  }
+  return -1;
+}
+
+void setAlertLed(const char* code, bool blink) {
+  int i = findAlertLed(code);
+  if (i == -1) {
+    Serial.printf("Bo qua: khong co den canh bao \"%s\"\n", code);
+    return;
+  }
+  ALERT_LEDS[i].blinking = blink;
+  if (!blink) analogWrite(ALERT_LEDS[i].pin, 0);
+  Serial.printf("Den canh bao %s: %s\n", code, blink ? "NHAY" : "TAT");
+}
+
+// Gọi mỗi vòng loop(): mọi LED đang cảnh báo nháy CÙNG nhịp. Dùng millis(), không delay(),
+// để vẫn nhận được lệnh MQTT và gửi số đo đúng 2 giây/lần trong lúc nháy.
+void updateAlertLeds() {
+  if (millis() - lastBlink < BLINK_HALF_PERIOD) return;
+  lastBlink = millis();
+  blinkPhaseOn = !blinkPhaseOn;
+  for (int i = 0; i < ALERT_COUNT; i++) {
+    if (ALERT_LEDS[i].blinking) {
+      analogWrite(ALERT_LEDS[i].pin, blinkPhaseOn ? ALERT_BRIGHTNESS : 0);
+    }
+  }
 }
 
 // Xếp một phản hồi vào hàng đợi. Gọi từ callback; việc gửi để loop() làm.
@@ -219,9 +285,13 @@ void handleSerialCommand() {
   else if (line == "fan off"  || line == "quat off") publishControl("room01_fan",  "OFF");
   else if (line == "all on"   || line == "bat het")  publishControl(ALL_DEVICES_CODE, "ON");
   else if (line == "all off"  || line == "tat het")  publishControl(ALL_DEVICES_CODE, "OFF");
+  // Thử dây 3 LED cảnh báo ngay trên mạch, không cần backend: "led test" nháy cả ba,
+  // "led off" tắt hết. Lệnh tiếp theo từ backend sẽ đặt lại đúng trạng thái thật.
+  else if (line == "led test") { for (int i = 0; i < ALERT_COUNT; i++) setAlertLed(ALERT_LEDS[i].code, true); }
+  else if (line == "led off")  { for (int i = 0; i < ALERT_COUNT; i++) setAlertLed(ALERT_LEDS[i].code, false); }
   else {
     Serial.println("Khong hieu lenh: \"" + line + "\"");
-    Serial.println("Cac lenh dung duoc: lamp on | lamp off | fan on | fan off | all on | all off");
+    Serial.println("Cac lenh dung duoc: lamp on | lamp off | fan on | fan off | all on | all off | led test | led off");
   }
 }
 
@@ -263,6 +333,20 @@ void publishStateReport() {
     client.loop();
     delay(10);
   }
+  // Đèn cảnh báo cũng báo — vừa khởi động thì đều OFF; backend thấy cảm biến còn vượt ngưỡng
+  // sẽ gửi lại lệnh ON để đèn nháy tiếp.
+  for (int i = 0; i < ALERT_COUNT; i++) {
+    JsonDocument doc;
+    doc["device"] = ALERT_LEDS[i].code;
+    doc["state"]  = ALERT_LEDS[i].blinking ? "ON" : "OFF";
+    doc["status"] = "REPORT";
+    String out;
+    serializeJson(doc, out);
+    client.publish("device_respond", out, false, 1);
+    Serial.println("Da bao trang thai: " + out);
+    client.loop();
+    delay(10);
+  }
 }
 
 void publishSensorData() {
@@ -294,6 +378,12 @@ void setup() {
   pinMode(PIN_FAN, OUTPUT);
   digitalWrite(PIN_LAMP, LOW);
   digitalWrite(PIN_FAN, LOW);
+  // Ghim thang PWM 0..255: lõi esp8266 bản 2.x mặc định 0..1023, bản 3.x mặc định 0..255.
+  analogWriteRange(255);
+  for (int i = 0; i < ALERT_COUNT; i++) {
+    pinMode(ALERT_LEDS[i].pin, OUTPUT);
+    analogWrite(ALERT_LEDS[i].pin, 0);
+  }
 
   dht.begin();
   // Lần đọc DHT11 đầu tiên sau khi cấp điện ra số rác (đo được 0.9 °C / 0 % ngày 18/09/2026)
@@ -307,7 +397,7 @@ void setup() {
   connectMQTT();
 
   Serial.println("San sang. Go lenh vao o Message cua Serial Monitor:");
-  Serial.println("  lamp on | lamp off | fan on | fan off | all on | all off");
+  Serial.println("  lamp on | lamp off | fan on | fan off | all on | all off | led test | led off");
 }
 
 void loop() {
@@ -320,6 +410,7 @@ void loop() {
 
   flushCommandResults();   // Gửi phản hồi của message vừa nhận — phải ở NGOÀI callback
   handleSerialCommand();
+  updateAlertLeds();
 
   if (millis() - lastSend > SEND_INTERVAL) {
     lastSend = millis();
