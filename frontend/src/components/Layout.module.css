@@ -75,6 +75,20 @@
   color: var(--accent);
   font-weight: 600;
 }
+.navAlert {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--bad);
+  color: #ffffff;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 600;
+  text-align: center;
+}
 .spacer {
   flex: 1;
 }

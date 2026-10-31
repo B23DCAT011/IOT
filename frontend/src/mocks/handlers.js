@@ -153,7 +153,19 @@ export function startMockLoops() {
   loopsStarted = true
   // BR-01: ESP8266 gửi số đo 2 giây/lần
   setInterval(() => {
-    if (!flag('sensorOffline')) broadcast(db.appendLiveCycle())
+    if (flag('sensorOffline')) return
+    const { event, ledCommands } = db.appendLiveCycle()
+    // Đèn cảnh báo: như worker thật — ghi lịch sử PENDING, "mạch" xác nhận sau ~0,3 giây
+    for (const command of ledCommands) {
+      const device = db.devices.find((d) => d.id === command.deviceId)
+      if (!device) continue
+      const record = db.createAction(device, command.action, null)
+      setTimeout(() => {
+        const done = db.completeAction(record.id)
+        if (done) broadcast(done)
+      }, 300)
+    }
+    broadcast(event)
   }, 2000)
   // Vòng quét timeout mỗi giây (SD-05)
   setInterval(() => {
@@ -194,6 +206,26 @@ const httpHandlers = [
 
   // §4.0
   http.get(url('/sensors/devices'), authed(() => HttpResponse.json(db.sensorCatalog()))),
+
+  // Sửa ngưỡng cảnh báo — ai đăng nhập cũng sửa được
+  http.put(
+    url('/sensors/devices/:id/alert'),
+    authed(async ({ request, params, user }) => {
+      const sensor = db.sensorById(Number(params.id))
+      if (!sensor) return errorResponse(404, 'NOT_FOUND', 'Không tìm thấy tài nguyên.')
+      let body = {}
+      try {
+        body = await request.json()
+      } catch {
+        /* thân rỗng */
+      }
+      const errors = db.alertConfigErrors(sensor, body)
+      if (errors) return invalid(errors)
+      const saved = db.saveAlertConfig(sensor, body, user)
+      broadcast({ type: 'sensor.alert', sensor: saved })
+      return HttpResponse.json(saved)
+    }),
+  ),
 
   // §4.1
   http.get(url('/sensors/latest'), authed(() => HttpResponse.json(db.latestReadings()))),
@@ -302,6 +334,10 @@ const httpHandlers = [
         return errorResponse(503, 'BROKER_UNAVAILABLE', 'Không kết nối được tới hệ thống điều khiển (MQTT broker).')
       }
 
+      if (device.device_type === 'ALERT') {
+        return errorResponse(400, 'VALIDATION_ERROR',
+          'Đèn cảnh báo do hệ thống tự bật/tắt theo ngưỡng cảm biến, không điều khiển tay được.')
+      }
       const record = db.createAction(device, action, user)
       if (!flag('deviceOffline')) {
         setTimeout(() => {

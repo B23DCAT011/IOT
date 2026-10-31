@@ -25,17 +25,88 @@ const round1 = (v) => Math.round(v * 10) / 10
 
 /* ======================= Danh mục cảm biến ======================= */
 
+// Cấu hình cảnh báo ban đầu giống backend: chưa bật, chưa đặt ngưỡng.
+const NO_ALERT = {
+  alert_enabled: false,
+  alert_low: null,
+  alert_high: null,
+  alert_state: null,
+  alert_updated_at: null,
+  alert_updated_by: null,
+}
+
 export const SENSORS = [
-  { id: 1, code: 'room01_temp', name: 'Nhiệt độ phòng', metric_type: 'TEMPERATURE', unit: '°C', node_id: 'esp8266_room01', key: 'temperature' },
-  { id: 2, code: 'room01_humi', name: 'Độ ẩm phòng', metric_type: 'HUMIDITY', unit: '%', node_id: 'esp8266_room01', key: 'humidity' },
-  { id: 3, code: 'room01_lux', name: 'Ánh sáng phòng', metric_type: 'LIGHT', unit: 'lux', node_id: 'esp8266_room01', key: 'light' },
+  { id: 1, code: 'room01_temp', name: 'Nhiệt độ phòng', metric_type: 'TEMPERATURE', unit: '°C', node_id: 'esp8266_room01', key: 'temperature', min_value: -10, max_value: 60, hysteresis: 0.5, ...NO_ALERT, alert_device: 3 },
+  { id: 2, code: 'room01_humi', name: 'Độ ẩm phòng', metric_type: 'HUMIDITY', unit: '%', node_id: 'esp8266_room01', key: 'humidity', min_value: 0, max_value: 100, hysteresis: 2, ...NO_ALERT, alert_device: 4 },
+  { id: 3, code: 'room01_lux', name: 'Ánh sáng phòng', metric_type: 'LIGHT', unit: 'lux', node_id: 'esp8266_room01', key: 'light', min_value: 0, max_value: 2000, hysteresis: 20, ...NO_ALERT, alert_device: 5 },
 ]
 const SENSOR_BY_ID = new Map(SENSORS.map((s) => [s.id, s]))
 
 export const sensorById = (id) => SENSOR_BY_ID.get(id)
 export const sensorByCode = (code) => SENSORS.find((s) => s.code === code) ?? null
-export const sensorCatalog = () =>
-  SENSORS.map(({ id, code, name, metric_type, unit, node_id }) => ({ id, code, name, metric_type, unit, node_id }))
+export const serializeSensor = ({ key, hysteresis, ...rest }) => ({ ...rest })
+export const sensorCatalog = () => SENSORS.map(serializeSensor)
+
+/* ======================= Cảnh báo vượt ngưỡng ======================= */
+
+// Cùng quy tắc với apps/sensors/services.next_alert_state() của backend, kể cả vùng đệm.
+function nextAlertState(sensor, value, current) {
+  if (!sensor.alert_enabled) return null
+  if (value == null) return current
+  const { alert_high: high, alert_low: low, hysteresis: band } = sensor
+  if (high != null && value > high) return 'HIGH'
+  if (low != null && value < low) return 'LOW'
+  if (current === 'HIGH' && high != null && value > high - band) return 'HIGH'
+  if (current === 'LOW' && low != null && value < low + band) return 'LOW'
+  return null
+}
+
+// Trả trạng thái cảnh báo mới + danh sách lệnh cho đèn cảnh báo (chỉ cảm biến vừa đổi trạng thái).
+function updateAlerts(values) {
+  const alerts = {}
+  const ledCommands = []
+  for (const sensor of SENSORS) {
+    const state = nextAlertState(sensor, values[sensor.key], sensor.alert_state)
+    if (state !== sensor.alert_state) {
+      ledCommands.push({ deviceId: sensor.alert_device, action: state ? 'ON' : 'OFF' })
+    }
+    sensor.alert_state = state
+    alerts[sensor.key] = state
+  }
+  return { alerts, ledCommands }
+}
+
+// Kiểm tra giống AlertConfigSerializer; trả về details lỗi hoặc null.
+export function alertConfigErrors(sensor, body) {
+  const errors = {}
+  for (const field of ['alert_enabled', 'alert_low', 'alert_high']) {
+    if (!(field in body)) errors[field] = ['Trường này là bắt buộc.']
+  }
+  if (Object.keys(errors).length) return errors
+  for (const field of ['alert_low', 'alert_high']) {
+    const v = body[field]
+    if (v == null) continue
+    if (typeof v !== 'number' || !Number.isFinite(v)) errors[field] = ['Phải là một số hợp lệ.']
+    else if (v < sensor.min_value || v > sensor.max_value)
+      errors[field] = [`Phải nằm trong khoảng hợp lệ ${sensor.min_value} … ${sensor.max_value} ${sensor.unit}.`]
+  }
+  if (Object.keys(errors).length) return errors
+  if (body.alert_low != null && body.alert_high != null && body.alert_low >= body.alert_high)
+    return { alert_high: ['Ngưỡng trên phải lớn hơn ngưỡng dưới.'] }
+  if (body.alert_enabled && body.alert_low == null && body.alert_high == null)
+    return { non_field_errors: ['Bật cảnh báo thì phải đặt ít nhất một ngưỡng.'] }
+  return null
+}
+
+// Không đụng alert_state — chu kỳ kế tiếp mới tính lại, đúng như worker ở backend.
+export function saveAlertConfig(sensor, body, user) {
+  sensor.alert_enabled = Boolean(body.alert_enabled)
+  sensor.alert_low = body.alert_low
+  sensor.alert_high = body.alert_high
+  sensor.alert_updated_at = new Date().toISOString()
+  sensor.alert_updated_by = { id: user.id, full_name: user.full_name }
+  return serializeSensor(sensor)
+}
 
 /* ======================= Số đo ======================= */
 
@@ -132,7 +203,11 @@ export function appendLiveCycle() {
     light: walk(last.light, 4, 60, 600, 0),
   }
   pushCycle(t, values)
-  return { type: 'sensor.data', device_id: 'esp8266_room01', ...values, recorded_at: iso(t) }
+  const { alerts, ledCommands } = updateAlerts(values)
+  return {
+    event: { type: 'sensor.data', device_id: 'esp8266_room01', ...values, alerts, recorded_at: iso(t) },
+    ledCommands,
+  }
 }
 
 /* ======================= Người dùng + token ======================= */
@@ -198,6 +273,10 @@ const userBrief = (id) => {
 export const devices = [
   { id: 1, code: 'room01_lamp', name: 'Đèn phòng', device_type: 'LIGHT', node_id: 'esp8266_room01', gpio_pin: 'D5', current_state: 'OFF', updated_at: '2026-08-17T10:15:33.921Z' },
   { id: 2, code: 'room01_fan', name: 'Quạt trần', device_type: 'FAN', node_id: 'esp8266_room01', gpio_pin: 'D6', current_state: 'ON', updated_at: '2026-08-17T10:28:07.884Z' },
+  // Đèn cảnh báo — hệ thống tự bật theo ngưỡng, không có công tắc trên giao diện
+  { id: 3, code: 'room01_alert_temp', name: 'Đèn cảnh báo nhiệt độ', device_type: 'ALERT', node_id: 'esp8266_room01', gpio_pin: 'D1', current_state: 'OFF', updated_at: '2026-08-17T09:00:00.000Z' },
+  { id: 4, code: 'room01_alert_humi', name: 'Đèn cảnh báo độ ẩm', device_type: 'ALERT', node_id: 'esp8266_room01', gpio_pin: 'D2', current_state: 'OFF', updated_at: '2026-08-17T09:00:00.000Z' },
+  { id: 5, code: 'room01_alert_lux', name: 'Đèn cảnh báo ánh sáng', device_type: 'ALERT', node_id: 'esp8266_room01', gpio_pin: 'D7', current_state: 'OFF', updated_at: '2026-08-17T09:00:00.000Z' },
 ]
 
 const vn = (hms, ms = 500) => Date.parse(`2026-08-17T${hms}.${String(ms).padStart(3, '0')}+07:00`)
@@ -303,7 +382,7 @@ export function createAction(device, action, user) {
     id: nextActionId++,
     device_id: device.id,
     action,
-    user_id: user.id, // lấy từ token, không từ thân yêu cầu (05-API.md §4.5)
+    user_id: user?.id ?? null, // lấy từ token (05-API.md §4.5); null = lệnh tự động của đèn cảnh báo
     status: 'PENDING',
     error_message: null,
     request_id: crypto.randomUUID(),

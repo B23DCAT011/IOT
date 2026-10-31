@@ -17,3 +17,10 @@ export const ROLE_LABEL = {
 
 export const STATUS_OPTIONS = ['PENDING', 'SUCCESS', 'FAILED']
 export const ACTION_OPTIONS = ['ON', 'OFF']
+
+// Trạng thái cảnh báo của một cảm biến — trường alert_state / alerts.<khóa> do backend gửi.
+export const ALERT_LABEL = {
+  HIGH: 'Vượt ngưỡng trên',
+  LOW: 'Dưới ngưỡng dưới',
+}
+

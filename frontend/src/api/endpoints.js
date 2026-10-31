@@ -24,6 +24,9 @@ export const sensorApi = {
   latest: (config) => api.get('/sensors/latest', config).then(data),
   chart: (limit, config) => api.get('/sensors/chart', { ...config, params: { limit } }).then(data),
   list: (params, config) => api.get('/sensors', { ...config, params }).then(data),
+  // Gửi đủ ba trường; ô bỏ trống gửi null = không cảnh báo chiều đó.
+  saveAlert: (id, { alert_enabled, alert_low, alert_high }) =>
+    api.put(`/sensors/devices/${id}/alert`, { alert_enabled, alert_low, alert_high }).then(data),
 }
 
 export const deviceApi = {

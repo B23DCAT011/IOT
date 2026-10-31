@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { fmtTime, fmtValue } from '../../utils/format'
 
 // Thuộc tính trình bày của SVG không nhận var(--...), nên màu chữ trục phải là mã hex.
@@ -15,6 +15,8 @@ const TOOLTIP_STYLE = {
 /**
  * Hai trục tung giống bản vẽ: trái 20→100 cho °C và %, phải 0→500 cho lux.
  * connectNulls = false → chu kỳ thiếu số đo làm đường đứt một đoạn (05-API.md §4.2).
+ * Ngưỡng cảnh báo vẽ thành đường ngang nét đứt cùng màu; ngưỡng nằm ngoài thang trục thì
+ * Recharts tự bỏ (ifOverflow mặc định "discard") chứ không kéo giãn trục.
  */
 export default function SensorChart({ data, series }) {
   const byKey = Object.fromEntries(series.map((item) => [item.key, item]))
@@ -59,6 +61,19 @@ export default function SensorChart({ data, series }) {
             return [value == null ? '—' : `${fmtValue(value, meta?.metricType)} ${meta?.unit ?? ''}`, name]
           }}
         />
+        {series.flatMap((item) =>
+          item.thresholds.map((y) => (
+            <ReferenceLine
+              key={`${item.key}-${y}`}
+              yAxisId={item.axis}
+              y={y}
+              stroke={item.color}
+              strokeOpacity={0.55}
+              strokeDasharray="5 4"
+              strokeWidth={1.5}
+            />
+          )),
+        )}
         {series.map((item) => (
           <Line
             key={item.key}

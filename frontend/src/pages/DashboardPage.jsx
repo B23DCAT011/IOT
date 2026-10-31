@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isAbort } from '../api/client'
 import { deviceApi, sensorApi } from '../api/endpoints'
 import Banner from '../components/Banner'
+import AlertLeds from '../components/dashboard/AlertLeds'
 import DevicePanel from '../components/dashboard/DevicePanel'
 import s from '../components/dashboard/Dashboard.module.css'
 import SensorChart from '../components/dashboard/SensorChart'
@@ -30,6 +31,9 @@ export default function DashboardPage() {
   const [offline, setOffline] = useState(false)
   const [notice, setNotice] = useState(null)
   const [reloadKey, setReloadKey] = useState(0)
+  // Trạng thái cảnh báo theo khóa temperature/humidity/light: 'HIGH' | 'LOW' | null.
+  const [alerts, setAlerts] = useState({})
+  const [editingId, setEditingId] = useState(null)
   const offlineTimer = useRef(null)
 
   // BR-07: quá 30 giây không có sensor.data thì báo ngoại tuyến. Đếm ở giao diện, không ở máy chủ.
@@ -69,6 +73,8 @@ export default function DashboardPage() {
           if (!newest || reading.recorded_at > newest) newest = reading.recorded_at
         })
         setCatalog(sensors)
+        // Cảnh báo lúc vừa mở trang lấy từ danh mục; từ chu kỳ sau thì theo sự kiện sensor.data.
+        setAlerts(Object.fromEntries(sensors.map((sensor) => [metricKey(sensor.metric_type), sensor.alert_state])))
         setCurrent(values)
         setChart(chartData)
         setDevices(deviceList)
@@ -85,9 +91,20 @@ export default function DashboardPage() {
     return () => controller.abort()
   }, [reconnectKey, reloadKey])
 
+  // Ai đó (tab này hoặc tab khác) vừa sửa ngưỡng → thay đúng phần tử đó trong danh mục.
+  const replaceSensor = useCallback((updated) => {
+    setCatalog((prev) => prev.map((sensor) => (sensor.id === updated.id ? updated : sensor)))
+  }, [])
+  const closeEditor = useCallback(() => setEditingId(null), [])
+
   useRealtimeEvent((event) => {
+    if (event.type === 'sensor.alert') {
+      replaceSensor(event.sensor)
+      return
+    }
     if (event.type !== 'sensor.data') return
     armOfflineTimer()
+    if (event.alerts) setAlerts((prev) => ({ ...prev, ...event.alerts }))
 
     // Cảm biến không đọc được ở chu kỳ này thì trường là null: thẻ giữ giá trị cũ, biểu đồ đứt nét.
     setCurrent((prev) => {
@@ -121,6 +138,8 @@ export default function DashboardPage() {
           metricType: sensor.metric_type,
           color: METRIC_COLOR[key] ?? '#5B6D7C',
           axis: sensor.metric_type === 'LIGHT' ? 'right' : 'left',
+          // Đường ngưỡng nét đứt trên biểu đồ — chỉ khi đã bật cảnh báo.
+          thresholds: sensor.alert_enabled ? [sensor.alert_low, sensor.alert_high].filter((v) => v != null) : [],
         }
       }),
     [catalog],
@@ -245,7 +264,18 @@ export default function DashboardPage() {
             loading={loading}
             onNotice={setNotice}
             onFallback={reloadDevices}
-          />
+          >
+            <AlertLeds
+              catalog={catalog}
+              devices={devices}
+              alerts={alerts}
+              offline={offline}
+              editingId={editingId}
+              onEdit={setEditingId}
+              onClose={closeEditor}
+              onSaved={replaceSensor}
+            />
+          </DevicePanel>
         </div>
       </div>
     </Layout>

@@ -76,6 +76,158 @@
   text-overflow: ellipsis;
 }
 
+/* ---------- 3 đèn cảnh báo (cuối panel Thiết bị) ---------- */
+.devSection {
+  padding: 12px 16px 4px;
+  border-top: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.led {
+  position: relative; /* mốc cho khung chỉnh ngưỡng */
+}
+.ledDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--off-bg);
+  border: 1px solid var(--line);
+}
+/* Box đang cảnh báo: cả dòng và bóng đèn nháy đỏ theo nhịp 0,8 s — gần nhịp LED trên mạch.
+   CỐ Ý không tắt theo prefers-reduced-motion: Windows tắt "Animation effects" là Chrome báo
+   reduce (máy demo đang như vậy), box sẽ đứng yên trong khi LED thật vẫn nháy. */
+.ledOn {
+  animation: ledRow 0.8s steps(1, end) infinite;
+}
+.ledOn .devIc {
+  border-color: var(--bad);
+}
+.ledOn .ledDot {
+  animation: ledDot 0.8s steps(1, end) infinite;
+}
+.ledOn .devCode,
+.ledOn .swState {
+  color: var(--bad);
+  font-weight: 600;
+}
+@keyframes ledRow {
+  0% {
+    background: var(--bad-bg);
+  }
+  50% {
+    background: var(--surface);
+  }
+}
+@keyframes ledDot {
+  0% {
+    background: var(--bad);
+    border-color: var(--bad);
+    box-shadow: 0 0 6px 2px rgba(179, 38, 30, 0.55);
+  }
+  50% {
+    background: var(--off-bg);
+    border-color: var(--line);
+    box-shadow: none;
+  }
+}
+.gear {
+  width: 28px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+.gear svg {
+  width: 16px;
+  height: 16px;
+}
+.gear:hover,
+.gearActive {
+  border-color: var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.gear:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Khung chỉnh ngưỡng — mở sang TRÁI dòng đèn, đè lên biểu đồ; mở xuống dưới thì dòng
+   cuối (ánh sáng) bị tràn khỏi đáy màn hình. */
+.alertBox {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 12px);
+  z-index: 20;
+  width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: 0 6px 20px rgba(15, 30, 43, 0.14);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.alertHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.alertTitle {
+  font-weight: 600;
+  font-size: 14px;
+}
+.alertRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.alertRowLabel {
+  width: 36px;
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.alertInput {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+}
+.alertUnit {
+  width: 28px;
+  flex: none;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.alertHint {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ink-faint);
+}
+.alertErr {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--bad);
+}
+.alertActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 /* ---------- biểu đồ + thiết bị ---------- */
 .chartRow {
   display: flex;

@@ -12,7 +12,7 @@ import s from './Dashboard.module.css'
  * pending[deviceId] = { requestId } trong lúc chờ device.state.
  * Đang chờ thì công tắc GIỮ NGUYÊN trạng thái cũ — chỉ đổi khi phần cứng xác nhận (device.state).
  */
-export default function DevicePanel({ devices, setDevices, loading, onNotice, onFallback }) {
+export default function DevicePanel({ devices, setDevices, loading, onNotice, onFallback, children }) {
   const [pending, setPending] = useState({})
   const pendingRef = useRef({})
   const timers = useRef({})
@@ -89,6 +89,10 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
     }
   }
 
+  // Đèn cảnh báo (ALERT) cũng là thiết bị nhưng hệ thống tự bật/tắt — không có công tắc ở đây,
+  // hiển thị riêng ở khối "Đèn cảnh báo" (AlertLeds) truyền vào qua `children`.
+  const switchable = devices.filter((device) => device.device_type !== 'ALERT')
+
   return (
     <section className={ui.card}>
       <div className={ui.cardHead}>
@@ -96,11 +100,11 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
         <div className={ui.cardSub}>{devices.length} thiết bị</div>
       </div>
 
-      {devices.length === 0 && (
+      {switchable.length === 0 && (
         <div className={s.devEmpty}>{loading ? 'Đang tải…' : 'Chưa có thiết bị nào.'}</div>
       )}
 
-      {devices.map((device) => {
+      {switchable.map((device) => {
         const wait = pending[device.id]
         const shown = device.current_state
         return (
@@ -135,6 +139,8 @@ export default function DevicePanel({ devices, setDevices, loading, onNotice, on
           </div>
         )
       })}
+
+      {children}
     </section>
   )
 }

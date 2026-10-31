@@ -1,6 +1,9 @@
+import { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { OFFLINE_AFTER_MS } from '../config'
 import { ROLE_LABEL } from '../constants'
+import { useRealtimeEvent } from '../realtime/RealtimeContext'
 import { LogoutIcon, NavIcon } from './Icons'
 import styles from './Layout.module.css'
 
@@ -11,9 +14,26 @@ const NAV = [
   { to: '/profile', label: 'Profile', icon: 'profile' },
 ]
 
+// Số cảm biến đang vượt ngưỡng theo sự kiện sensor.data gần nhất — để trang nào cũng thấy
+// chấm đỏ cạnh mục Dashboard. Quá 30 giây không có sự kiện (BR-07) thì thôi báo: số đo đã cũ.
+function useAlertCount() {
+  const [count, setCount] = useState(0)
+  const staleTimer = useRef(null)
+
+  useRealtimeEvent((event) => {
+    if (event.type !== 'sensor.data' || !event.alerts) return
+    setCount(Object.values(event.alerts).filter(Boolean).length)
+    clearTimeout(staleTimer.current)
+    staleTimer.current = setTimeout(() => setCount(0), OFFLINE_AFTER_MS)
+  })
+  useEffect(() => () => clearTimeout(staleTimer.current), [])
+  return count
+}
+
 export default function Layout({ title, right, children }) {
   const { auth, logout } = useAuth()
   const user = auth?.user
+  const alertCount = useAlertCount()
 
   return (
     <div className={styles.app}>
@@ -33,6 +53,11 @@ export default function Layout({ title, right, children }) {
             >
               <NavIcon name={item.icon} />
               {item.label}
+              {item.to === '/' && alertCount > 0 && (
+                <span className={styles.navAlert} title={`${alertCount} cảm biến đang vượt ngưỡng`}>
+                  {alertCount}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
