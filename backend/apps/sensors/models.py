@@ -1,4 +1,5 @@
 """Bảng sensors_sensordevice và sensors_sensordata — 04-Database.md §4.2, §4.3, §8.2."""
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -11,6 +12,10 @@ class SensorDevice(models.Model):
         HUMIDITY = "HUMIDITY", "Độ ẩm"
         LIGHT = "LIGHT", "Ánh sáng"
 
+    class AlertState(models.TextChoices):
+        HIGH = "HIGH", "Vượt ngưỡng trên"
+        LOW = "LOW", "Dưới ngưỡng dưới"
+
     code = models.CharField(max_length=30, unique=True, verbose_name="Mã cảm biến")
     name = models.CharField(max_length=100, verbose_name="Tên hiển thị")
     metric_type = models.CharField(
@@ -22,6 +27,31 @@ class SensorDevice(models.Model):
     # BR-02 — ngưỡng là dữ liệu cấu hình; sửa ở đây rồi khởi động lại mqtt_worker
     min_value = models.FloatField(verbose_name="Ngưỡng dưới hợp lệ")
     max_value = models.FloatField(verbose_name="Ngưỡng trên hợp lệ")
+
+    # Ngưỡng CẢNH BÁO — khác hẳn ngưỡng hợp lệ ở trên: số đo vượt ngưỡng cảnh báo vẫn đúng
+    # và vẫn được lưu, chỉ làm thẻ trên Dashboard và LED trên mạch nháy. Người dùng sửa ở
+    # Dashboard (PUT /api/sensors/devices/{id}/alert); worker đọc lại mỗi chu kỳ.
+    alert_enabled = models.BooleanField(default=False, verbose_name="Bật cảnh báo")
+    alert_low = models.FloatField(null=True, blank=True, verbose_name="Cảnh báo khi dưới")
+    alert_high = models.FloatField(null=True, blank=True, verbose_name="Cảnh báo khi trên")
+    # Trạng thái cảnh báo hiện tại — CHỈ mqtt_worker ghi, và chỉ khi trạng thái đổi.
+    # Lưu ở CSDL để vùng đệm (services.ALERT_HYSTERESIS) không mất khi khởi động lại worker
+    # và để Dashboard vừa mở đã nháy đúng thẻ, khỏi chờ chu kỳ tới.
+    alert_state = models.CharField(
+        max_length=4, choices=AlertState.choices, null=True, blank=True,
+        verbose_name="Đang cảnh báo",
+    )
+    # LED cảnh báo của cảm biến này trên mạch (thiết bị loại ALERT). Một cảm biến — một đèn.
+    alert_device = models.OneToOneField(
+        "devices.Device", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="alert_for", verbose_name="Đèn cảnh báo",
+    )
+    alert_updated_at = models.DateTimeField(null=True, blank=True, verbose_name="Sửa ngưỡng lúc")
+    alert_updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=True, blank=True,
+        related_name="+", verbose_name="Người sửa ngưỡng",
+    )
+
     is_active = models.BooleanField(default=True, verbose_name="Đang sử dụng")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -43,6 +73,25 @@ class SensorDevice(models.Model):
             models.CheckConstraint(
                 condition=models.Q(min_value__lt=models.F("max_value")),
                 name="sensordevice_range_valid",
+            ),
+            # Ngưỡng cảnh báo phải nằm TRONG ngưỡng hợp lệ — số đo ngoài khoảng hợp lệ đã bị
+            # worker loại trước khi tới bước so ngưỡng cảnh báo. NULL = không cảnh báo chiều đó.
+            models.CheckConstraint(
+                condition=(models.Q(alert_low__isnull=True)
+                           | models.Q(alert_low__gte=models.F("min_value"),
+                                      alert_low__lte=models.F("max_value"))),
+                name="sensordevice_alert_low_in_range",
+            ),
+            models.CheckConstraint(
+                condition=(models.Q(alert_high__isnull=True)
+                           | models.Q(alert_high__gte=models.F("min_value"),
+                                      alert_high__lte=models.F("max_value"))),
+                name="sensordevice_alert_high_in_range",
+            ),
+            models.CheckConstraint(
+                condition=(models.Q(alert_low__isnull=True) | models.Q(alert_high__isnull=True)
+                           | models.Q(alert_low__lt=models.F("alert_high"))),
+                name="sensordevice_alert_order",
             ),
         ]
 

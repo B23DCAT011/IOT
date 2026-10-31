@@ -6,7 +6,8 @@ from .models import SensorData, SensorDevice
 @admin.register(SensorDevice)
 class SensorDeviceAdmin(admin.ModelAdmin):
     list_display = ["id", "code", "name", "metric_type", "unit", "node_id",
-                    "min_value", "max_value", "is_active"]
+                    "min_value", "max_value", "alert_enabled", "alert_low", "alert_high",
+                    "alert_state", "is_active"]
     list_filter = ["metric_type", "node_id", "is_active"]
 
 

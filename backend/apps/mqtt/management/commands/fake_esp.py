@@ -9,11 +9,13 @@ Làm đúng ba việc của firmware esp8266_room01.ino:
 Tuỳ chọn để diễn lại các tình huống lỗi:
   --no-respond          không trả lời lệnh → sau 5–6 giây lệnh FAILED (BR-03, SD-05)
   --missing-humidity N  cứ N chu kỳ thì bỏ trường humidity một lần (UC-07 A2, biểu đồ đứt nét)
+  --hot                 nhiệt độ leo dần lên 36 °C rồi giữ đó — để thử cảnh báo vượt ngưỡng
 
 ⚠️ Đừng chạy cùng lúc với mạch thật: hai "thiết bị" cùng trả lời một lệnh.
 """
 import json
 import random
+import threading
 import time
 
 from django.core.management.base import BaseCommand
@@ -32,17 +34,26 @@ class Command(BaseCommand):
         parser.add_argument("--no-respond", action="store_true", help="Không trả lời device_control")
         parser.add_argument("--missing-humidity", type=int, default=0, metavar="N",
                             help="Cứ N chu kỳ bỏ trường humidity một lần (0 = không bỏ)")
+        parser.add_argument("--hot", action="store_true",
+                            help="Nhiệt độ leo dần lên 36 °C — thử cảnh báo vượt ngưỡng")
 
     def handle(self, *args, **options):
         self.respond = not options["no_respond"]
+        self.hot = options["hot"]
         self.state = {"temperature": 28.0, "humidity": 72.0, "light": 350.0}
-        self.outputs = {"room01_lamp": "OFF", "room01_fan": "OFF"}   # như setup(): mọi chân LOW
+        # như setup(): mọi chân LOW — gồm cả 3 đèn cảnh báo
+        self.outputs = {code: "OFF" for code in ("room01_lamp", "room01_fan", "room01_alert_temp",
+                                                 "room01_alert_humi", "room01_alert_lux")}
 
         client = create_client(f"fake_{NODE_ID}")   # khác ID của mạch thật, không đá nhau
         client.on_connect = self.on_connect
         client.on_message = self.on_message
+        self.ready = threading.Event()
         client.connect(*broker_address(), keepalive=30)
         client.loop_start()
+        # Như firmware: vào broker → báo trạng thái (REPORT) → rồi mới gửi số đo. Không chờ thì
+        # số đo đầu tiên có thể tới trước REPORT — backend xử lý theo thứ tự khác mạch thật.
+        self.ready.wait(5)
 
         cycle = 0
         try:
@@ -62,7 +73,10 @@ class Command(BaseCommand):
     def next_reading(self, drop_humidity):
         """Đi ngẫu nhiên quanh giá trị hiện tại — nhìn trên biểu đồ giống số liệu thật."""
         s = self.state
-        s["temperature"] = min(max(s["temperature"] + random.uniform(-0.2, 0.2), 25), 32)
+        if self.hot:
+            s["temperature"] = min(s["temperature"] + random.uniform(0.1, 0.4), 36)
+        else:
+            s["temperature"] = min(max(s["temperature"] + random.uniform(-0.2, 0.2), 25), 32)
         s["humidity"] = min(max(s["humidity"] + random.uniform(-0.8, 0.8), 60), 90)
         s["light"] = min(max(s["light"] + random.uniform(-15, 15), 80), 700)
         payload = {
@@ -85,6 +99,7 @@ class Command(BaseCommand):
             report = {"device": code, "state": state, "status": "REPORT"}
             client.publish(topics.DEVICE_RESPOND, json.dumps(report), qos=topics.QOS[topics.DEVICE_RESPOND])
             self.stdout.write(f"→ báo trạng thái {report}")
+        self.ready.set()
 
     def on_message(self, client, userdata, message):
         command = json.loads(message.payload)

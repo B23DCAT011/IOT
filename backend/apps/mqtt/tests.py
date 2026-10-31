@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from apps.devices import services as device_services
 from apps.devices.models import ActionHistory, Device
-from apps.sensors.models import SensorData
+from apps.sensors.models import SensorData, SensorDevice
 from apps.sensors.services import SensorCatalog
 from apps.users.models import User
 
@@ -91,3 +91,74 @@ class HandlerTests(TestCase):
         event = broadcast.call_args.args[0]
         self.assertEqual((event["status"], event["current_state"]), ("FAILED", "OFF"))
         self.assertIn("Timeout", event["error_message"])
+
+
+@mock.patch("apps.mqtt.handlers.events.broadcast")
+class AlertLedTests(TestCase):
+    """Đèn cảnh báo là thiết bị: mỗi lần bật/tắt nháy là một dòng Action History, đi đủ vòng đời lệnh."""
+
+    def setUp(self):
+        self.catalog = SensorCatalog.load()
+        SensorDevice.objects.filter(code="room01_temp").update(alert_enabled=True, alert_high=32)
+        self.led = Device.objects.get(code="room01_alert_temp")
+        self.sent = []
+
+    def send(self, temperature):
+        payload = json.dumps({"device_id": "esp8266_room01", "temperature": temperature,
+                              "humidity": 70, "light": 300}).encode()
+        handlers.handle_data_sensors(payload, self.catalog, self.sent.append)
+
+    def reply(self, record, state):
+        handlers.handle_device_respond(json.dumps({
+            "request_id": str(record.request_id), "device": record.device.code,
+            "state": state, "status": "SUCCESS"}).encode(), self.sent.append)
+
+    def test_seeded_and_linked(self, broadcast):
+        links = dict(SensorDevice.objects.values_list("code", "alert_device__code"))
+        self.assertEqual(links, {"room01_temp": "room01_alert_temp", "room01_humi": "room01_alert_humi",
+                                 "room01_lux": "room01_alert_lux"})
+        self.assertEqual(list(Device.objects.filter(device_type="ALERT").values_list("gpio_pin", flat=True)),
+                         ["D1", "D2", "D7"])
+
+    def test_transition_writes_history_and_publishes(self, broadcast):
+        self.send(33)
+        self.send(33.4)                     # vẫn nóng → không có lệnh mới
+        self.send(28)
+        self.assertEqual([(r.device.code, r.action) for r in self.sent],
+                         [("room01_alert_temp", "ON"), ("room01_alert_temp", "OFF")])
+        rows = list(ActionHistory.objects.order_by("id").values_list("device__code", "action", "status", "user"))
+        self.assertEqual(rows, [("room01_alert_temp", "ON", "PENDING", None),
+                                ("room01_alert_temp", "OFF", "PENDING", None)])
+        self.assertEqual(broadcast.call_args_list[0].args[0]["alerts"],
+                         {"temperature": "HIGH", "humidity": None, "light": None})
+
+    def test_board_confirms_then_success(self, broadcast):
+        self.send(33)
+        self.reply(self.sent[0], "ON")
+        record = ActionHistory.objects.get()
+        self.led.refresh_from_db()
+        self.assertEqual((record.status, self.led.current_state), ("SUCCESS", "ON"))
+        self.assertEqual(broadcast.call_args.args[0]["device"], "room01_alert_temp")
+
+    def test_no_reply_times_out(self, broadcast):               # firmware cũ chưa biết đèn này
+        self.send(33)
+        ActionHistory.objects.update(
+            created_at=device_services.timezone.now() - device_services.timedelta(seconds=6))
+        handlers.handle_timeouts()
+        self.assertEqual(ActionHistory.objects.get().status, "FAILED")
+
+    def test_board_reboot_report_turns_blinking_back_on(self, broadcast):
+        self.send(33)
+        self.reply(self.sent[0], "ON")
+        self.sent.clear()
+        # mạch khởi động lại: mọi chân LOW, báo đèn cảnh báo đang OFF
+        handlers.handle_device_respond(json.dumps(
+            {"device": "room01_alert_temp", "state": "OFF", "status": "REPORT"}).encode(), self.sent.append)
+        self.assertEqual([(r.device.code, r.action) for r in self.sent], [("room01_alert_temp", "ON")])
+
+    def test_report_matching_state_sends_nothing(self, broadcast):
+        handlers.handle_device_respond(json.dumps(
+            {"device": "room01_alert_humi", "state": "OFF", "status": "REPORT"}).encode(), self.sent.append)
+        handlers.handle_device_respond(json.dumps(
+            {"device": "room01_lamp", "state": "OFF", "status": "REPORT"}).encode(), self.sent.append)
+        self.assertEqual(self.sent, [])

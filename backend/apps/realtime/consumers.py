@@ -39,3 +39,6 @@ class RealtimeConsumer(AsyncJsonWebsocketConsumer):
 
     async def device_state(self, event):
         await self.send_json(event)
+
+    async def sensor_alert(self, event):
+        await self.send_json(event)

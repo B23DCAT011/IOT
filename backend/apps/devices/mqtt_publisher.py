@@ -16,13 +16,18 @@ class MqttPublishError(Exception):
     """Không kết nối được, sai tài khoản, hoặc broker không xác nhận PUBACK."""
 
 
-def publish_control(request_id, device_code, action):
-    """Gửi `{"request_id", "device", "action"}` với QoS 1 và CHỜ broker xác nhận."""
-    payload = json.dumps({
+def control_payload(request_id, device_code, action):
+    """Thân message `device_control` — dùng chung cho lệnh người bấm (API) và lệnh tự động (worker)."""
+    return json.dumps({
         "request_id": str(request_id),   # UUID → chuỗi 36 ký tự
         "device": device_code,           # mã `code`, KHÔNG phải id số (04-Database.md §7.2)
         "action": action,
     })
+
+
+def publish_control(request_id, device_code, action):
+    """Gửi `{"request_id", "device", "action"}` với QoS 1 và CHỜ broker xác nhận."""
+    payload = control_payload(request_id, device_code, action)
     timeout = settings.MQTT_CONNECT_TIMEOUT
     connack = threading.Event()
     result = {}

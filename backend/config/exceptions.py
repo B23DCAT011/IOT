@@ -43,6 +43,13 @@ class BrokerUnavailable(APIException):
     default_detail = "Không kết nối được tới hệ thống điều khiển (MQTT broker)."
 
 
+class AutoControlledDevice(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    error_code = "VALIDATION_ERROR"                 # không thêm mã mới — vẫn là "dữ liệu không hợp lệ"
+    default_detail = ("Đèn cảnh báo do hệ thống tự bật/tắt theo ngưỡng cảm biến, "
+                      "không điều khiển tay được.")
+
+
 class PageNotFound(NotFound):
     error_code = "PAGE_NOT_FOUND"                   # UC-03 A2
     default_detail = "Trang không tồn tại."

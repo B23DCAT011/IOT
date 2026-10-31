@@ -26,19 +26,41 @@ def parse_json_object(topic, payload):
     return data
 
 
-def handle_data_sensors(payload, catalog):
-    """Topic `data_sensors` — SD-03, UC-07. Một message → tối đa 3 bản ghi → một sự kiện."""
+def command_alert_led(sensor, publish_command):
+    """Ra lệnh cho đèn cảnh báo của `sensor` theo trạng thái cảnh báo hiện tại.
+
+    Ghi một dòng Action History (PENDING, người thao tác NULL) rồi `publish_command(record)`
+    đẩy lệnh lên device_control — y như lệnh người bấm, chỉ khác người ra lệnh là hệ thống.
+    """
+    device = sensor.alert_device
+    if device is None or publish_command is None:
+        return None
+    record = device_services.start_auto_command(device, sensor_services.led_action(sensor))
+    publish_command(record)
+    return record
+
+
+def handle_data_sensors(payload, catalog, publish_command=None):
+    """Topic `data_sensors` — SD-03, UC-07. Một message → tối đa 3 bản ghi → một sự kiện.
+
+    Sau khi ghi: so với ngưỡng cảnh báo; cảm biến nào đổi trạng thái thì ra lệnh bật nháy /
+    tắt đèn cảnh báo của nó. Trạng thái cảnh báo đi kèm sự kiện sensor.data.
+    """
     data = parse_json_object("data_sensors", payload)
     if data is None:
         return
     cycle = sensor_services.record_cycle(data, catalog)
-    if cycle.readings:
-        events.broadcast(events.sensor_data_event(cycle))
-    else:
+    if not cycle.readings:
         logger.warning("Message data_sensors không có số đo hợp lệ nào: %s", data)
+        return
+
+    alerts, changes = sensor_services.update_alert_states(cycle)
+    for change in changes:
+        command_alert_led(change.sensor, publish_command)
+    events.broadcast(events.sensor_data_event(cycle, alerts))
 
 
-def handle_device_respond(payload):
+def handle_device_respond(payload, publish_command=None):
     """Topic `device_respond` — hai loại gói:
 
     - `status: "REPORT"`, không có request_id: thiết bị tự báo trạng thái thật khi
@@ -54,6 +76,11 @@ def handle_device_respond(payload):
         device = device_services.sync_reported_state(data.get("device"), data.get("state"))
         if device is not None:
             events.broadcast(events.device_sync_event(device))
+        # Đèn cảnh báo vừa báo trạng thái (mạch khởi động lại → mọi chân LOW) mà cảm biến
+        # của nó vẫn đang vượt ngưỡng → ra lệnh bật nháy lại. Khớp rồi thì thôi.
+        sensor = sensor_services.sensor_for_alert_led(data.get("device"))
+        if sensor is not None and data.get("state") != sensor_services.led_action(sensor):
+            command_alert_led(sensor, publish_command)
         return
 
     record = device_services.confirm_command(

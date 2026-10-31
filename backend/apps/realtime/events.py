@@ -1,4 +1,4 @@
-"""Hai sự kiện WebSocket của hệ thống và hàm phát chúng — 05-API.md §5.2, §5.3.
+"""Ba sự kiện WebSocket của hệ thống và hàm phát chúng — 05-API.md §5.2, §5.3 (+ sensor.alert).
 
 Đây là chỗ DUY NHẤT định nghĩa hình dạng sự kiện. MQTT worker gọi `broadcast(...)`,
 Redis chuyển sang tiến trình daphne, consumer đẩy nguyên dict ra trình duyệt.
@@ -6,15 +6,18 @@ Redis chuyển sang tiến trình daphne, consumer đẩy nguyên dict ra trình
 ⚠️ Khóa `type` vừa là tên sự kiện Frontend nhận, vừa là khóa định tuyến của Channels:
 `"sensor.data"` → phương thức `sensor_data()` của consumer. Đổi tên phải đổi cả hai chỗ.
 """
+import json
 from datetime import timezone as dt_timezone
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.core.serializers.json import DjangoJSONEncoder
 
 GROUP = "realtime"   # một nhóm cho toàn hệ thống — một phòng, mọi client quan tâm mọi sự kiện
 
 SENSOR_DATA = "sensor.data"
 DEVICE_STATE = "device.state"
+SENSOR_ALERT = "sensor.alert"   # phát từ tiến trình API khi có người sửa ngưỡng cảnh báo
 
 
 def broadcast(event):
@@ -27,14 +30,29 @@ def iso_utc(moment):
     return moment.astimezone(dt_timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def sensor_data_event(cycle):
-    """Một chu kỳ = MỘT sự kiện, dù CSDL nhận 3 bản ghi. Cảm biến thiếu số đo → null."""
+def sensor_data_event(cycle, alerts=None):
+    """Một chu kỳ = MỘT sự kiện, dù CSDL nhận 3 bản ghi. Cảm biến thiếu số đo → null.
+
+    `alerts`: trạng thái cảnh báo của từng cảm biến SAU chu kỳ này — `"HIGH"`, `"LOW"` hoặc
+    null, cùng khóa với số đo. Frontend nháy thẻ theo đúng trường này, không tự so ngưỡng,
+    để thẻ trên màn hình và LED trên mạch luôn khớp nhau.
+    """
     return {
         "type": SENSOR_DATA,
         "device_id": cycle.node_id,                  # mã node (chuỗi), không phải id thiết bị
         **cycle.values_by_metric(),                  # temperature, humidity, light
+        "alerts": alerts if alerts is not None else {},
         "recorded_at": iso_utc(cycle.recorded_at),   # chung cho cả chu kỳ (BR-11)
     }
+
+
+def sensor_alert_event(sensor_data):
+    """Ngưỡng cảnh báo của một cảm biến vừa được sửa — `sensor_data` là một phần tử của
+    GET /api/sensors/devices. Các tab đang mở cập nhật ô ngưỡng và đường ngưỡng trên biểu đồ."""
+    # Đi qua JSON một lượt: serializer trả ReturnDict/OrderedDict lồng nhau, còn Redis
+    # channel layer đóng gói bằng msgpack — chỉ nên đưa vào dict/list/chuỗi/số thuần.
+    plain = json.loads(json.dumps(sensor_data, cls=DjangoJSONEncoder))
+    return {"type": SENSOR_ALERT, "sensor": plain}
 
 
 def device_state_event(record):

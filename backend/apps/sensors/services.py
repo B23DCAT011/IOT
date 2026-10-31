@@ -5,6 +5,9 @@
 | `record_cycle()`    | mqtt_worker, topic data_sensors | 04-Database.md §6.4, §7.1; UC-07 |
 | `latest_readings()` | GET /api/sensors/latest        | 05-API.md §4.1                  |
 | `chart_cycles()`    | GET /api/sensors/chart         | 05-API.md §4.2                  |
+| `update_alert_states()` | mqtt_worker, sau `record_cycle()` | cảnh báo vượt ngưỡng      |
+| `led_action()` / `sensor_for_alert_led()` | mqtt_worker | lệnh cho đèn cảnh báo        |
+| `save_alert_config()`   | PUT /api/sensors/devices/{id}/alert | cảnh báo vượt ngưỡng    |
 """
 import logging
 import math
@@ -122,6 +125,110 @@ def record_cycle(payload, catalog):
     if readings:
         SensorData.objects.bulk_create(readings)
     return SensorCycle(node_id=node_id, recorded_at=recorded_at, readings=readings)
+
+
+# ---------------------------------------------------------------------------
+# Cảnh báo vượt ngưỡng (MQTT worker ghi trạng thái, API ghi cấu hình)
+# ---------------------------------------------------------------------------
+
+# Vùng đệm: đã cảnh báo thì phải về hẳn bên trong ngưỡng một khoảng này mới thôi. Không có
+# nó, nhiệt độ dao động 32,0 ↔ 32,1 quanh ngưỡng 32 sẽ làm LED và thẻ bật/tắt mỗi 2 giây.
+ALERT_HYSTERESIS = {
+    SensorDevice.MetricType.TEMPERATURE: 0.5,   # °C
+    SensorDevice.MetricType.HUMIDITY: 2.0,      # %
+    SensorDevice.MetricType.LIGHT: 20.0,        # lux
+}
+
+HIGH = SensorDevice.AlertState.HIGH
+LOW = SensorDevice.AlertState.LOW
+
+
+def next_alert_state(sensor, value, current):
+    """Trạng thái cảnh báo sau khi nhận số đo `value`. `current` là trạng thái trước đó.
+
+    Vượt hẳn ngưỡng (> trên, < dưới) thì cảnh báo ngay; đang cảnh báo thì chỉ thôi khi đã
+    về bên trong ngưỡng quá vùng đệm. `value` là None (chu kỳ này không đo được) → giữ nguyên.
+    """
+    if not sensor.alert_enabled:
+        return None
+    if value is None:
+        return current
+    high, low = sensor.alert_high, sensor.alert_low
+    band = ALERT_HYSTERESIS.get(sensor.metric_type, 0)
+
+    if high is not None and value > high:
+        return HIGH
+    if low is not None and value < low:
+        return LOW
+    if current == HIGH and high is not None and value > high - band:
+        return HIGH
+    if current == LOW and low is not None and value < low + band:
+        return LOW
+    return None
+
+
+@dataclass
+class AlertChange:
+    """Một cảm biến vừa đổi trạng thái cảnh báo — worker gửi lệnh cho LED tương ứng."""
+
+    sensor: SensorDevice
+    state: str | None
+
+
+def update_alert_states(cycle):
+    """So số đo của chu kỳ với ngưỡng cảnh báo, ghi lại cảm biến nào ĐỔI trạng thái.
+
+    Đọc lại ngưỡng từ CSDL mỗi chu kỳ (3 dòng, một truy vấn) thay vì dùng danh mục nạp sẵn
+    của worker: người dùng sửa ngưỡng trên Dashboard thì chậm nhất một chu kỳ sau đã có hiệu
+    lực, không phải khởi động lại worker.
+
+    Trả `(alerts, changes)`: `alerts` là trạng thái của MỌI cảm biến trong node theo khóa
+    `temperature`/`humidity`/`light` (đi kèm sự kiện sensor.data), `changes` là danh sách
+    `AlertChange` cần báo xuống mạch.
+    """
+    values = {reading.sensor_id: reading.value for reading in cycle.readings}
+    alerts = empty_metrics()
+    changes = []
+    sensors = (SensorDevice.objects.filter(is_active=True, node_id=cycle.node_id)
+               .select_related("alert_device"))
+    for sensor in sensors:
+        state = next_alert_state(sensor, values.get(sensor.id), sensor.alert_state)
+        if state != sensor.alert_state:
+            sensor.alert_state = state
+            sensor.save(update_fields=["alert_state"])
+            changes.append(AlertChange(sensor=sensor, state=state))
+            logger.info("Cảnh báo %s: %s (giá trị %s)", sensor.code, state or "hết",
+                        values.get(sensor.id))
+        alerts[metric_key(sensor.metric_type)] = state
+    return alerts, changes
+
+
+def led_action(sensor):
+    """Đèn cảnh báo của cảm biến phải ở trạng thái nào: "ON" (nháy) khi đang vượt ngưỡng, còn lại "OFF"."""
+    return "ON" if sensor.alert_enabled and sensor.alert_state else "OFF"
+
+
+def sensor_for_alert_led(device_code):
+    """Cảm biến mà đèn cảnh báo mang mã `device_code` phụ trách, hoặc None nếu không phải đèn cảnh báo."""
+    return (SensorDevice.objects.select_related("alert_device")
+            .filter(is_active=True, alert_device__code=device_code).first())
+
+
+def save_alert_config(sensor, *, alert_enabled, alert_low, alert_high, user):
+    """Lưu ngưỡng cảnh báo do người dùng nhập. KHÔNG đụng `alert_state`.
+
+    Trạng thái cảnh báo và lệnh cho LED chỉ do worker sinh ra, ở chu kỳ kế tiếp (≤ 2 giây).
+    Nếu ở đây tự xoá `alert_state` khi tắt cảnh báo, worker sẽ thấy "trước đã là None" và
+    không bao giờ gửi lệnh tắt — LED trên mạch nháy mãi.
+    """
+    sensor.alert_enabled = alert_enabled
+    sensor.alert_low = alert_low
+    sensor.alert_high = alert_high
+    sensor.alert_updated_at = timezone.now()
+    sensor.alert_updated_by = user
+    sensor.save(update_fields=["alert_enabled", "alert_low", "alert_high",
+                               "alert_updated_at", "alert_updated_by", "updated_at"])
+    return sensor
 
 
 def _as_number(raw):

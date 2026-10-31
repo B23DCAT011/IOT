@@ -7,7 +7,9 @@ Django không giữ được vòng lặp MQTT trong tiến trình web, nên vi�
     mỗi 1 giây             → handlers.handle_timeouts       → sự kiện device.state (FAILED)
 
 Hai luồng: luồng mạng của paho gọi on_message; luồng chính chạy vòng quét timeout.
-Sửa ngưỡng hoặc thêm cảm biến trong CSDL → phải khởi động lại lệnh này (danh mục nạp một lần).
+Sửa ngưỡng HỢP LỆ (BR-02) hoặc thêm cảm biến trong CSDL → phải khởi động lại lệnh này (danh mục
+nạp một lần). Ngưỡng CẢNH BÁO thì không cần: worker đọc lại mỗi chu kỳ, vượt ngưỡng thì ghi
+Action History + publish lệnh bật nháy đèn cảnh báo lên device_control.
 """
 import logging
 import time
@@ -16,6 +18,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import DatabaseError, connection
 
+from apps.devices.mqtt_publisher import control_payload
 from apps.mqtt import handlers, topics
 from apps.mqtt.client import broker_address, create_client
 from apps.sensors.services import SensorCatalog
@@ -32,11 +35,14 @@ class Command(BaseCommand):
         catalog = SensorCatalog.load()
         logger.info("Đã nạp %d cảm biến trong danh mục", len(catalog))
         self.routes = {
-            topics.DATA_SENSORS: lambda payload: handlers.handle_data_sensors(payload, catalog),
-            topics.DEVICE_RESPOND: handlers.handle_device_respond,
+            topics.DATA_SENSORS:
+                lambda payload: handlers.handle_data_sensors(payload, catalog, self.publish_command),
+            topics.DEVICE_RESPOND:
+                lambda payload: handlers.handle_device_respond(payload, self.publish_command),
         }
 
         client = create_client(CLIENT_ID)
+        self.client = client
         client.on_connect = self.on_connect
         client.on_disconnect = self.on_disconnect
         client.on_message = self.on_message
@@ -74,6 +80,18 @@ class Command(BaseCommand):
         handler = self.routes.get(message.topic)
         if handler is not None:
             self.run_safely(message.topic, handler, message.payload)
+
+    def publish_command(self, record):
+        """Gửi lệnh tự động (đèn cảnh báo) — bằng chính client của worker, cùng payload với API.
+
+        Gọi từ on_message (luồng mạng của paho): publish() chỉ xếp hàng rồi trả về ngay.
+        TUYỆT ĐỐI không wait_for_publish() ở đây — chính luồng này mới là luồng gửi gói đi,
+        đứng chờ thì treo cả worker. Gói không đi được thì bản ghi tự thành FAILED sau 5 giây.
+        """
+        payload = control_payload(record.request_id, record.device.code, record.action)
+        self.client.publish(topics.DEVICE_CONTROL, payload,
+                            qos=topics.QOS[topics.DEVICE_CONTROL], retain=topics.RETAIN)
+        logger.info("→ device_control %s", payload)
 
     # ----- tiện ích -----
 

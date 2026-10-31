@@ -6,12 +6,18 @@ from django.db import models
 
 
 class Device(models.Model):
-    """Thiết bị chấp hành bật/tắt được từ giao diện (đèn, quạt)."""
+    """Thiết bị chấp hành trên mạch: đèn, quạt (người bấm) và đèn cảnh báo (hệ thống tự bật).
+
+    Đèn cảnh báo (`ALERT`) đi đúng vòng đời lệnh như đèn/quạt — PENDING → SUCCESS/FAILED,
+    có mặt trong Action History — nhưng do mqtt_worker ra lệnh khi cảm biến vượt ngưỡng,
+    người dùng KHÔNG bấm được (POST .../control trả 400). Với loại này ON = đang nháy.
+    """
 
     class DeviceType(models.TextChoices):
         LIGHT = "LIGHT", "Đèn"
         FAN = "FAN", "Quạt"
         OTHER = "OTHER", "Khác"
+        ALERT = "ALERT", "Đèn cảnh báo"
 
     class State(models.TextChoices):
         ON = "ON", "Bật"
@@ -46,7 +52,7 @@ class Device(models.Model):
                 condition=models.Q(current_state__in=["ON", "OFF"]), name="device_state_valid"
             ),
             models.CheckConstraint(
-                condition=models.Q(device_type__in=["LIGHT", "FAN", "OTHER"]),
+                condition=models.Q(device_type__in=["LIGHT", "FAN", "OTHER", "ALERT"]),
                 name="device_type_valid",
             ),
         ]

@@ -23,8 +23,17 @@ class ControlTests(LoggedInAPITestCase):
 
     def test_A08_device_list_is_plain_array(self, publish):
         data = self.client.get("/api/devices").data
-        self.assertEqual([d["code"] for d in data], ["room01_lamp", "room01_fan"])
+        self.assertEqual([d["code"] for d in data], ["room01_lamp", "room01_fan", "room01_alert_temp",
+                                                     "room01_alert_humi", "room01_alert_lux"])
         self.assertEqual(data[0]["current_state"], "OFF")
+        self.assertEqual(data[2]["device_type"], "ALERT")
+
+    def test_alert_led_cannot_be_controlled_by_hand(self, publish):
+        led = Device.objects.get(code="room01_alert_temp")
+        error = self.assertError(self.control(device_id=led.id), 400, "VALIDATION_ERROR")
+        self.assertIn("tự bật/tắt", error["message"])
+        self.assertFalse(ActionHistory.objects.exists())
+        publish.assert_not_called()
 
     def test_A09_unknown_or_inactive_device_is_404(self, publish):
         self.assertError(self.control(device_id=999), 404, "NOT_FOUND")
@@ -121,7 +130,7 @@ class ActionHistoryListTests(LoggedInAPITestCase):
 
     def setUp(self):
         super().setUp()
-        lamp, fan = Device.objects.order_by("id")
+        lamp, fan = Device.objects.order_by("id")[:2]
         now = services.timezone.now()
         # Một bản ghi không qua API (user NULL — như lệnh gõ bằng mosquitto_pub) và hai bản ghi có người
         ActionHistory.objects.create(device=fan, action="OFF", status="SUCCESS", responded_at=now)

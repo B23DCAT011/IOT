@@ -1,6 +1,7 @@
 """Vòng đời một lệnh điều khiển — 04-Database.md §5.3, §6; 03-Sequence.md SD-01, SD-02, SD-05.
 
     send_command()             PENDING   ← POST /api/devices/{id}/control   (tiến trình API)
+    start_auto_command()       PENDING   ← đèn cảnh báo, cảm biến vượt ngưỡng (mqtt_worker)
     confirm_command()          SUCCESS   ← topic device_respond             (mqtt_worker)
     expire_pending_commands()  FAILED    ← vòng quét mỗi 1 giây             (mqtt_worker)
 
@@ -18,7 +19,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
-from config.exceptions import BrokerUnavailable, DeviceBusy
+from config.exceptions import AutoControlledDevice, BrokerUnavailable, DeviceBusy
 
 from .models import ActionHistory, Device
 from .mqtt_publisher import MqttPublishError, publish_control
@@ -48,6 +49,8 @@ def send_command(device, action, user):
     hơn lúc commit thì worker không thấy bản ghi, bỏ qua phản hồi, 5 giây sau đánh FAILED
     trong khi đèn đã bật thật. Đo được khi chạy thử: ESP giả lập trả lời sau ~20 ms.
     """
+    if device.device_type == Device.DeviceType.ALERT:
+        raise AutoControlledDevice()
     with transaction.atomic():
         # Khoá dòng thiết bị: hai request đồng thời (2 tab, ca T-15) phải xếp hàng,
         # nếu không cả hai cùng thấy "không bận" và cùng ghi PENDING.
@@ -65,6 +68,21 @@ def send_command(device, action, user):
 
     logger.info("Đã gửi lệnh %s %s (request_id=%s, người thao tác=%s)",
                 device.code, action, record.request_id, user)
+    return record
+
+
+def start_auto_command(device, action):
+    """Lệnh do HỆ THỐNG ra (đèn cảnh báo khi cảm biến vượt/hết vượt ngưỡng): ghi PENDING, `user` NULL.
+
+    Người gọi (mqtt_worker) publish ngay sau khi hàm này trả về — bản ghi đã COMMIT nên
+    phản hồi của mạch đến sớm cỡ nào cũng tìm thấy (cùng lý do với send_command).
+    Từ đây đi chung đường với lệnh người bấm: confirm_command() → SUCCESS, hết 5 giây → FAILED.
+
+    Không kiểm tra "đang bận" (409): lệnh mới phản ánh trạng thái cảm biến MỚI NHẤT, chặn lại
+    thì đèn kẹt ở trạng thái cũ. Vùng đệm ngưỡng làm hai lệnh sát nhau gần như không xảy ra.
+    """
+    record = ActionHistory.objects.create(device=device, action=action, user=None)
+    logger.info("Lệnh tự động %s %s (request_id=%s)", device.code, action, record.request_id)
     return record
 
 

@@ -12,3 +12,4 @@ QOS = {
 
 # Không dùng retain ở cả 3 topic: ESP khởi động lại sẽ nhận lại lệnh cũ và tự bật đèn (§6.1)
 RETAIN = False
+
