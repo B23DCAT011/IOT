@@ -23,8 +23,3 @@ class LoginRequestSerializer(serializers.Serializer):
     username = serializers.CharField()
     # Mặc định CharField cắt khoảng trắng hai đầu → mật khẩu có dấu cách không bao giờ khớp.
     password = serializers.CharField(trim_whitespace=False)
-
-
-class LoginResponseSerializer(serializers.Serializer):
-    token = serializers.CharField()
-    user = LoginUserSerializer()

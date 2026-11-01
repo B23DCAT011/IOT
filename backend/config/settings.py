@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",      # bảng authtoken_token — 05-API.md §2.2
     "django_filters",
     "corsheaders",
-    "drf_spectacular",
     "channels",
     # Ứng dụng của dự án — thứ tự migrate: users → sensors → devices (04-Database.md §8)
     "apps.core",
@@ -146,50 +145,6 @@ REST_FRAMEWORK = {
         "apps.core.filters.TiebreakOrderingFilter",          # 05-API.md §7.3 điểm 3
     ],
     "EXCEPTION_HANDLER": "config.exceptions.api_exception_handler",
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "IoT Room Monitoring API",
-    "DESCRIPTION": (
-        "Hệ thống giám sát và điều khiển môi trường phòng dựa trên IoT.\n\n"
-        "Bấm **Authorize** và nhập `Token <token>` — có chữ `Token` và một dấu cách "
-        "(lấy token bằng `POST /api/auth/login`)."
-    ),
-    "VERSION": "2.1.0",
-    "SERVE_INCLUDE_SCHEMA": False,
-    # Swagger mở được khi chưa đăng nhập (05-API.md §3.3) — đừng đổi
-    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
-    "SERVE_AUTHENTICATION": [],
-    # Device.State và ActionHistory.Action cùng là ON/OFF — đặt một tên chung cho Swagger
-    "ENUM_NAME_OVERRIDES": {"OnOffEnum": "apps.devices.models.Device.State"},
-    # Dạng chuỗi = chèn nguyên văn vào JS của trang Swagger (drf-spectacular), nên khai được hàm.
-    # Mục đích: demo chỉ việc bấm — ô nhập mở sẵn, nhớ token qua lần tải lại, hiện thời gian phản hồi,
-    # và đăng nhập thành công thì tự Authorize (đăng xuất thì tự bỏ), khỏi chép token bằng tay.
-    # `responseInterceptor` bên trong hàm là hàm gốc của drf-spectacular (swagger_ui.js) — vẫn gọi tiếp nó.
-    "SWAGGER_UI_SETTINGS": """{
-        deepLinking: true,
-        persistAuthorization: true,
-        tryItOutEnabled: true,
-        displayRequestDuration: true,
-        responseInterceptor: (res) => {
-            try {
-                const path = new URL(res.url).pathname;
-                if (path.endsWith("/api/auth/login") && res.status === 200 && res.body && res.body.token) {
-                    // ...WithPersistOption: Authorize VÀ lưu vào localStorage (preauthorizeApiKey không lưu)
-                    const schema = ui.specSelectors.securityDefinitions().get("tokenAuth");
-                    ui.authActions.authorizeWithPersistOption({
-                        tokenAuth: { name: "tokenAuth", schema: schema, value: "Token " + res.body.token },
-                    });
-                } else if (path.endsWith("/api/auth/logout") && res.status === 204) {
-                    ui.authActions.logoutWithPersistOption(["tokenAuth"]);
-                }
-            } catch (e) {
-                console.warn("tự Authorize thất bại:", e);
-            }
-            return responseInterceptor(res);
-        },
-    }""",
 }
 
 # Frontend (Vite :5173) khác origin với backend (:8000) — 05-API.md §2.9.

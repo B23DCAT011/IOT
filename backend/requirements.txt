@@ -4,7 +4,6 @@ Django==5.2.17
 djangorestframework==3.18.1
 django-filter==26.1
 django-cors-headers==4.9.0
-drf-spectacular==0.30.0
 channels[daphne]==4.3.2
 channels-redis==4.3.0
 # redis-py 8 mặc định socket_timeout = 5 giây — phải kèm "socket_timeout" trong CHANNEL_LAYERS (settings.py)

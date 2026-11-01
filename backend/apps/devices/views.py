@@ -6,13 +6,10 @@
     GET  /api/actions                bảng lịch sử thao tác              (UC-05, UC-04)
     GET  /api/actions/{id}           một bản ghi lịch sử
 """
-from drf_spectacular.utils import OpenApiExample, extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-
-from apps.core.schema import error_responses
 
 from . import services
 from .filters import ActionHistoryFilter
@@ -25,11 +22,6 @@ from .serializers import (
 )
 
 
-@extend_schema_view(
-    list=extend_schema(responses={200: DeviceSerializer(many=True), **error_responses(401)}),
-    retrieve=extend_schema(responses={200: DeviceSerializer, **error_responses(401, 404)}),
-)
-@extend_schema(tags=["Devices"])
 class DeviceViewSet(ReadOnlyModelViewSet):
     # Thiết bị đã tháo (is_active=false) coi như không tồn tại: không có trong danh sách,
     # điều khiển thì 404 — nhất quán giữa danh sách và thao tác (05-API.md §4.5).
@@ -38,11 +30,6 @@ class DeviceViewSet(ReadOnlyModelViewSet):
     pagination_class = None       # bắt buộc: PAGE_SIZE toàn cục sẽ bọc mảng trong {count, results}
     filter_backends = []
 
-    @extend_schema(
-        request=ControlRequestSerializer,
-        responses={202: ControlAcceptedSerializer, **error_responses(400, 401, 404, 409, 503)},
-        examples=[OpenApiExample("Bật đèn", value={"action": "ON"}, request_only=True)],
-    )
     @action(detail=True, methods=["post"], url_path="control")
     def control(self, request, pk=None):
         device = self.get_object()                                   # 404 — UC-02 E3
@@ -56,12 +43,6 @@ class DeviceViewSet(ReadOnlyModelViewSet):
         return Response(ControlAcceptedSerializer(record).data, status=status.HTTP_202_ACCEPTED)
 
 
-@extend_schema_view(
-    list=extend_schema(responses={200: ActionHistorySerializer(many=True),
-                                  **error_responses(400, 401, 404)}),
-    retrieve=extend_schema(responses={200: ActionHistorySerializer, **error_responses(401, 404)}),
-)
-@extend_schema(tags=["Actions"])
 class ActionHistoryViewSet(ReadOnlyModelViewSet):
     # select_related BẮT BUỘC — thiếu thì 10 dòng thành 21 truy vấn (04-Database.md §11.3)
     queryset = ActionHistory.objects.select_related("device", "user")

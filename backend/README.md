@@ -42,7 +42,6 @@ Redis trên máy này là container `redis-dev` có sẵn (tự bật cùng Dock
 
 | Địa chỉ | Nội dung |
 |---|---|
-| <http://localhost:8000/api/schema/swagger-ui/> | Swagger — bấm **Authorize**, nhập `Token <token>` (có chữ `Token`) |
 | <http://localhost:8000/admin/> | Trang quản trị — sửa ngưỡng cảm biến, xem lịch sử |
 | `ws://localhost:8000/ws/realtime/?token=<token>` | WebSocket |
 
@@ -68,7 +67,7 @@ backend/
 │   ├── exceptions.py      lỗi thống nhất {error:{code,message,details}} — 9 mã
 │   └── pagination.py      page / page_size (1→100), 404 PAGE_NOT_FOUND
 └── apps/
-    ├── core/              dùng chung: TiebreakOrderingFilter, RangeCheckForm, Profile, schema lỗi
+    ├── core/              dùng chung: TiebreakOrderingFilter, RangeCheckForm, Profile
     ├── users/             bảng users_user, đăng nhập / đăng xuất
     ├── sensors/           danh mục cảm biến + số đo; 4 endpoint /api/sensors*
     ├── devices/           thiết bị + lịch sử thao tác; điều khiển; publish MQTT
